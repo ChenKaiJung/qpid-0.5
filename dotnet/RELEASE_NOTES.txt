@@ -1,0 +1,21 @@
+Apache Qpid .NET Release Notes
+-------------------------------------------
+
+The Qpid release contains seperate clients that support the AMQP
+0-10 and AMQP 0-8 protocols.
+
+For full details of Qpid capabilities, as they currently stand, see our
+detailed project documentation at:
+
+http://cwiki.apache.org/confluence/display/qpid/Qpid+.Net+Documentation
+
+From the link above you can access our Getting Started Guide, FAQ, Build How To
+and developer documentation.
+
+
+Known Issues/Outstanding Work
+-----------------------------
+
+You can view the outstanding task list for Qpid by visiting our JIRA:
+http://issues.apache.org/jira/browse/QPID
+

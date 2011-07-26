@@ -1,0 +1,53 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+==== declare_queues.out
+==== direct_producer_java.out
+Producer: Creating a non-transacted, auto-acknowledged session
+Producer: Creating a Message Producer
+Producer: Creating a TestMessage to send to the destination
+Producer: Sending message: 1
+Producer: Sending message: 2
+Producer: Sending message: 3
+Producer: Sending message: 4
+Producer: Sending message: 5
+Producer: Sending message: 6
+Producer: Sending message: 7
+Producer: Sending message: 8
+Producer: Sending message: 9
+Producer: Sending message: 10
+Producer: Closing connection
+Producer: Closing JNDI context
+==== direct_consumer_java.out
+Consumer: Setting an ExceptionListener on the connection as sample uses a MessageConsumer
+Consumer: Creating a non-transacted, auto-acknowledged session
+Consumer: Creating a MessageConsumer
+Consumer: Starting connection so MessageConsumer can receive messages
+Consumer: Received  message:  Message 1
+Consumer: Received  message:  Message 2
+Consumer: Received  message:  Message 3
+Consumer: Received  message:  Message 4
+Consumer: Received  message:  Message 5
+Consumer: Received  message:  Message 6
+Consumer: Received  message:  Message 7
+Consumer: Received  message:  Message 8
+Consumer: Received  message:  Message 9
+Consumer: Received  message:  Message 10
+Consumer: Received final message That's all, folks!
+Consumer: Closing connection
+Consumer: Closing JNDI context
