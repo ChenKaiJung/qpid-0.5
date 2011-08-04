@@ -351,15 +351,15 @@ EOS
   end
 
   def declare_packed_accessors(f)
-    genl "QPID_COMMON_EXTERN void set#{f.name.caps}(#{f.cpptype.param} _#{f.cppname});";
-    genl "QPID_COMMON_EXTERN #{f.cpptype.ret} get#{f.name.caps}() const;"
+    genl "void set#{f.name.caps}(#{f.cpptype.param} _#{f.cppname});";
+    genl "#{f.cpptype.ret} get#{f.name.caps}() const;"
     if (f.cpptype.name == "FieldTable")
-      genl "QPID_COMMON_EXTERN #{f.cpptype.name}& get#{f.name.caps}();"
+      genl "#{f.cpptype.name}& get#{f.name.caps}();"
     end
     if (f.type_ != "bit")
       #extra 'accessors' for packed fields:
-      genl "QPID_COMMON_EXTERN bool has#{f.name.caps}() const;"
-      genl "QPID_COMMON_EXTERN void clear#{f.name.caps}Flag();"
+      genl "bool has#{f.name.caps}() const;"
+      genl "void clear#{f.name.caps}Flag();"
     end
   end
 
@@ -399,7 +399,6 @@ EOS
 
 #include <ostream>
 #include "qpid/framing/amqp_types_full.h"
-#include "qpid/CommonImportExport.h"
 
 namespace qpid {
 namespace framing {
@@ -439,17 +438,17 @@ EOS
     methodbody_extra_defs(s)
   end
   if (s.kind_of? AmqpStruct)
-    indent {genl "QPID_COMMON_EXTERN friend std::ostream& operator<<(std::ostream&, const #{classname}&);" }
+    indent {genl "friend std::ostream& operator<<(std::ostream&, const #{classname}&);" }
   end
 
   gen <<EOS
-    QPID_COMMON_EXTERN void encode(Buffer&) const;
-    QPID_COMMON_EXTERN void decode(Buffer&, uint32_t=0);
-    QPID_COMMON_EXTERN void encodeStructBody(Buffer&) const;
-    QPID_COMMON_EXTERN void decodeStructBody(Buffer&, uint32_t=0);
-    QPID_COMMON_EXTERN uint32_t encodedSize() const;
-    QPID_COMMON_EXTERN uint32_t bodySize() const;
-    QPID_COMMON_EXTERN void print(std::ostream& out) const;
+    void encode(Buffer&) const;
+    void decode(Buffer&, uint32_t=0);
+    void encodeStructBody(Buffer&) const;
+    void decodeStructBody(Buffer&, uint32_t=0);
+    uint32_t encodedSize() const;
+    uint32_t bodySize() const;
+    void print(std::ostream& out) const;
 }; /* class #{classname} */
 
 }}

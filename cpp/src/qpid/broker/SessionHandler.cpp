@@ -38,7 +38,9 @@ SessionHandler::SessionHandler(Connection& c, ChannelId ch)
       clusterOrderProxy(c.getClusterOrderOutput() ? new SetChannelProxy(ch, c.getClusterOrderOutput()) : 0)
 {}
 
-SessionHandler::~SessionHandler() {}
+SessionHandler::~SessionHandler() {
+  if(session.get()) session.release();
+}
 
 namespace {
 ClassId classId(AMQMethodBody* m) { return m ? m->amqpMethodId() : 0; }

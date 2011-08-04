@@ -33,6 +33,31 @@
 # under the License.
 #
 
+# Generated makefile fragment.
+# Including makefile defines $(rgen_dir) $(rgen_cmd) and $(specs).
+
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+# 
+#   http:#www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+
+# This source file was created by a code generator.
+# Please do not edit.
+
 #
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
@@ -140,11 +165,18 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-DIST_COMMON = $(nobase_include_HEADERS) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/acl.mk $(srcdir)/cluster.mk \
-	$(srcdir)/config.h.in $(srcdir)/managementgen.mk \
-	$(srcdir)/qmf.mk $(srcdir)/qmfc.mk $(srcdir)/replication.mk \
-	$(srcdir)/rubygen.mk $(srcdir)/ssl.mk $(srcdir)/xml.mk
+DIST_COMMON = $(dist_org_apache_qpid_acl_HEADERS) \
+	$(dist_org_apache_qpid_broker_HEADERS) \
+	$(dist_org_apache_qpid_cluster_HEADERS) \
+	$(dist_qpid_amqp_0_10_HEADERS) $(dist_qpid_broker_HEADERS) \
+	$(dist_qpid_client_HEADERS) \
+	$(dist_qpid_client_no_keyword_HEADERS) \
+	$(dist_qpid_framing_HEADERS) $(nobase_include_HEADERS) \
+	$(srcdir)/Makefile.am $(srcdir)/Makefile.in $(srcdir)/acl.mk \
+	$(srcdir)/cluster.mk $(srcdir)/config.h.in \
+	$(srcdir)/managementgen.mk $(srcdir)/qmf.mk $(srcdir)/qmfc.mk \
+	$(srcdir)/replication.mk $(srcdir)/rubygen.mk $(srcdir)/ssl.mk \
+	$(srcdir)/xml.mk
 sbin_PROGRAMS = qpidd$(EXEEXT)
 @HAVE_LIBCPG_TRUE@am__append_1 = cluster.la
 @SUNOS_TRUE@am__append_2 = libqmfagent.la libqmfconsole.la libqpidcommon.la -lboost_program_options $(SUNCC_RUNTIME_LIBS)
@@ -207,7 +239,13 @@ am__vpath_adj = case $$p in \
 am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
 am__installdirs = "$(DESTDIR)$(cmoduledir)" "$(DESTDIR)$(dmoduledir)" \
 	"$(DESTDIR)$(libdir)" "$(DESTDIR)$(sbindir)" \
-	"$(DESTDIR)$(includedir)"
+	"$(DESTDIR)$(org_apache_qpid_acldir)" \
+	"$(DESTDIR)$(org_apache_qpid_brokerdir)" \
+	"$(DESTDIR)$(org_apache_qpid_clusterdir)" \
+	"$(DESTDIR)$(qpid_amqp_0_10dir)" "$(DESTDIR)$(qpid_brokerdir)" \
+	"$(DESTDIR)$(qpid_clientdir)" \
+	"$(DESTDIR)$(qpid_client_no_keyworddir)" \
+	"$(DESTDIR)$(qpid_framingdir)" "$(DESTDIR)$(includedir)"
 cmoduleLTLIBRARIES_INSTALL = $(INSTALL)
 dmoduleLTLIBRARIES_INSTALL = $(INSTALL)
 libLTLIBRARIES_INSTALL = $(INSTALL)
@@ -234,6 +272,8 @@ am__cluster_la_SOURCES_DIST = qpid/cluster/Quorum_null.h \
 	qpid/cluster/ConnectionCodec.h qpid/cluster/Cpg.cpp \
 	qpid/cluster/Cpg.h qpid/cluster/Dispatchable.h \
 	qpid/cluster/UpdateClient.cpp qpid/cluster/UpdateClient.h \
+	qpid/cluster/RetractClient.cpp qpid/cluster/RetractClient.h \
+	qpid/cluster/ErrorCheck.cpp qpid/cluster/ErrorCheck.h \
 	qpid/cluster/Event.cpp qpid/cluster/Event.h \
 	qpid/cluster/EventFrame.h qpid/cluster/EventFrame.cpp \
 	qpid/cluster/ExpiryPolicy.h qpid/cluster/ExpiryPolicy.cpp \
@@ -243,6 +283,7 @@ am__cluster_la_SOURCES_DIST = qpid/cluster/Quorum_null.h \
 	qpid/cluster/Multicaster.cpp qpid/cluster/Multicaster.h \
 	qpid/cluster/McastFrameHandler.h \
 	qpid/cluster/NoOpConnectionOutputHandler.h \
+	qpid/cluster/StallConnectionOutputHandler.h \
 	qpid/cluster/OutputInterceptor.cpp \
 	qpid/cluster/OutputInterceptor.h \
 	qpid/cluster/PollerDispatch.cpp qpid/cluster/PollerDispatch.h \
@@ -259,6 +300,8 @@ am__cluster_la_SOURCES_DIST = qpid/cluster/Quorum_null.h \
 @HAVE_LIBCPG_TRUE@	qpid/cluster/ConnectionCodec.lo \
 @HAVE_LIBCPG_TRUE@	qpid/cluster/Cpg.lo \
 @HAVE_LIBCPG_TRUE@	qpid/cluster/UpdateClient.lo \
+@HAVE_LIBCPG_TRUE@	qpid/cluster/RetractClient.lo \
+@HAVE_LIBCPG_TRUE@	qpid/cluster/ErrorCheck.lo \
 @HAVE_LIBCPG_TRUE@	qpid/cluster/Event.lo \
 @HAVE_LIBCPG_TRUE@	qpid/cluster/EventFrame.lo \
 @HAVE_LIBCPG_TRUE@	qpid/cluster/ExpiryPolicy.lo \
@@ -281,8 +324,41 @@ am_libqmfconsole_la_OBJECTS = qpid/console/Agent.lo \
 	qpid/console/SessionManager.lo qpid/console/Value.lo
 libqmfconsole_la_OBJECTS = $(am_libqmfconsole_la_OBJECTS)
 libqpidbroker_la_DEPENDENCIES = libqpidcommon.la
-am__objects_2 = qpid/broker/posix/BrokerDefaults.lo
-am_libqpidbroker_la_OBJECTS = $(am__objects_2) \
+am__objects_2 = gen/qmf/org/apache/qpid/broker/System.lo \
+	gen/qmf/org/apache/qpid/broker/Broker.lo \
+	gen/qmf/org/apache/qpid/broker/Agent.lo \
+	gen/qmf/org/apache/qpid/broker/Vhost.lo \
+	gen/qmf/org/apache/qpid/broker/Queue.lo \
+	gen/qmf/org/apache/qpid/broker/Exchange.lo \
+	gen/qmf/org/apache/qpid/broker/Binding.lo \
+	gen/qmf/org/apache/qpid/broker/Connection.lo \
+	gen/qmf/org/apache/qpid/broker/Link.lo \
+	gen/qmf/org/apache/qpid/broker/Bridge.lo \
+	gen/qmf/org/apache/qpid/broker/Session.lo \
+	gen/qmf/org/apache/qpid/broker/EventClientConnect.lo \
+	gen/qmf/org/apache/qpid/broker/EventClientConnectFail.lo \
+	gen/qmf/org/apache/qpid/broker/EventClientDisconnect.lo \
+	gen/qmf/org/apache/qpid/broker/EventBrokerLinkUp.lo \
+	gen/qmf/org/apache/qpid/broker/EventBrokerLinkDown.lo \
+	gen/qmf/org/apache/qpid/broker/EventQueueDeclare.lo \
+	gen/qmf/org/apache/qpid/broker/EventQueueDelete.lo \
+	gen/qmf/org/apache/qpid/broker/EventExchangeDeclare.lo \
+	gen/qmf/org/apache/qpid/broker/EventExchangeDelete.lo \
+	gen/qmf/org/apache/qpid/broker/EventBind.lo \
+	gen/qmf/org/apache/qpid/broker/EventUnbind.lo \
+	gen/qmf/org/apache/qpid/broker/EventSubscribe.lo \
+	gen/qmf/org/apache/qpid/broker/EventUnsubscribe.lo \
+	gen/qmf/org/apache/qpid/broker/Package.lo \
+	gen/qmf/org/apache/qpid/acl/Acl.lo \
+	gen/qmf/org/apache/qpid/acl/EventAllow.lo \
+	gen/qmf/org/apache/qpid/acl/EventDeny.lo \
+	gen/qmf/org/apache/qpid/acl/EventFileLoaded.lo \
+	gen/qmf/org/apache/qpid/acl/EventFileLoadFailed.lo \
+	gen/qmf/org/apache/qpid/acl/Package.lo \
+	gen/qmf/org/apache/qpid/cluster/Cluster.lo \
+	gen/qmf/org/apache/qpid/cluster/Package.lo
+am__objects_3 = qpid/broker/posix/BrokerDefaults.lo
+am_libqpidbroker_la_OBJECTS = $(am__objects_2) $(am__objects_3) \
 	qpid/amqp_0_10/Connection.lo qpid/broker/Broker.lo \
 	qpid/broker/BrokerSingleton.lo qpid/broker/Exchange.lo \
 	qpid/broker/ExpiryPolicy.lo qpid/broker/Queue.lo \
@@ -319,7 +395,10 @@ am_libqpidbroker_la_OBJECTS = $(am__objects_2) \
 	qpid/management/ManagementExchange.lo qpid/sys/TCPIOPlugin.lo
 libqpidbroker_la_OBJECTS = $(am_libqpidbroker_la_OBJECTS)
 libqpidclient_la_DEPENDENCIES = libqpidcommon.la
-am_libqpidclient_la_OBJECTS = qpid/client/libqpidclient_la-Bounds.lo \
+am__objects_4 = gen/qpid/client/no_keyword/libqpidclient_la-AsyncSession_0_10.lo \
+	gen/qpid/client/no_keyword/libqpidclient_la-Session_0_10.lo
+am_libqpidclient_la_OBJECTS = $(am__objects_4) \
+	qpid/client/libqpidclient_la-Bounds.lo \
 	qpid/client/libqpidclient_la-Connection.lo \
 	qpid/client/libqpidclient_la-ConnectionHandler.lo \
 	qpid/client/libqpidclient_la-ConnectionImpl.lo \
@@ -349,13 +428,279 @@ am_libqpidclient_la_OBJECTS = qpid/client/libqpidclient_la-Bounds.lo \
 libqpidclient_la_OBJECTS = $(am_libqpidclient_la_OBJECTS)
 libqpidcommon_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
-am__libqpidcommon_la_SOURCES_DIST = qpid/log/posix/SinkOptions.cpp \
-	qpid/sys/posix/IOHandle.cpp qpid/sys/posix/Socket.cpp \
-	qpid/sys/posix/AsynchIO.cpp qpid/sys/posix/FileSysDir.cpp \
-	qpid/sys/posix/LockFile.cpp qpid/sys/posix/Time.cpp \
-	qpid/sys/posix/Thread.cpp qpid/sys/posix/Shlib.cpp \
-	qpid/sys/posix/Mutex.cpp qpid/sys/posix/Fork.cpp \
-	qpid/sys/posix/StrError.cpp \
+am__libqpidcommon_la_SOURCES_DIST = gen/qpid/framing/ClientInvoker.h \
+	gen/qpid/framing/ClientInvoker.cpp \
+	gen/qpid/framing/ServerInvoker.h \
+	gen/qpid/framing/ServerInvoker.cpp \
+	gen/qpid/framing/AllInvoker.h gen/qpid/framing/AllInvoker.cpp \
+	gen/qpid/framing/MethodBodyConstVisitor.h \
+	gen/qpid/framing/MethodBodyDefaultVisitor.h \
+	gen/qpid/framing/MethodBodyDefaultVisitor.cpp \
+	gen/qpid/framing/AMQP_ClientProxy.h \
+	gen/qpid/framing/AMQP_ClientProxy.cpp \
+	gen/qpid/framing/AMQP_ServerProxy.h \
+	gen/qpid/framing/AMQP_ServerProxy.cpp \
+	gen/qpid/framing/AMQP_AllProxy.h \
+	gen/qpid/framing/AMQP_AllProxy.cpp \
+	gen/qpid/framing/frame_body_lists.h gen/qpid/framing/Header.h \
+	gen/qpid/framing/Header.cpp \
+	gen/qpid/framing/DeliveryProperties.h \
+	gen/qpid/framing/DeliveryProperties.cpp \
+	gen/qpid/framing/FragmentProperties.h \
+	gen/qpid/framing/FragmentProperties.cpp \
+	gen/qpid/framing/ReplyTo.h gen/qpid/framing/ReplyTo.cpp \
+	gen/qpid/framing/MessageProperties.h \
+	gen/qpid/framing/MessageProperties.cpp \
+	gen/qpid/framing/MessageAcquireResult.h \
+	gen/qpid/framing/MessageAcquireResult.cpp \
+	gen/qpid/framing/MessageResumeResult.h \
+	gen/qpid/framing/MessageResumeResult.cpp \
+	gen/qpid/framing/XaResult.h gen/qpid/framing/XaResult.cpp \
+	gen/qpid/framing/Xid.h gen/qpid/framing/Xid.cpp \
+	gen/qpid/framing/DtxGetTimeoutResult.h \
+	gen/qpid/framing/DtxGetTimeoutResult.cpp \
+	gen/qpid/framing/DtxRecoverResult.h \
+	gen/qpid/framing/DtxRecoverResult.cpp \
+	gen/qpid/framing/ExchangeQueryResult.h \
+	gen/qpid/framing/ExchangeQueryResult.cpp \
+	gen/qpid/framing/ExchangeBoundResult.h \
+	gen/qpid/framing/ExchangeBoundResult.cpp \
+	gen/qpid/framing/QueueQueryResult.h \
+	gen/qpid/framing/QueueQueryResult.cpp \
+	gen/qpid/framing/FileProperties.h \
+	gen/qpid/framing/FileProperties.cpp \
+	gen/qpid/framing/StreamProperties.h \
+	gen/qpid/framing/StreamProperties.cpp \
+	gen/qpid/framing/ConnectionStartBody.h \
+	gen/qpid/framing/ConnectionStartBody.cpp \
+	gen/qpid/framing/ConnectionStartOkBody.h \
+	gen/qpid/framing/ConnectionStartOkBody.cpp \
+	gen/qpid/framing/ConnectionSecureBody.h \
+	gen/qpid/framing/ConnectionSecureBody.cpp \
+	gen/qpid/framing/ConnectionSecureOkBody.h \
+	gen/qpid/framing/ConnectionSecureOkBody.cpp \
+	gen/qpid/framing/ConnectionTuneBody.h \
+	gen/qpid/framing/ConnectionTuneBody.cpp \
+	gen/qpid/framing/ConnectionTuneOkBody.h \
+	gen/qpid/framing/ConnectionTuneOkBody.cpp \
+	gen/qpid/framing/ConnectionOpenBody.h \
+	gen/qpid/framing/ConnectionOpenBody.cpp \
+	gen/qpid/framing/ConnectionOpenOkBody.h \
+	gen/qpid/framing/ConnectionOpenOkBody.cpp \
+	gen/qpid/framing/ConnectionRedirectBody.h \
+	gen/qpid/framing/ConnectionRedirectBody.cpp \
+	gen/qpid/framing/ConnectionHeartbeatBody.h \
+	gen/qpid/framing/ConnectionHeartbeatBody.cpp \
+	gen/qpid/framing/ConnectionCloseBody.h \
+	gen/qpid/framing/ConnectionCloseBody.cpp \
+	gen/qpid/framing/ConnectionCloseOkBody.h \
+	gen/qpid/framing/ConnectionCloseOkBody.cpp \
+	gen/qpid/framing/SessionAttachBody.h \
+	gen/qpid/framing/SessionAttachBody.cpp \
+	gen/qpid/framing/SessionAttachedBody.h \
+	gen/qpid/framing/SessionAttachedBody.cpp \
+	gen/qpid/framing/SessionDetachBody.h \
+	gen/qpid/framing/SessionDetachBody.cpp \
+	gen/qpid/framing/SessionDetachedBody.h \
+	gen/qpid/framing/SessionDetachedBody.cpp \
+	gen/qpid/framing/SessionRequestTimeoutBody.h \
+	gen/qpid/framing/SessionRequestTimeoutBody.cpp \
+	gen/qpid/framing/SessionTimeoutBody.h \
+	gen/qpid/framing/SessionTimeoutBody.cpp \
+	gen/qpid/framing/SessionCommandPointBody.h \
+	gen/qpid/framing/SessionCommandPointBody.cpp \
+	gen/qpid/framing/SessionExpectedBody.h \
+	gen/qpid/framing/SessionExpectedBody.cpp \
+	gen/qpid/framing/SessionConfirmedBody.h \
+	gen/qpid/framing/SessionConfirmedBody.cpp \
+	gen/qpid/framing/SessionCompletedBody.h \
+	gen/qpid/framing/SessionCompletedBody.cpp \
+	gen/qpid/framing/SessionKnownCompletedBody.h \
+	gen/qpid/framing/SessionKnownCompletedBody.cpp \
+	gen/qpid/framing/SessionFlushBody.h \
+	gen/qpid/framing/SessionFlushBody.cpp \
+	gen/qpid/framing/SessionGapBody.h \
+	gen/qpid/framing/SessionGapBody.cpp \
+	gen/qpid/framing/ExecutionSyncBody.h \
+	gen/qpid/framing/ExecutionSyncBody.cpp \
+	gen/qpid/framing/ExecutionResultBody.h \
+	gen/qpid/framing/ExecutionResultBody.cpp \
+	gen/qpid/framing/ExecutionExceptionBody.h \
+	gen/qpid/framing/ExecutionExceptionBody.cpp \
+	gen/qpid/framing/MessageTransferBody.h \
+	gen/qpid/framing/MessageTransferBody.cpp \
+	gen/qpid/framing/MessageAcceptBody.h \
+	gen/qpid/framing/MessageAcceptBody.cpp \
+	gen/qpid/framing/MessageRejectBody.h \
+	gen/qpid/framing/MessageRejectBody.cpp \
+	gen/qpid/framing/MessageReleaseBody.h \
+	gen/qpid/framing/MessageReleaseBody.cpp \
+	gen/qpid/framing/MessageAcquireBody.h \
+	gen/qpid/framing/MessageAcquireBody.cpp \
+	gen/qpid/framing/MessageResumeBody.h \
+	gen/qpid/framing/MessageResumeBody.cpp \
+	gen/qpid/framing/MessageSubscribeBody.h \
+	gen/qpid/framing/MessageSubscribeBody.cpp \
+	gen/qpid/framing/MessageCancelBody.h \
+	gen/qpid/framing/MessageCancelBody.cpp \
+	gen/qpid/framing/MessageSetFlowModeBody.h \
+	gen/qpid/framing/MessageSetFlowModeBody.cpp \
+	gen/qpid/framing/MessageFlowBody.h \
+	gen/qpid/framing/MessageFlowBody.cpp \
+	gen/qpid/framing/MessageFlushBody.h \
+	gen/qpid/framing/MessageFlushBody.cpp \
+	gen/qpid/framing/MessageStopBody.h \
+	gen/qpid/framing/MessageStopBody.cpp \
+	gen/qpid/framing/TxSelectBody.h \
+	gen/qpid/framing/TxSelectBody.cpp \
+	gen/qpid/framing/TxCommitBody.h \
+	gen/qpid/framing/TxCommitBody.cpp \
+	gen/qpid/framing/TxRollbackBody.h \
+	gen/qpid/framing/TxRollbackBody.cpp \
+	gen/qpid/framing/DtxSelectBody.h \
+	gen/qpid/framing/DtxSelectBody.cpp \
+	gen/qpid/framing/DtxStartBody.h \
+	gen/qpid/framing/DtxStartBody.cpp \
+	gen/qpid/framing/DtxEndBody.h gen/qpid/framing/DtxEndBody.cpp \
+	gen/qpid/framing/DtxCommitBody.h \
+	gen/qpid/framing/DtxCommitBody.cpp \
+	gen/qpid/framing/DtxForgetBody.h \
+	gen/qpid/framing/DtxForgetBody.cpp \
+	gen/qpid/framing/DtxGetTimeoutBody.h \
+	gen/qpid/framing/DtxGetTimeoutBody.cpp \
+	gen/qpid/framing/DtxPrepareBody.h \
+	gen/qpid/framing/DtxPrepareBody.cpp \
+	gen/qpid/framing/DtxRecoverBody.h \
+	gen/qpid/framing/DtxRecoverBody.cpp \
+	gen/qpid/framing/DtxRollbackBody.h \
+	gen/qpid/framing/DtxRollbackBody.cpp \
+	gen/qpid/framing/DtxSetTimeoutBody.h \
+	gen/qpid/framing/DtxSetTimeoutBody.cpp \
+	gen/qpid/framing/ExchangeDeclareBody.h \
+	gen/qpid/framing/ExchangeDeclareBody.cpp \
+	gen/qpid/framing/ExchangeDeleteBody.h \
+	gen/qpid/framing/ExchangeDeleteBody.cpp \
+	gen/qpid/framing/ExchangeQueryBody.h \
+	gen/qpid/framing/ExchangeQueryBody.cpp \
+	gen/qpid/framing/ExchangeBindBody.h \
+	gen/qpid/framing/ExchangeBindBody.cpp \
+	gen/qpid/framing/ExchangeUnbindBody.h \
+	gen/qpid/framing/ExchangeUnbindBody.cpp \
+	gen/qpid/framing/ExchangeBoundBody.h \
+	gen/qpid/framing/ExchangeBoundBody.cpp \
+	gen/qpid/framing/QueueDeclareBody.h \
+	gen/qpid/framing/QueueDeclareBody.cpp \
+	gen/qpid/framing/QueueDeleteBody.h \
+	gen/qpid/framing/QueueDeleteBody.cpp \
+	gen/qpid/framing/QueuePurgeBody.h \
+	gen/qpid/framing/QueuePurgeBody.cpp \
+	gen/qpid/framing/QueueQueryBody.h \
+	gen/qpid/framing/QueueQueryBody.cpp \
+	gen/qpid/framing/FileQosBody.h \
+	gen/qpid/framing/FileQosBody.cpp \
+	gen/qpid/framing/FileQosOkBody.h \
+	gen/qpid/framing/FileQosOkBody.cpp \
+	gen/qpid/framing/FileConsumeBody.h \
+	gen/qpid/framing/FileConsumeBody.cpp \
+	gen/qpid/framing/FileConsumeOkBody.h \
+	gen/qpid/framing/FileConsumeOkBody.cpp \
+	gen/qpid/framing/FileCancelBody.h \
+	gen/qpid/framing/FileCancelBody.cpp \
+	gen/qpid/framing/FileOpenBody.h \
+	gen/qpid/framing/FileOpenBody.cpp \
+	gen/qpid/framing/FileOpenOkBody.h \
+	gen/qpid/framing/FileOpenOkBody.cpp \
+	gen/qpid/framing/FileStageBody.h \
+	gen/qpid/framing/FileStageBody.cpp \
+	gen/qpid/framing/FilePublishBody.h \
+	gen/qpid/framing/FilePublishBody.cpp \
+	gen/qpid/framing/FileReturnBody.h \
+	gen/qpid/framing/FileReturnBody.cpp \
+	gen/qpid/framing/FileDeliverBody.h \
+	gen/qpid/framing/FileDeliverBody.cpp \
+	gen/qpid/framing/FileAckBody.h \
+	gen/qpid/framing/FileAckBody.cpp \
+	gen/qpid/framing/FileRejectBody.h \
+	gen/qpid/framing/FileRejectBody.cpp \
+	gen/qpid/framing/StreamQosBody.h \
+	gen/qpid/framing/StreamQosBody.cpp \
+	gen/qpid/framing/StreamQosOkBody.h \
+	gen/qpid/framing/StreamQosOkBody.cpp \
+	gen/qpid/framing/StreamConsumeBody.h \
+	gen/qpid/framing/StreamConsumeBody.cpp \
+	gen/qpid/framing/StreamConsumeOkBody.h \
+	gen/qpid/framing/StreamConsumeOkBody.cpp \
+	gen/qpid/framing/StreamCancelBody.h \
+	gen/qpid/framing/StreamCancelBody.cpp \
+	gen/qpid/framing/StreamPublishBody.h \
+	gen/qpid/framing/StreamPublishBody.cpp \
+	gen/qpid/framing/StreamReturnBody.h \
+	gen/qpid/framing/StreamReturnBody.cpp \
+	gen/qpid/framing/StreamDeliverBody.h \
+	gen/qpid/framing/StreamDeliverBody.cpp \
+	gen/qpid/framing/ClusterUpdateRequestBody.h \
+	gen/qpid/framing/ClusterUpdateRequestBody.cpp \
+	gen/qpid/framing/ClusterUpdateOfferBody.h \
+	gen/qpid/framing/ClusterUpdateOfferBody.cpp \
+	gen/qpid/framing/ClusterReadyBody.h \
+	gen/qpid/framing/ClusterReadyBody.cpp \
+	gen/qpid/framing/ClusterConfigChangeBody.h \
+	gen/qpid/framing/ClusterConfigChangeBody.cpp \
+	gen/qpid/framing/ClusterMessageExpiredBody.h \
+	gen/qpid/framing/ClusterMessageExpiredBody.cpp \
+	gen/qpid/framing/ClusterShutdownBody.h \
+	gen/qpid/framing/ClusterShutdownBody.cpp \
+	gen/qpid/framing/ClusterConnectionDeliverCloseBody.h \
+	gen/qpid/framing/ClusterConnectionDeliverCloseBody.cpp \
+	gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.h \
+	gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.cpp \
+	gen/qpid/framing/ClusterConnectionConsumerStateBody.h \
+	gen/qpid/framing/ClusterConnectionConsumerStateBody.cpp \
+	gen/qpid/framing/ClusterConnectionDeliveryRecordBody.h \
+	gen/qpid/framing/ClusterConnectionDeliveryRecordBody.cpp \
+	gen/qpid/framing/ClusterConnectionTxStartBody.h \
+	gen/qpid/framing/ClusterConnectionTxStartBody.cpp \
+	gen/qpid/framing/ClusterConnectionTxAcceptBody.h \
+	gen/qpid/framing/ClusterConnectionTxAcceptBody.cpp \
+	gen/qpid/framing/ClusterConnectionTxDequeueBody.h \
+	gen/qpid/framing/ClusterConnectionTxDequeueBody.cpp \
+	gen/qpid/framing/ClusterConnectionTxEnqueueBody.h \
+	gen/qpid/framing/ClusterConnectionTxEnqueueBody.cpp \
+	gen/qpid/framing/ClusterConnectionTxPublishBody.h \
+	gen/qpid/framing/ClusterConnectionTxPublishBody.cpp \
+	gen/qpid/framing/ClusterConnectionTxEndBody.h \
+	gen/qpid/framing/ClusterConnectionTxEndBody.cpp \
+	gen/qpid/framing/ClusterConnectionAccumulatedAckBody.h \
+	gen/qpid/framing/ClusterConnectionAccumulatedAckBody.cpp \
+	gen/qpid/framing/ClusterConnectionSessionStateBody.h \
+	gen/qpid/framing/ClusterConnectionSessionStateBody.cpp \
+	gen/qpid/framing/ClusterConnectionShadowReadyBody.h \
+	gen/qpid/framing/ClusterConnectionShadowReadyBody.cpp \
+	gen/qpid/framing/ClusterConnectionMembershipBody.h \
+	gen/qpid/framing/ClusterConnectionMembershipBody.cpp \
+	gen/qpid/framing/ClusterConnectionQueuePositionBody.h \
+	gen/qpid/framing/ClusterConnectionQueuePositionBody.cpp \
+	gen/qpid/framing/ClusterConnectionExchangeBody.h \
+	gen/qpid/framing/ClusterConnectionExchangeBody.cpp \
+	gen/qpid/framing/ClusterConnectionQueueBody.h \
+	gen/qpid/framing/ClusterConnectionQueueBody.cpp \
+	gen/qpid/framing/ClusterConnectionExpiryIdBody.h \
+	gen/qpid/framing/ClusterConnectionExpiryIdBody.cpp \
+	gen/qpid/framing/amqp_structs.h gen/qpid/framing/constants.h \
+	gen/qpid/framing/enum.h gen/qpid/framing/reply_exceptions.h \
+	gen/qpid/framing/reply_exceptions.cpp \
+	gen/qpid/framing/TypeCode.h gen/qpid/framing/TypeCode.cpp \
+	gen/qpid/framing/AMQP_ClientOperations.h \
+	gen/qpid/framing/AMQP_ServerOperations.h \
+	gen/qpid/framing/AMQP_AllOperations.h \
+	gen/qpid/framing/all_method_bodies.h \
+	gen/qpid/framing/MethodBodyFactory.cpp \
+	qpid/log/posix/SinkOptions.cpp qpid/sys/posix/IOHandle.cpp \
+	qpid/sys/posix/Socket.cpp qpid/sys/posix/AsynchIO.cpp \
+	qpid/sys/posix/FileSysDir.cpp qpid/sys/posix/LockFile.cpp \
+	qpid/sys/posix/Time.cpp qpid/sys/posix/Thread.cpp \
+	qpid/sys/posix/Shlib.cpp qpid/sys/posix/Mutex.cpp \
+	qpid/sys/posix/Fork.cpp qpid/sys/posix/StrError.cpp \
 	qpid/sys/posix/PollableCondition.cpp \
 	qpid/sys/solaris/ECFPoller.cpp qpid/sys/epoll/EpollPoller.cpp \
 	qpid/sys/posix/SystemInfo.cpp qpid/sys/solaris/SystemInfo.cpp \
@@ -392,23 +737,155 @@ am__libqpidcommon_la_SOURCES_DIST = qpid/log/posix/SinkOptions.cpp \
 	qpid/sys/Shlib.cpp qpid/sys/Timer.cpp \
 	qpid/sys/cyrus/CyrusSecurityLayer.h \
 	qpid/sys/cyrus/CyrusSecurityLayer.cpp
-am__objects_3 = qpid/log/posix/SinkOptions.lo \
+am__objects_5 = gen/qpid/framing/ClientInvoker.lo \
+	gen/qpid/framing/ServerInvoker.lo \
+	gen/qpid/framing/AllInvoker.lo \
+	gen/qpid/framing/MethodBodyDefaultVisitor.lo \
+	gen/qpid/framing/AMQP_ClientProxy.lo \
+	gen/qpid/framing/AMQP_ServerProxy.lo \
+	gen/qpid/framing/AMQP_AllProxy.lo gen/qpid/framing/Header.lo \
+	gen/qpid/framing/DeliveryProperties.lo \
+	gen/qpid/framing/FragmentProperties.lo \
+	gen/qpid/framing/ReplyTo.lo \
+	gen/qpid/framing/MessageProperties.lo \
+	gen/qpid/framing/MessageAcquireResult.lo \
+	gen/qpid/framing/MessageResumeResult.lo \
+	gen/qpid/framing/XaResult.lo gen/qpid/framing/Xid.lo \
+	gen/qpid/framing/DtxGetTimeoutResult.lo \
+	gen/qpid/framing/DtxRecoverResult.lo \
+	gen/qpid/framing/ExchangeQueryResult.lo \
+	gen/qpid/framing/ExchangeBoundResult.lo \
+	gen/qpid/framing/QueueQueryResult.lo \
+	gen/qpid/framing/FileProperties.lo \
+	gen/qpid/framing/StreamProperties.lo \
+	gen/qpid/framing/ConnectionStartBody.lo \
+	gen/qpid/framing/ConnectionStartOkBody.lo \
+	gen/qpid/framing/ConnectionSecureBody.lo \
+	gen/qpid/framing/ConnectionSecureOkBody.lo \
+	gen/qpid/framing/ConnectionTuneBody.lo \
+	gen/qpid/framing/ConnectionTuneOkBody.lo \
+	gen/qpid/framing/ConnectionOpenBody.lo \
+	gen/qpid/framing/ConnectionOpenOkBody.lo \
+	gen/qpid/framing/ConnectionRedirectBody.lo \
+	gen/qpid/framing/ConnectionHeartbeatBody.lo \
+	gen/qpid/framing/ConnectionCloseBody.lo \
+	gen/qpid/framing/ConnectionCloseOkBody.lo \
+	gen/qpid/framing/SessionAttachBody.lo \
+	gen/qpid/framing/SessionAttachedBody.lo \
+	gen/qpid/framing/SessionDetachBody.lo \
+	gen/qpid/framing/SessionDetachedBody.lo \
+	gen/qpid/framing/SessionRequestTimeoutBody.lo \
+	gen/qpid/framing/SessionTimeoutBody.lo \
+	gen/qpid/framing/SessionCommandPointBody.lo \
+	gen/qpid/framing/SessionExpectedBody.lo \
+	gen/qpid/framing/SessionConfirmedBody.lo \
+	gen/qpid/framing/SessionCompletedBody.lo \
+	gen/qpid/framing/SessionKnownCompletedBody.lo \
+	gen/qpid/framing/SessionFlushBody.lo \
+	gen/qpid/framing/SessionGapBody.lo \
+	gen/qpid/framing/ExecutionSyncBody.lo \
+	gen/qpid/framing/ExecutionResultBody.lo \
+	gen/qpid/framing/ExecutionExceptionBody.lo \
+	gen/qpid/framing/MessageTransferBody.lo \
+	gen/qpid/framing/MessageAcceptBody.lo \
+	gen/qpid/framing/MessageRejectBody.lo \
+	gen/qpid/framing/MessageReleaseBody.lo \
+	gen/qpid/framing/MessageAcquireBody.lo \
+	gen/qpid/framing/MessageResumeBody.lo \
+	gen/qpid/framing/MessageSubscribeBody.lo \
+	gen/qpid/framing/MessageCancelBody.lo \
+	gen/qpid/framing/MessageSetFlowModeBody.lo \
+	gen/qpid/framing/MessageFlowBody.lo \
+	gen/qpid/framing/MessageFlushBody.lo \
+	gen/qpid/framing/MessageStopBody.lo \
+	gen/qpid/framing/TxSelectBody.lo \
+	gen/qpid/framing/TxCommitBody.lo \
+	gen/qpid/framing/TxRollbackBody.lo \
+	gen/qpid/framing/DtxSelectBody.lo \
+	gen/qpid/framing/DtxStartBody.lo \
+	gen/qpid/framing/DtxEndBody.lo \
+	gen/qpid/framing/DtxCommitBody.lo \
+	gen/qpid/framing/DtxForgetBody.lo \
+	gen/qpid/framing/DtxGetTimeoutBody.lo \
+	gen/qpid/framing/DtxPrepareBody.lo \
+	gen/qpid/framing/DtxRecoverBody.lo \
+	gen/qpid/framing/DtxRollbackBody.lo \
+	gen/qpid/framing/DtxSetTimeoutBody.lo \
+	gen/qpid/framing/ExchangeDeclareBody.lo \
+	gen/qpid/framing/ExchangeDeleteBody.lo \
+	gen/qpid/framing/ExchangeQueryBody.lo \
+	gen/qpid/framing/ExchangeBindBody.lo \
+	gen/qpid/framing/ExchangeUnbindBody.lo \
+	gen/qpid/framing/ExchangeBoundBody.lo \
+	gen/qpid/framing/QueueDeclareBody.lo \
+	gen/qpid/framing/QueueDeleteBody.lo \
+	gen/qpid/framing/QueuePurgeBody.lo \
+	gen/qpid/framing/QueueQueryBody.lo \
+	gen/qpid/framing/FileQosBody.lo \
+	gen/qpid/framing/FileQosOkBody.lo \
+	gen/qpid/framing/FileConsumeBody.lo \
+	gen/qpid/framing/FileConsumeOkBody.lo \
+	gen/qpid/framing/FileCancelBody.lo \
+	gen/qpid/framing/FileOpenBody.lo \
+	gen/qpid/framing/FileOpenOkBody.lo \
+	gen/qpid/framing/FileStageBody.lo \
+	gen/qpid/framing/FilePublishBody.lo \
+	gen/qpid/framing/FileReturnBody.lo \
+	gen/qpid/framing/FileDeliverBody.lo \
+	gen/qpid/framing/FileAckBody.lo \
+	gen/qpid/framing/FileRejectBody.lo \
+	gen/qpid/framing/StreamQosBody.lo \
+	gen/qpid/framing/StreamQosOkBody.lo \
+	gen/qpid/framing/StreamConsumeBody.lo \
+	gen/qpid/framing/StreamConsumeOkBody.lo \
+	gen/qpid/framing/StreamCancelBody.lo \
+	gen/qpid/framing/StreamPublishBody.lo \
+	gen/qpid/framing/StreamReturnBody.lo \
+	gen/qpid/framing/StreamDeliverBody.lo \
+	gen/qpid/framing/ClusterUpdateRequestBody.lo \
+	gen/qpid/framing/ClusterUpdateOfferBody.lo \
+	gen/qpid/framing/ClusterReadyBody.lo \
+	gen/qpid/framing/ClusterConfigChangeBody.lo \
+	gen/qpid/framing/ClusterMessageExpiredBody.lo \
+	gen/qpid/framing/ClusterShutdownBody.lo \
+	gen/qpid/framing/ClusterConnectionDeliverCloseBody.lo \
+	gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.lo \
+	gen/qpid/framing/ClusterConnectionConsumerStateBody.lo \
+	gen/qpid/framing/ClusterConnectionDeliveryRecordBody.lo \
+	gen/qpid/framing/ClusterConnectionTxStartBody.lo \
+	gen/qpid/framing/ClusterConnectionTxAcceptBody.lo \
+	gen/qpid/framing/ClusterConnectionTxDequeueBody.lo \
+	gen/qpid/framing/ClusterConnectionTxEnqueueBody.lo \
+	gen/qpid/framing/ClusterConnectionTxPublishBody.lo \
+	gen/qpid/framing/ClusterConnectionTxEndBody.lo \
+	gen/qpid/framing/ClusterConnectionAccumulatedAckBody.lo \
+	gen/qpid/framing/ClusterConnectionSessionStateBody.lo \
+	gen/qpid/framing/ClusterConnectionShadowReadyBody.lo \
+	gen/qpid/framing/ClusterConnectionMembershipBody.lo \
+	gen/qpid/framing/ClusterConnectionQueuePositionBody.lo \
+	gen/qpid/framing/ClusterConnectionExchangeBody.lo \
+	gen/qpid/framing/ClusterConnectionQueueBody.lo \
+	gen/qpid/framing/ClusterConnectionExpiryIdBody.lo \
+	gen/qpid/framing/reply_exceptions.lo \
+	gen/qpid/framing/TypeCode.lo \
+	gen/qpid/framing/MethodBodyFactory.lo
+am__objects_6 = qpid/log/posix/SinkOptions.lo \
 	qpid/sys/posix/IOHandle.lo qpid/sys/posix/Socket.lo \
 	qpid/sys/posix/AsynchIO.lo qpid/sys/posix/FileSysDir.lo \
 	qpid/sys/posix/LockFile.lo qpid/sys/posix/Time.lo \
 	qpid/sys/posix/Thread.lo qpid/sys/posix/Shlib.lo \
 	qpid/sys/posix/Mutex.lo qpid/sys/posix/Fork.lo \
 	qpid/sys/posix/StrError.lo qpid/sys/posix/PollableCondition.lo
-@HAVE_ECF_FALSE@@HAVE_EPOLL_TRUE@am__objects_4 = qpid/sys/epoll/EpollPoller.lo
-@HAVE_ECF_TRUE@am__objects_4 = qpid/sys/solaris/ECFPoller.lo
-@SUNOS_FALSE@am__objects_5 = qpid/sys/posix/SystemInfo.lo
-@SUNOS_TRUE@am__objects_5 = qpid/sys/solaris/SystemInfo.lo
-am__objects_6 = $(am__objects_3) $(am__objects_4) $(am__objects_5)
-@HAVE_SASL_TRUE@am__objects_7 = qpid/sys/cyrus/CyrusSecurityLayer.lo
-am_libqpidcommon_la_OBJECTS = $(am__objects_6) qpid/assert.lo \
-	qpid/Address.lo qpid/DataDir.lo qpid/Exception.lo \
-	qpid/Modules.lo qpid/Options.lo qpid/Plugin.lo \
-	qpid/RefCountedBuffer.lo qpid/SessionState.lo \
+@HAVE_ECF_FALSE@@HAVE_EPOLL_TRUE@am__objects_7 = qpid/sys/epoll/EpollPoller.lo
+@HAVE_ECF_TRUE@am__objects_7 = qpid/sys/solaris/ECFPoller.lo
+@SUNOS_FALSE@am__objects_8 = qpid/sys/posix/SystemInfo.lo
+@SUNOS_TRUE@am__objects_8 = qpid/sys/solaris/SystemInfo.lo
+am__objects_9 = $(am__objects_6) $(am__objects_7) $(am__objects_8)
+@HAVE_SASL_TRUE@am__objects_10 = qpid/sys/cyrus/CyrusSecurityLayer.lo
+am_libqpidcommon_la_OBJECTS = $(am__objects_5) $(am__objects_9) \
+	qpid/assert.lo qpid/Address.lo qpid/DataDir.lo \
+	qpid/Exception.lo qpid/Modules.lo qpid/Options.lo \
+	qpid/Plugin.lo qpid/RefCountedBuffer.lo qpid/SessionState.lo \
 	qpid/SessionId.lo qpid/StringUtils.lo qpid/Url.lo \
 	qpid/amqp_0_10/SessionHandler.lo \
 	qpid/framing/AccumulatedAck.lo qpid/framing/AMQBody.lo \
@@ -432,7 +909,7 @@ am_libqpidcommon_la_OBJECTS = $(am__objects_6) qpid/assert.lo \
 	qpid/sys/AggregateOutput.lo qpid/sys/AsynchIOHandler.lo \
 	qpid/sys/Dispatcher.lo qpid/sys/DispatchHandle.lo \
 	qpid/sys/LatencyMetric.lo qpid/sys/Runnable.lo \
-	qpid/sys/Shlib.lo qpid/sys/Timer.lo $(am__objects_7)
+	qpid/sys/Shlib.lo qpid/sys/Timer.lo $(am__objects_10)
 libqpidcommon_la_OBJECTS = $(am_libqpidcommon_la_OBJECTS)
 @RDMA_TRUE@librdmawrap_la_DEPENDENCIES = libqpidcommon.la
 am__librdmawrap_la_SOURCES_DIST = qpid/sys/rdma/rdma_exception.h \
@@ -518,8 +995,8 @@ am__RdmaServer_SOURCES_DIST = qpid/sys/rdma/RdmaServer.cpp
 @RDMA_TRUE@am_RdmaServer_OBJECTS = qpid/sys/rdma/RdmaServer.$(OBJEXT)
 RdmaServer_OBJECTS = $(am_RdmaServer_OBJECTS)
 @RDMA_TRUE@RdmaServer_DEPENDENCIES = librdmawrap.la libqpidcommon.la
-am__objects_8 = posix/qpidd-QpiddBroker.$(OBJEXT)
-am_qpidd_OBJECTS = qpidd-qpidd.$(OBJEXT) $(am__objects_8)
+am__objects_11 = posix/qpidd-QpiddBroker.$(OBJEXT)
+am_qpidd_OBJECTS = qpidd-qpidd.$(OBJEXT) $(am__objects_11)
 qpidd_OBJECTS = $(am_qpidd_OBJECTS)
 qpidd_DEPENDENCIES = libqpidbroker.la libqpidcommon.la
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
@@ -569,8 +1046,22 @@ RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
 	install-recursive installcheck-recursive installdirs-recursive \
 	pdf-recursive ps-recursive uninstall-info-recursive \
 	uninstall-recursive
+dist_org_apache_qpid_aclHEADERS_INSTALL = $(INSTALL_HEADER)
+dist_org_apache_qpid_brokerHEADERS_INSTALL = $(INSTALL_HEADER)
+dist_org_apache_qpid_clusterHEADERS_INSTALL = $(INSTALL_HEADER)
+dist_qpid_amqp_0_10HEADERS_INSTALL = $(INSTALL_HEADER)
+dist_qpid_brokerHEADERS_INSTALL = $(INSTALL_HEADER)
+dist_qpid_clientHEADERS_INSTALL = $(INSTALL_HEADER)
+dist_qpid_client_no_keywordHEADERS_INSTALL = $(INSTALL_HEADER)
+dist_qpid_framingHEADERS_INSTALL = $(INSTALL_HEADER)
 nobase_includeHEADERS_INSTALL = $(install_sh_DATA)
-HEADERS = $(nobase_include_HEADERS)
+HEADERS = $(dist_org_apache_qpid_acl_HEADERS) \
+	$(dist_org_apache_qpid_broker_HEADERS) \
+	$(dist_org_apache_qpid_cluster_HEADERS) \
+	$(dist_qpid_amqp_0_10_HEADERS) $(dist_qpid_broker_HEADERS) \
+	$(dist_qpid_client_HEADERS) \
+	$(dist_qpid_client_no_keyword_HEADERS) \
+	$(dist_qpid_framing_HEADERS) $(nobase_include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = $(SUBDIRS)
@@ -809,6 +1300,1008 @@ EXTRA_DIST = $(platform_dist) $(rgen_srcs) $(windows_dist) \
 @GENERATE_TRUE@	$(srcdir)/qpid/acl/management-schema.xml \
 @GENERATE_TRUE@	$(srcdir)/qpid/cluster/management-schema.xml
 
+rgen_generator = $(rgen_dir)/amqpgen.rb \
+    $(rgen_dir)/MethodBodyDefaultVisitor.rb \
+    $(rgen_dir)/cppgen.rb \
+    $(rgen_dir)/framing.0-10/OperationsInvoker.rb \
+    $(rgen_dir)/framing.0-10/MethodBodyConstVisitor.rb \
+    $(rgen_dir)/framing.0-10/MethodBodyDefaultVisitor.rb \
+    $(rgen_dir)/framing.0-10/Proxy.rb \
+    $(rgen_dir)/framing.0-10/frame_body_lists.rb \
+    $(rgen_dir)/framing.0-10/structs.rb \
+    $(rgen_dir)/framing.0-10/constants.rb \
+    $(rgen_dir)/framing.0-10/Operations.rb \
+    $(rgen_dir)/framing.0-10/Session.rb \
+    $(rgen_dir)/framing.0-10/all_method_bodies.rb \
+    $(rgen_dir)/framing.0-10/MethodHolder.rb \
+    $(rgen_dir)/framing.0-10/MethodBodyFactory.rb \
+    $(rgen_dir)/0-10/exceptions.rb \
+    $(rgen_dir)/0-10/typecode.rb \
+    $(rgen_dir)/0-10/specification.rb \
+    $(rgen_dir)/0-10/allsegmenttypes.rb \
+    $(rgen_dir)/0-10/handlers.rb \
+    $(rgen_dir)/generate
+
+rgen_framing_srcs = gen/qpid/framing/ClientInvoker.h \
+    gen/qpid/framing/ClientInvoker.cpp \
+    gen/qpid/framing/ServerInvoker.h \
+    gen/qpid/framing/ServerInvoker.cpp \
+    gen/qpid/framing/AllInvoker.h \
+    gen/qpid/framing/AllInvoker.cpp \
+    gen/qpid/framing/MethodBodyConstVisitor.h \
+    gen/qpid/framing/MethodBodyDefaultVisitor.h \
+    gen/qpid/framing/MethodBodyDefaultVisitor.cpp \
+    gen/qpid/framing/AMQP_ClientProxy.h \
+    gen/qpid/framing/AMQP_ClientProxy.cpp \
+    gen/qpid/framing/AMQP_ServerProxy.h \
+    gen/qpid/framing/AMQP_ServerProxy.cpp \
+    gen/qpid/framing/AMQP_AllProxy.h \
+    gen/qpid/framing/AMQP_AllProxy.cpp \
+    gen/qpid/framing/frame_body_lists.h \
+    gen/qpid/framing/Header.h \
+    gen/qpid/framing/Header.cpp \
+    gen/qpid/framing/DeliveryProperties.h \
+    gen/qpid/framing/DeliveryProperties.cpp \
+    gen/qpid/framing/FragmentProperties.h \
+    gen/qpid/framing/FragmentProperties.cpp \
+    gen/qpid/framing/ReplyTo.h \
+    gen/qpid/framing/ReplyTo.cpp \
+    gen/qpid/framing/MessageProperties.h \
+    gen/qpid/framing/MessageProperties.cpp \
+    gen/qpid/framing/MessageAcquireResult.h \
+    gen/qpid/framing/MessageAcquireResult.cpp \
+    gen/qpid/framing/MessageResumeResult.h \
+    gen/qpid/framing/MessageResumeResult.cpp \
+    gen/qpid/framing/XaResult.h \
+    gen/qpid/framing/XaResult.cpp \
+    gen/qpid/framing/Xid.h \
+    gen/qpid/framing/Xid.cpp \
+    gen/qpid/framing/DtxGetTimeoutResult.h \
+    gen/qpid/framing/DtxGetTimeoutResult.cpp \
+    gen/qpid/framing/DtxRecoverResult.h \
+    gen/qpid/framing/DtxRecoverResult.cpp \
+    gen/qpid/framing/ExchangeQueryResult.h \
+    gen/qpid/framing/ExchangeQueryResult.cpp \
+    gen/qpid/framing/ExchangeBoundResult.h \
+    gen/qpid/framing/ExchangeBoundResult.cpp \
+    gen/qpid/framing/QueueQueryResult.h \
+    gen/qpid/framing/QueueQueryResult.cpp \
+    gen/qpid/framing/FileProperties.h \
+    gen/qpid/framing/FileProperties.cpp \
+    gen/qpid/framing/StreamProperties.h \
+    gen/qpid/framing/StreamProperties.cpp \
+    gen/qpid/framing/ConnectionStartBody.h \
+    gen/qpid/framing/ConnectionStartBody.cpp \
+    gen/qpid/framing/ConnectionStartOkBody.h \
+    gen/qpid/framing/ConnectionStartOkBody.cpp \
+    gen/qpid/framing/ConnectionSecureBody.h \
+    gen/qpid/framing/ConnectionSecureBody.cpp \
+    gen/qpid/framing/ConnectionSecureOkBody.h \
+    gen/qpid/framing/ConnectionSecureOkBody.cpp \
+    gen/qpid/framing/ConnectionTuneBody.h \
+    gen/qpid/framing/ConnectionTuneBody.cpp \
+    gen/qpid/framing/ConnectionTuneOkBody.h \
+    gen/qpid/framing/ConnectionTuneOkBody.cpp \
+    gen/qpid/framing/ConnectionOpenBody.h \
+    gen/qpid/framing/ConnectionOpenBody.cpp \
+    gen/qpid/framing/ConnectionOpenOkBody.h \
+    gen/qpid/framing/ConnectionOpenOkBody.cpp \
+    gen/qpid/framing/ConnectionRedirectBody.h \
+    gen/qpid/framing/ConnectionRedirectBody.cpp \
+    gen/qpid/framing/ConnectionHeartbeatBody.h \
+    gen/qpid/framing/ConnectionHeartbeatBody.cpp \
+    gen/qpid/framing/ConnectionCloseBody.h \
+    gen/qpid/framing/ConnectionCloseBody.cpp \
+    gen/qpid/framing/ConnectionCloseOkBody.h \
+    gen/qpid/framing/ConnectionCloseOkBody.cpp \
+    gen/qpid/framing/SessionAttachBody.h \
+    gen/qpid/framing/SessionAttachBody.cpp \
+    gen/qpid/framing/SessionAttachedBody.h \
+    gen/qpid/framing/SessionAttachedBody.cpp \
+    gen/qpid/framing/SessionDetachBody.h \
+    gen/qpid/framing/SessionDetachBody.cpp \
+    gen/qpid/framing/SessionDetachedBody.h \
+    gen/qpid/framing/SessionDetachedBody.cpp \
+    gen/qpid/framing/SessionRequestTimeoutBody.h \
+    gen/qpid/framing/SessionRequestTimeoutBody.cpp \
+    gen/qpid/framing/SessionTimeoutBody.h \
+    gen/qpid/framing/SessionTimeoutBody.cpp \
+    gen/qpid/framing/SessionCommandPointBody.h \
+    gen/qpid/framing/SessionCommandPointBody.cpp \
+    gen/qpid/framing/SessionExpectedBody.h \
+    gen/qpid/framing/SessionExpectedBody.cpp \
+    gen/qpid/framing/SessionConfirmedBody.h \
+    gen/qpid/framing/SessionConfirmedBody.cpp \
+    gen/qpid/framing/SessionCompletedBody.h \
+    gen/qpid/framing/SessionCompletedBody.cpp \
+    gen/qpid/framing/SessionKnownCompletedBody.h \
+    gen/qpid/framing/SessionKnownCompletedBody.cpp \
+    gen/qpid/framing/SessionFlushBody.h \
+    gen/qpid/framing/SessionFlushBody.cpp \
+    gen/qpid/framing/SessionGapBody.h \
+    gen/qpid/framing/SessionGapBody.cpp \
+    gen/qpid/framing/ExecutionSyncBody.h \
+    gen/qpid/framing/ExecutionSyncBody.cpp \
+    gen/qpid/framing/ExecutionResultBody.h \
+    gen/qpid/framing/ExecutionResultBody.cpp \
+    gen/qpid/framing/ExecutionExceptionBody.h \
+    gen/qpid/framing/ExecutionExceptionBody.cpp \
+    gen/qpid/framing/MessageTransferBody.h \
+    gen/qpid/framing/MessageTransferBody.cpp \
+    gen/qpid/framing/MessageAcceptBody.h \
+    gen/qpid/framing/MessageAcceptBody.cpp \
+    gen/qpid/framing/MessageRejectBody.h \
+    gen/qpid/framing/MessageRejectBody.cpp \
+    gen/qpid/framing/MessageReleaseBody.h \
+    gen/qpid/framing/MessageReleaseBody.cpp \
+    gen/qpid/framing/MessageAcquireBody.h \
+    gen/qpid/framing/MessageAcquireBody.cpp \
+    gen/qpid/framing/MessageResumeBody.h \
+    gen/qpid/framing/MessageResumeBody.cpp \
+    gen/qpid/framing/MessageSubscribeBody.h \
+    gen/qpid/framing/MessageSubscribeBody.cpp \
+    gen/qpid/framing/MessageCancelBody.h \
+    gen/qpid/framing/MessageCancelBody.cpp \
+    gen/qpid/framing/MessageSetFlowModeBody.h \
+    gen/qpid/framing/MessageSetFlowModeBody.cpp \
+    gen/qpid/framing/MessageFlowBody.h \
+    gen/qpid/framing/MessageFlowBody.cpp \
+    gen/qpid/framing/MessageFlushBody.h \
+    gen/qpid/framing/MessageFlushBody.cpp \
+    gen/qpid/framing/MessageStopBody.h \
+    gen/qpid/framing/MessageStopBody.cpp \
+    gen/qpid/framing/TxSelectBody.h \
+    gen/qpid/framing/TxSelectBody.cpp \
+    gen/qpid/framing/TxCommitBody.h \
+    gen/qpid/framing/TxCommitBody.cpp \
+    gen/qpid/framing/TxRollbackBody.h \
+    gen/qpid/framing/TxRollbackBody.cpp \
+    gen/qpid/framing/DtxSelectBody.h \
+    gen/qpid/framing/DtxSelectBody.cpp \
+    gen/qpid/framing/DtxStartBody.h \
+    gen/qpid/framing/DtxStartBody.cpp \
+    gen/qpid/framing/DtxEndBody.h \
+    gen/qpid/framing/DtxEndBody.cpp \
+    gen/qpid/framing/DtxCommitBody.h \
+    gen/qpid/framing/DtxCommitBody.cpp \
+    gen/qpid/framing/DtxForgetBody.h \
+    gen/qpid/framing/DtxForgetBody.cpp \
+    gen/qpid/framing/DtxGetTimeoutBody.h \
+    gen/qpid/framing/DtxGetTimeoutBody.cpp \
+    gen/qpid/framing/DtxPrepareBody.h \
+    gen/qpid/framing/DtxPrepareBody.cpp \
+    gen/qpid/framing/DtxRecoverBody.h \
+    gen/qpid/framing/DtxRecoverBody.cpp \
+    gen/qpid/framing/DtxRollbackBody.h \
+    gen/qpid/framing/DtxRollbackBody.cpp \
+    gen/qpid/framing/DtxSetTimeoutBody.h \
+    gen/qpid/framing/DtxSetTimeoutBody.cpp \
+    gen/qpid/framing/ExchangeDeclareBody.h \
+    gen/qpid/framing/ExchangeDeclareBody.cpp \
+    gen/qpid/framing/ExchangeDeleteBody.h \
+    gen/qpid/framing/ExchangeDeleteBody.cpp \
+    gen/qpid/framing/ExchangeQueryBody.h \
+    gen/qpid/framing/ExchangeQueryBody.cpp \
+    gen/qpid/framing/ExchangeBindBody.h \
+    gen/qpid/framing/ExchangeBindBody.cpp \
+    gen/qpid/framing/ExchangeUnbindBody.h \
+    gen/qpid/framing/ExchangeUnbindBody.cpp \
+    gen/qpid/framing/ExchangeBoundBody.h \
+    gen/qpid/framing/ExchangeBoundBody.cpp \
+    gen/qpid/framing/QueueDeclareBody.h \
+    gen/qpid/framing/QueueDeclareBody.cpp \
+    gen/qpid/framing/QueueDeleteBody.h \
+    gen/qpid/framing/QueueDeleteBody.cpp \
+    gen/qpid/framing/QueuePurgeBody.h \
+    gen/qpid/framing/QueuePurgeBody.cpp \
+    gen/qpid/framing/QueueQueryBody.h \
+    gen/qpid/framing/QueueQueryBody.cpp \
+    gen/qpid/framing/FileQosBody.h \
+    gen/qpid/framing/FileQosBody.cpp \
+    gen/qpid/framing/FileQosOkBody.h \
+    gen/qpid/framing/FileQosOkBody.cpp \
+    gen/qpid/framing/FileConsumeBody.h \
+    gen/qpid/framing/FileConsumeBody.cpp \
+    gen/qpid/framing/FileConsumeOkBody.h \
+    gen/qpid/framing/FileConsumeOkBody.cpp \
+    gen/qpid/framing/FileCancelBody.h \
+    gen/qpid/framing/FileCancelBody.cpp \
+    gen/qpid/framing/FileOpenBody.h \
+    gen/qpid/framing/FileOpenBody.cpp \
+    gen/qpid/framing/FileOpenOkBody.h \
+    gen/qpid/framing/FileOpenOkBody.cpp \
+    gen/qpid/framing/FileStageBody.h \
+    gen/qpid/framing/FileStageBody.cpp \
+    gen/qpid/framing/FilePublishBody.h \
+    gen/qpid/framing/FilePublishBody.cpp \
+    gen/qpid/framing/FileReturnBody.h \
+    gen/qpid/framing/FileReturnBody.cpp \
+    gen/qpid/framing/FileDeliverBody.h \
+    gen/qpid/framing/FileDeliverBody.cpp \
+    gen/qpid/framing/FileAckBody.h \
+    gen/qpid/framing/FileAckBody.cpp \
+    gen/qpid/framing/FileRejectBody.h \
+    gen/qpid/framing/FileRejectBody.cpp \
+    gen/qpid/framing/StreamQosBody.h \
+    gen/qpid/framing/StreamQosBody.cpp \
+    gen/qpid/framing/StreamQosOkBody.h \
+    gen/qpid/framing/StreamQosOkBody.cpp \
+    gen/qpid/framing/StreamConsumeBody.h \
+    gen/qpid/framing/StreamConsumeBody.cpp \
+    gen/qpid/framing/StreamConsumeOkBody.h \
+    gen/qpid/framing/StreamConsumeOkBody.cpp \
+    gen/qpid/framing/StreamCancelBody.h \
+    gen/qpid/framing/StreamCancelBody.cpp \
+    gen/qpid/framing/StreamPublishBody.h \
+    gen/qpid/framing/StreamPublishBody.cpp \
+    gen/qpid/framing/StreamReturnBody.h \
+    gen/qpid/framing/StreamReturnBody.cpp \
+    gen/qpid/framing/StreamDeliverBody.h \
+    gen/qpid/framing/StreamDeliverBody.cpp \
+    gen/qpid/framing/ClusterUpdateRequestBody.h \
+    gen/qpid/framing/ClusterUpdateRequestBody.cpp \
+    gen/qpid/framing/ClusterUpdateOfferBody.h \
+    gen/qpid/framing/ClusterUpdateOfferBody.cpp \
+    gen/qpid/framing/ClusterReadyBody.h \
+    gen/qpid/framing/ClusterReadyBody.cpp \
+    gen/qpid/framing/ClusterConfigChangeBody.h \
+    gen/qpid/framing/ClusterConfigChangeBody.cpp \
+    gen/qpid/framing/ClusterMessageExpiredBody.h \
+    gen/qpid/framing/ClusterMessageExpiredBody.cpp \
+    gen/qpid/framing/ClusterShutdownBody.h \
+    gen/qpid/framing/ClusterShutdownBody.cpp \
+    gen/qpid/framing/ClusterConnectionDeliverCloseBody.h \
+    gen/qpid/framing/ClusterConnectionDeliverCloseBody.cpp \
+    gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.h \
+    gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.cpp \
+    gen/qpid/framing/ClusterConnectionConsumerStateBody.h \
+    gen/qpid/framing/ClusterConnectionConsumerStateBody.cpp \
+    gen/qpid/framing/ClusterConnectionDeliveryRecordBody.h \
+    gen/qpid/framing/ClusterConnectionDeliveryRecordBody.cpp \
+    gen/qpid/framing/ClusterConnectionTxStartBody.h \
+    gen/qpid/framing/ClusterConnectionTxStartBody.cpp \
+    gen/qpid/framing/ClusterConnectionTxAcceptBody.h \
+    gen/qpid/framing/ClusterConnectionTxAcceptBody.cpp \
+    gen/qpid/framing/ClusterConnectionTxDequeueBody.h \
+    gen/qpid/framing/ClusterConnectionTxDequeueBody.cpp \
+    gen/qpid/framing/ClusterConnectionTxEnqueueBody.h \
+    gen/qpid/framing/ClusterConnectionTxEnqueueBody.cpp \
+    gen/qpid/framing/ClusterConnectionTxPublishBody.h \
+    gen/qpid/framing/ClusterConnectionTxPublishBody.cpp \
+    gen/qpid/framing/ClusterConnectionTxEndBody.h \
+    gen/qpid/framing/ClusterConnectionTxEndBody.cpp \
+    gen/qpid/framing/ClusterConnectionAccumulatedAckBody.h \
+    gen/qpid/framing/ClusterConnectionAccumulatedAckBody.cpp \
+    gen/qpid/framing/ClusterConnectionSessionStateBody.h \
+    gen/qpid/framing/ClusterConnectionSessionStateBody.cpp \
+    gen/qpid/framing/ClusterConnectionShadowReadyBody.h \
+    gen/qpid/framing/ClusterConnectionShadowReadyBody.cpp \
+    gen/qpid/framing/ClusterConnectionMembershipBody.h \
+    gen/qpid/framing/ClusterConnectionMembershipBody.cpp \
+    gen/qpid/framing/ClusterConnectionQueuePositionBody.h \
+    gen/qpid/framing/ClusterConnectionQueuePositionBody.cpp \
+    gen/qpid/framing/ClusterConnectionExchangeBody.h \
+    gen/qpid/framing/ClusterConnectionExchangeBody.cpp \
+    gen/qpid/framing/ClusterConnectionQueueBody.h \
+    gen/qpid/framing/ClusterConnectionQueueBody.cpp \
+    gen/qpid/framing/ClusterConnectionExpiryIdBody.h \
+    gen/qpid/framing/ClusterConnectionExpiryIdBody.cpp \
+    gen/qpid/framing/amqp_structs.h \
+    gen/qpid/framing/constants.h \
+    gen/qpid/framing/enum.h \
+    gen/qpid/framing/reply_exceptions.h \
+    gen/qpid/framing/reply_exceptions.cpp \
+    gen/qpid/framing/TypeCode.h \
+    gen/qpid/framing/TypeCode.cpp \
+    gen/qpid/framing/AMQP_ClientOperations.h \
+    gen/qpid/framing/AMQP_ServerOperations.h \
+    gen/qpid/framing/AMQP_AllOperations.h \
+    gen/qpid/framing/all_method_bodies.h \
+    gen/qpid/framing/MethodBodyFactory.cpp
+
+rgen_client_srcs = gen/qpid/client/no_keyword/AsyncSession_0_10.h \
+    gen/qpid/client/no_keyword/AsyncSession_0_10.cpp \
+    gen/qpid/client/no_keyword/Session_0_10.h \
+    gen/qpid/client/no_keyword/Session_0_10.cpp \
+    gen/qpid/client/arg.h \
+    gen/qpid/client/AsyncSession_0_10.h \
+    gen/qpid/client/arg.h \
+    gen/qpid/client/Session_0_10.h
+
+rgen_amqp_0_10_srcs = gen/qpid/amqp_0_10/exceptions.h \
+    gen/qpid/amqp_0_10/TypeForCode.h \
+    gen/qpid/amqp_0_10/TypeForCode.cpp \
+    gen/qpid/amqp_0_10/CodeForType.h \
+    gen/qpid/amqp_0_10/CodeForType.cpp \
+    gen/qpid/amqp_0_10/specification_fwd.h \
+    gen/qpid/amqp_0_10/specification.h \
+    gen/qpid/amqp_0_10/specification.cpp \
+    gen/qpid/amqp_0_10/ProxyTemplate.h \
+    gen/qpid/amqp_0_10/structs.h \
+    gen/qpid/amqp_0_10/structs.cpp \
+    gen/qpid/amqp_0_10/CommandHolder.h \
+    gen/qpid/amqp_0_10/CommandHolder.cpp \
+    gen/qpid/amqp_0_10/CommandVisitor.h \
+    gen/qpid/amqp_0_10/ApplyCommand.h \
+    gen/qpid/amqp_0_10/ControlHolder.h \
+    gen/qpid/amqp_0_10/ControlHolder.cpp \
+    gen/qpid/amqp_0_10/ControlVisitor.h \
+    gen/qpid/amqp_0_10/ApplyControl.h \
+    gen/qpid/amqp_0_10/StructHolder.h \
+    gen/qpid/amqp_0_10/StructHolder.cpp \
+    gen/qpid/amqp_0_10/StructVisitor.h \
+    gen/qpid/amqp_0_10/ApplyStruct.h \
+    gen/qpid/amqp_0_10/handlers.h
+
+rgen_srcs = gen/qpid/framing/ClientInvoker.h \
+    gen/qpid/framing/ClientInvoker.cpp \
+    gen/qpid/framing/ServerInvoker.h \
+    gen/qpid/framing/ServerInvoker.cpp \
+    gen/qpid/framing/AllInvoker.h \
+    gen/qpid/framing/AllInvoker.cpp \
+    gen/qpid/framing/MethodBodyConstVisitor.h \
+    gen/qpid/framing/MethodBodyDefaultVisitor.h \
+    gen/qpid/framing/MethodBodyDefaultVisitor.cpp \
+    gen/qpid/framing/AMQP_ClientProxy.h \
+    gen/qpid/framing/AMQP_ClientProxy.cpp \
+    gen/qpid/framing/AMQP_ServerProxy.h \
+    gen/qpid/framing/AMQP_ServerProxy.cpp \
+    gen/qpid/framing/AMQP_AllProxy.h \
+    gen/qpid/framing/AMQP_AllProxy.cpp \
+    gen/qpid/framing/frame_body_lists.h \
+    gen/qpid/framing/Header.h \
+    gen/qpid/framing/Header.cpp \
+    gen/qpid/framing/DeliveryProperties.h \
+    gen/qpid/framing/DeliveryProperties.cpp \
+    gen/qpid/framing/FragmentProperties.h \
+    gen/qpid/framing/FragmentProperties.cpp \
+    gen/qpid/framing/ReplyTo.h \
+    gen/qpid/framing/ReplyTo.cpp \
+    gen/qpid/framing/MessageProperties.h \
+    gen/qpid/framing/MessageProperties.cpp \
+    gen/qpid/framing/MessageAcquireResult.h \
+    gen/qpid/framing/MessageAcquireResult.cpp \
+    gen/qpid/framing/MessageResumeResult.h \
+    gen/qpid/framing/MessageResumeResult.cpp \
+    gen/qpid/framing/XaResult.h \
+    gen/qpid/framing/XaResult.cpp \
+    gen/qpid/framing/Xid.h \
+    gen/qpid/framing/Xid.cpp \
+    gen/qpid/framing/DtxGetTimeoutResult.h \
+    gen/qpid/framing/DtxGetTimeoutResult.cpp \
+    gen/qpid/framing/DtxRecoverResult.h \
+    gen/qpid/framing/DtxRecoverResult.cpp \
+    gen/qpid/framing/ExchangeQueryResult.h \
+    gen/qpid/framing/ExchangeQueryResult.cpp \
+    gen/qpid/framing/ExchangeBoundResult.h \
+    gen/qpid/framing/ExchangeBoundResult.cpp \
+    gen/qpid/framing/QueueQueryResult.h \
+    gen/qpid/framing/QueueQueryResult.cpp \
+    gen/qpid/framing/FileProperties.h \
+    gen/qpid/framing/FileProperties.cpp \
+    gen/qpid/framing/StreamProperties.h \
+    gen/qpid/framing/StreamProperties.cpp \
+    gen/qpid/framing/ConnectionStartBody.h \
+    gen/qpid/framing/ConnectionStartBody.cpp \
+    gen/qpid/framing/ConnectionStartOkBody.h \
+    gen/qpid/framing/ConnectionStartOkBody.cpp \
+    gen/qpid/framing/ConnectionSecureBody.h \
+    gen/qpid/framing/ConnectionSecureBody.cpp \
+    gen/qpid/framing/ConnectionSecureOkBody.h \
+    gen/qpid/framing/ConnectionSecureOkBody.cpp \
+    gen/qpid/framing/ConnectionTuneBody.h \
+    gen/qpid/framing/ConnectionTuneBody.cpp \
+    gen/qpid/framing/ConnectionTuneOkBody.h \
+    gen/qpid/framing/ConnectionTuneOkBody.cpp \
+    gen/qpid/framing/ConnectionOpenBody.h \
+    gen/qpid/framing/ConnectionOpenBody.cpp \
+    gen/qpid/framing/ConnectionOpenOkBody.h \
+    gen/qpid/framing/ConnectionOpenOkBody.cpp \
+    gen/qpid/framing/ConnectionRedirectBody.h \
+    gen/qpid/framing/ConnectionRedirectBody.cpp \
+    gen/qpid/framing/ConnectionHeartbeatBody.h \
+    gen/qpid/framing/ConnectionHeartbeatBody.cpp \
+    gen/qpid/framing/ConnectionCloseBody.h \
+    gen/qpid/framing/ConnectionCloseBody.cpp \
+    gen/qpid/framing/ConnectionCloseOkBody.h \
+    gen/qpid/framing/ConnectionCloseOkBody.cpp \
+    gen/qpid/framing/SessionAttachBody.h \
+    gen/qpid/framing/SessionAttachBody.cpp \
+    gen/qpid/framing/SessionAttachedBody.h \
+    gen/qpid/framing/SessionAttachedBody.cpp \
+    gen/qpid/framing/SessionDetachBody.h \
+    gen/qpid/framing/SessionDetachBody.cpp \
+    gen/qpid/framing/SessionDetachedBody.h \
+    gen/qpid/framing/SessionDetachedBody.cpp \
+    gen/qpid/framing/SessionRequestTimeoutBody.h \
+    gen/qpid/framing/SessionRequestTimeoutBody.cpp \
+    gen/qpid/framing/SessionTimeoutBody.h \
+    gen/qpid/framing/SessionTimeoutBody.cpp \
+    gen/qpid/framing/SessionCommandPointBody.h \
+    gen/qpid/framing/SessionCommandPointBody.cpp \
+    gen/qpid/framing/SessionExpectedBody.h \
+    gen/qpid/framing/SessionExpectedBody.cpp \
+    gen/qpid/framing/SessionConfirmedBody.h \
+    gen/qpid/framing/SessionConfirmedBody.cpp \
+    gen/qpid/framing/SessionCompletedBody.h \
+    gen/qpid/framing/SessionCompletedBody.cpp \
+    gen/qpid/framing/SessionKnownCompletedBody.h \
+    gen/qpid/framing/SessionKnownCompletedBody.cpp \
+    gen/qpid/framing/SessionFlushBody.h \
+    gen/qpid/framing/SessionFlushBody.cpp \
+    gen/qpid/framing/SessionGapBody.h \
+    gen/qpid/framing/SessionGapBody.cpp \
+    gen/qpid/framing/ExecutionSyncBody.h \
+    gen/qpid/framing/ExecutionSyncBody.cpp \
+    gen/qpid/framing/ExecutionResultBody.h \
+    gen/qpid/framing/ExecutionResultBody.cpp \
+    gen/qpid/framing/ExecutionExceptionBody.h \
+    gen/qpid/framing/ExecutionExceptionBody.cpp \
+    gen/qpid/framing/MessageTransferBody.h \
+    gen/qpid/framing/MessageTransferBody.cpp \
+    gen/qpid/framing/MessageAcceptBody.h \
+    gen/qpid/framing/MessageAcceptBody.cpp \
+    gen/qpid/framing/MessageRejectBody.h \
+    gen/qpid/framing/MessageRejectBody.cpp \
+    gen/qpid/framing/MessageReleaseBody.h \
+    gen/qpid/framing/MessageReleaseBody.cpp \
+    gen/qpid/framing/MessageAcquireBody.h \
+    gen/qpid/framing/MessageAcquireBody.cpp \
+    gen/qpid/framing/MessageResumeBody.h \
+    gen/qpid/framing/MessageResumeBody.cpp \
+    gen/qpid/framing/MessageSubscribeBody.h \
+    gen/qpid/framing/MessageSubscribeBody.cpp \
+    gen/qpid/framing/MessageCancelBody.h \
+    gen/qpid/framing/MessageCancelBody.cpp \
+    gen/qpid/framing/MessageSetFlowModeBody.h \
+    gen/qpid/framing/MessageSetFlowModeBody.cpp \
+    gen/qpid/framing/MessageFlowBody.h \
+    gen/qpid/framing/MessageFlowBody.cpp \
+    gen/qpid/framing/MessageFlushBody.h \
+    gen/qpid/framing/MessageFlushBody.cpp \
+    gen/qpid/framing/MessageStopBody.h \
+    gen/qpid/framing/MessageStopBody.cpp \
+    gen/qpid/framing/TxSelectBody.h \
+    gen/qpid/framing/TxSelectBody.cpp \
+    gen/qpid/framing/TxCommitBody.h \
+    gen/qpid/framing/TxCommitBody.cpp \
+    gen/qpid/framing/TxRollbackBody.h \
+    gen/qpid/framing/TxRollbackBody.cpp \
+    gen/qpid/framing/DtxSelectBody.h \
+    gen/qpid/framing/DtxSelectBody.cpp \
+    gen/qpid/framing/DtxStartBody.h \
+    gen/qpid/framing/DtxStartBody.cpp \
+    gen/qpid/framing/DtxEndBody.h \
+    gen/qpid/framing/DtxEndBody.cpp \
+    gen/qpid/framing/DtxCommitBody.h \
+    gen/qpid/framing/DtxCommitBody.cpp \
+    gen/qpid/framing/DtxForgetBody.h \
+    gen/qpid/framing/DtxForgetBody.cpp \
+    gen/qpid/framing/DtxGetTimeoutBody.h \
+    gen/qpid/framing/DtxGetTimeoutBody.cpp \
+    gen/qpid/framing/DtxPrepareBody.h \
+    gen/qpid/framing/DtxPrepareBody.cpp \
+    gen/qpid/framing/DtxRecoverBody.h \
+    gen/qpid/framing/DtxRecoverBody.cpp \
+    gen/qpid/framing/DtxRollbackBody.h \
+    gen/qpid/framing/DtxRollbackBody.cpp \
+    gen/qpid/framing/DtxSetTimeoutBody.h \
+    gen/qpid/framing/DtxSetTimeoutBody.cpp \
+    gen/qpid/framing/ExchangeDeclareBody.h \
+    gen/qpid/framing/ExchangeDeclareBody.cpp \
+    gen/qpid/framing/ExchangeDeleteBody.h \
+    gen/qpid/framing/ExchangeDeleteBody.cpp \
+    gen/qpid/framing/ExchangeQueryBody.h \
+    gen/qpid/framing/ExchangeQueryBody.cpp \
+    gen/qpid/framing/ExchangeBindBody.h \
+    gen/qpid/framing/ExchangeBindBody.cpp \
+    gen/qpid/framing/ExchangeUnbindBody.h \
+    gen/qpid/framing/ExchangeUnbindBody.cpp \
+    gen/qpid/framing/ExchangeBoundBody.h \
+    gen/qpid/framing/ExchangeBoundBody.cpp \
+    gen/qpid/framing/QueueDeclareBody.h \
+    gen/qpid/framing/QueueDeclareBody.cpp \
+    gen/qpid/framing/QueueDeleteBody.h \
+    gen/qpid/framing/QueueDeleteBody.cpp \
+    gen/qpid/framing/QueuePurgeBody.h \
+    gen/qpid/framing/QueuePurgeBody.cpp \
+    gen/qpid/framing/QueueQueryBody.h \
+    gen/qpid/framing/QueueQueryBody.cpp \
+    gen/qpid/framing/FileQosBody.h \
+    gen/qpid/framing/FileQosBody.cpp \
+    gen/qpid/framing/FileQosOkBody.h \
+    gen/qpid/framing/FileQosOkBody.cpp \
+    gen/qpid/framing/FileConsumeBody.h \
+    gen/qpid/framing/FileConsumeBody.cpp \
+    gen/qpid/framing/FileConsumeOkBody.h \
+    gen/qpid/framing/FileConsumeOkBody.cpp \
+    gen/qpid/framing/FileCancelBody.h \
+    gen/qpid/framing/FileCancelBody.cpp \
+    gen/qpid/framing/FileOpenBody.h \
+    gen/qpid/framing/FileOpenBody.cpp \
+    gen/qpid/framing/FileOpenOkBody.h \
+    gen/qpid/framing/FileOpenOkBody.cpp \
+    gen/qpid/framing/FileStageBody.h \
+    gen/qpid/framing/FileStageBody.cpp \
+    gen/qpid/framing/FilePublishBody.h \
+    gen/qpid/framing/FilePublishBody.cpp \
+    gen/qpid/framing/FileReturnBody.h \
+    gen/qpid/framing/FileReturnBody.cpp \
+    gen/qpid/framing/FileDeliverBody.h \
+    gen/qpid/framing/FileDeliverBody.cpp \
+    gen/qpid/framing/FileAckBody.h \
+    gen/qpid/framing/FileAckBody.cpp \
+    gen/qpid/framing/FileRejectBody.h \
+    gen/qpid/framing/FileRejectBody.cpp \
+    gen/qpid/framing/StreamQosBody.h \
+    gen/qpid/framing/StreamQosBody.cpp \
+    gen/qpid/framing/StreamQosOkBody.h \
+    gen/qpid/framing/StreamQosOkBody.cpp \
+    gen/qpid/framing/StreamConsumeBody.h \
+    gen/qpid/framing/StreamConsumeBody.cpp \
+    gen/qpid/framing/StreamConsumeOkBody.h \
+    gen/qpid/framing/StreamConsumeOkBody.cpp \
+    gen/qpid/framing/StreamCancelBody.h \
+    gen/qpid/framing/StreamCancelBody.cpp \
+    gen/qpid/framing/StreamPublishBody.h \
+    gen/qpid/framing/StreamPublishBody.cpp \
+    gen/qpid/framing/StreamReturnBody.h \
+    gen/qpid/framing/StreamReturnBody.cpp \
+    gen/qpid/framing/StreamDeliverBody.h \
+    gen/qpid/framing/StreamDeliverBody.cpp \
+    gen/qpid/framing/ClusterUpdateRequestBody.h \
+    gen/qpid/framing/ClusterUpdateRequestBody.cpp \
+    gen/qpid/framing/ClusterUpdateOfferBody.h \
+    gen/qpid/framing/ClusterUpdateOfferBody.cpp \
+    gen/qpid/framing/ClusterReadyBody.h \
+    gen/qpid/framing/ClusterReadyBody.cpp \
+    gen/qpid/framing/ClusterConfigChangeBody.h \
+    gen/qpid/framing/ClusterConfigChangeBody.cpp \
+    gen/qpid/framing/ClusterMessageExpiredBody.h \
+    gen/qpid/framing/ClusterMessageExpiredBody.cpp \
+    gen/qpid/framing/ClusterShutdownBody.h \
+    gen/qpid/framing/ClusterShutdownBody.cpp \
+    gen/qpid/framing/ClusterConnectionDeliverCloseBody.h \
+    gen/qpid/framing/ClusterConnectionDeliverCloseBody.cpp \
+    gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.h \
+    gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.cpp \
+    gen/qpid/framing/ClusterConnectionConsumerStateBody.h \
+    gen/qpid/framing/ClusterConnectionConsumerStateBody.cpp \
+    gen/qpid/framing/ClusterConnectionDeliveryRecordBody.h \
+    gen/qpid/framing/ClusterConnectionDeliveryRecordBody.cpp \
+    gen/qpid/framing/ClusterConnectionTxStartBody.h \
+    gen/qpid/framing/ClusterConnectionTxStartBody.cpp \
+    gen/qpid/framing/ClusterConnectionTxAcceptBody.h \
+    gen/qpid/framing/ClusterConnectionTxAcceptBody.cpp \
+    gen/qpid/framing/ClusterConnectionTxDequeueBody.h \
+    gen/qpid/framing/ClusterConnectionTxDequeueBody.cpp \
+    gen/qpid/framing/ClusterConnectionTxEnqueueBody.h \
+    gen/qpid/framing/ClusterConnectionTxEnqueueBody.cpp \
+    gen/qpid/framing/ClusterConnectionTxPublishBody.h \
+    gen/qpid/framing/ClusterConnectionTxPublishBody.cpp \
+    gen/qpid/framing/ClusterConnectionTxEndBody.h \
+    gen/qpid/framing/ClusterConnectionTxEndBody.cpp \
+    gen/qpid/framing/ClusterConnectionAccumulatedAckBody.h \
+    gen/qpid/framing/ClusterConnectionAccumulatedAckBody.cpp \
+    gen/qpid/framing/ClusterConnectionSessionStateBody.h \
+    gen/qpid/framing/ClusterConnectionSessionStateBody.cpp \
+    gen/qpid/framing/ClusterConnectionShadowReadyBody.h \
+    gen/qpid/framing/ClusterConnectionShadowReadyBody.cpp \
+    gen/qpid/framing/ClusterConnectionMembershipBody.h \
+    gen/qpid/framing/ClusterConnectionMembershipBody.cpp \
+    gen/qpid/framing/ClusterConnectionQueuePositionBody.h \
+    gen/qpid/framing/ClusterConnectionQueuePositionBody.cpp \
+    gen/qpid/framing/ClusterConnectionExchangeBody.h \
+    gen/qpid/framing/ClusterConnectionExchangeBody.cpp \
+    gen/qpid/framing/ClusterConnectionQueueBody.h \
+    gen/qpid/framing/ClusterConnectionQueueBody.cpp \
+    gen/qpid/framing/ClusterConnectionExpiryIdBody.h \
+    gen/qpid/framing/ClusterConnectionExpiryIdBody.cpp \
+    gen/qpid/framing/amqp_structs.h \
+    gen/qpid/framing/constants.h \
+    gen/qpid/framing/enum.h \
+    gen/qpid/framing/reply_exceptions.h \
+    gen/qpid/framing/reply_exceptions.cpp \
+    gen/qpid/framing/TypeCode.h \
+    gen/qpid/framing/TypeCode.cpp \
+    gen/qpid/framing/AMQP_ClientOperations.h \
+    gen/qpid/framing/AMQP_ServerOperations.h \
+    gen/qpid/framing/AMQP_AllOperations.h \
+    gen/qpid/client/no_keyword/AsyncSession_0_10.h \
+    gen/qpid/client/no_keyword/AsyncSession_0_10.cpp \
+    gen/qpid/client/no_keyword/Session_0_10.h \
+    gen/qpid/client/no_keyword/Session_0_10.cpp \
+    gen/qpid/client/arg.h \
+    gen/qpid/client/AsyncSession_0_10.h \
+    gen/qpid/client/arg.h \
+    gen/qpid/client/Session_0_10.h \
+    gen/qpid/framing/all_method_bodies.h \
+    gen/qpid/framing/MethodBodyFactory.cpp \
+    gen/qpid/amqp_0_10/exceptions.h \
+    gen/qpid/amqp_0_10/TypeForCode.h \
+    gen/qpid/amqp_0_10/TypeForCode.cpp \
+    gen/qpid/amqp_0_10/CodeForType.h \
+    gen/qpid/amqp_0_10/CodeForType.cpp \
+    gen/qpid/amqp_0_10/specification_fwd.h \
+    gen/qpid/amqp_0_10/specification.h \
+    gen/qpid/amqp_0_10/specification.cpp \
+    gen/qpid/amqp_0_10/ProxyTemplate.h \
+    gen/qpid/amqp_0_10/structs.h \
+    gen/qpid/amqp_0_10/structs.cpp \
+    gen/qpid/amqp_0_10/CommandHolder.h \
+    gen/qpid/amqp_0_10/CommandHolder.cpp \
+    gen/qpid/amqp_0_10/CommandVisitor.h \
+    gen/qpid/amqp_0_10/ApplyCommand.h \
+    gen/qpid/amqp_0_10/ControlHolder.h \
+    gen/qpid/amqp_0_10/ControlHolder.cpp \
+    gen/qpid/amqp_0_10/ControlVisitor.h \
+    gen/qpid/amqp_0_10/ApplyControl.h \
+    gen/qpid/amqp_0_10/StructHolder.h \
+    gen/qpid/amqp_0_10/StructHolder.cpp \
+    gen/qpid/amqp_0_10/StructVisitor.h \
+    gen/qpid/amqp_0_10/ApplyStruct.h \
+    gen/tests/allSegmentTypes.h \
+    gen/qpid/amqp_0_10/handlers.h
+
+
+# Header file install rules.
+qpid_amqp_0_10dir = $(includedir)/qpid/amqp_0_10
+dist_qpid_amqp_0_10_HEADERS = gen/qpid/amqp_0_10/exceptions.h \
+    gen/qpid/amqp_0_10/TypeForCode.h \
+    gen/qpid/amqp_0_10/CodeForType.h \
+    gen/qpid/amqp_0_10/specification_fwd.h \
+    gen/qpid/amqp_0_10/specification.h \
+    gen/qpid/amqp_0_10/ProxyTemplate.h \
+    gen/qpid/amqp_0_10/structs.h \
+    gen/qpid/amqp_0_10/CommandHolder.h \
+    gen/qpid/amqp_0_10/CommandVisitor.h \
+    gen/qpid/amqp_0_10/ApplyCommand.h \
+    gen/qpid/amqp_0_10/ControlHolder.h \
+    gen/qpid/amqp_0_10/ControlVisitor.h \
+    gen/qpid/amqp_0_10/ApplyControl.h \
+    gen/qpid/amqp_0_10/StructHolder.h \
+    gen/qpid/amqp_0_10/StructVisitor.h \
+    gen/qpid/amqp_0_10/ApplyStruct.h \
+    gen/qpid/amqp_0_10/handlers.h
+
+qpid_framingdir = $(includedir)/qpid/framing
+dist_qpid_framing_HEADERS = gen/qpid/framing/ClientInvoker.h \
+    gen/qpid/framing/ServerInvoker.h \
+    gen/qpid/framing/AllInvoker.h \
+    gen/qpid/framing/MethodBodyConstVisitor.h \
+    gen/qpid/framing/MethodBodyDefaultVisitor.h \
+    gen/qpid/framing/AMQP_ClientProxy.h \
+    gen/qpid/framing/AMQP_ServerProxy.h \
+    gen/qpid/framing/AMQP_AllProxy.h \
+    gen/qpid/framing/frame_body_lists.h \
+    gen/qpid/framing/Header.h \
+    gen/qpid/framing/DeliveryProperties.h \
+    gen/qpid/framing/FragmentProperties.h \
+    gen/qpid/framing/ReplyTo.h \
+    gen/qpid/framing/MessageProperties.h \
+    gen/qpid/framing/MessageAcquireResult.h \
+    gen/qpid/framing/MessageResumeResult.h \
+    gen/qpid/framing/XaResult.h \
+    gen/qpid/framing/Xid.h \
+    gen/qpid/framing/DtxGetTimeoutResult.h \
+    gen/qpid/framing/DtxRecoverResult.h \
+    gen/qpid/framing/ExchangeQueryResult.h \
+    gen/qpid/framing/ExchangeBoundResult.h \
+    gen/qpid/framing/QueueQueryResult.h \
+    gen/qpid/framing/FileProperties.h \
+    gen/qpid/framing/StreamProperties.h \
+    gen/qpid/framing/ConnectionStartBody.h \
+    gen/qpid/framing/ConnectionStartOkBody.h \
+    gen/qpid/framing/ConnectionSecureBody.h \
+    gen/qpid/framing/ConnectionSecureOkBody.h \
+    gen/qpid/framing/ConnectionTuneBody.h \
+    gen/qpid/framing/ConnectionTuneOkBody.h \
+    gen/qpid/framing/ConnectionOpenBody.h \
+    gen/qpid/framing/ConnectionOpenOkBody.h \
+    gen/qpid/framing/ConnectionRedirectBody.h \
+    gen/qpid/framing/ConnectionHeartbeatBody.h \
+    gen/qpid/framing/ConnectionCloseBody.h \
+    gen/qpid/framing/ConnectionCloseOkBody.h \
+    gen/qpid/framing/SessionAttachBody.h \
+    gen/qpid/framing/SessionAttachedBody.h \
+    gen/qpid/framing/SessionDetachBody.h \
+    gen/qpid/framing/SessionDetachedBody.h \
+    gen/qpid/framing/SessionRequestTimeoutBody.h \
+    gen/qpid/framing/SessionTimeoutBody.h \
+    gen/qpid/framing/SessionCommandPointBody.h \
+    gen/qpid/framing/SessionExpectedBody.h \
+    gen/qpid/framing/SessionConfirmedBody.h \
+    gen/qpid/framing/SessionCompletedBody.h \
+    gen/qpid/framing/SessionKnownCompletedBody.h \
+    gen/qpid/framing/SessionFlushBody.h \
+    gen/qpid/framing/SessionGapBody.h \
+    gen/qpid/framing/ExecutionSyncBody.h \
+    gen/qpid/framing/ExecutionResultBody.h \
+    gen/qpid/framing/ExecutionExceptionBody.h \
+    gen/qpid/framing/MessageTransferBody.h \
+    gen/qpid/framing/MessageAcceptBody.h \
+    gen/qpid/framing/MessageRejectBody.h \
+    gen/qpid/framing/MessageReleaseBody.h \
+    gen/qpid/framing/MessageAcquireBody.h \
+    gen/qpid/framing/MessageResumeBody.h \
+    gen/qpid/framing/MessageSubscribeBody.h \
+    gen/qpid/framing/MessageCancelBody.h \
+    gen/qpid/framing/MessageSetFlowModeBody.h \
+    gen/qpid/framing/MessageFlowBody.h \
+    gen/qpid/framing/MessageFlushBody.h \
+    gen/qpid/framing/MessageStopBody.h \
+    gen/qpid/framing/TxSelectBody.h \
+    gen/qpid/framing/TxCommitBody.h \
+    gen/qpid/framing/TxRollbackBody.h \
+    gen/qpid/framing/DtxSelectBody.h \
+    gen/qpid/framing/DtxStartBody.h \
+    gen/qpid/framing/DtxEndBody.h \
+    gen/qpid/framing/DtxCommitBody.h \
+    gen/qpid/framing/DtxForgetBody.h \
+    gen/qpid/framing/DtxGetTimeoutBody.h \
+    gen/qpid/framing/DtxPrepareBody.h \
+    gen/qpid/framing/DtxRecoverBody.h \
+    gen/qpid/framing/DtxRollbackBody.h \
+    gen/qpid/framing/DtxSetTimeoutBody.h \
+    gen/qpid/framing/ExchangeDeclareBody.h \
+    gen/qpid/framing/ExchangeDeleteBody.h \
+    gen/qpid/framing/ExchangeQueryBody.h \
+    gen/qpid/framing/ExchangeBindBody.h \
+    gen/qpid/framing/ExchangeUnbindBody.h \
+    gen/qpid/framing/ExchangeBoundBody.h \
+    gen/qpid/framing/QueueDeclareBody.h \
+    gen/qpid/framing/QueueDeleteBody.h \
+    gen/qpid/framing/QueuePurgeBody.h \
+    gen/qpid/framing/QueueQueryBody.h \
+    gen/qpid/framing/FileQosBody.h \
+    gen/qpid/framing/FileQosOkBody.h \
+    gen/qpid/framing/FileConsumeBody.h \
+    gen/qpid/framing/FileConsumeOkBody.h \
+    gen/qpid/framing/FileCancelBody.h \
+    gen/qpid/framing/FileOpenBody.h \
+    gen/qpid/framing/FileOpenOkBody.h \
+    gen/qpid/framing/FileStageBody.h \
+    gen/qpid/framing/FilePublishBody.h \
+    gen/qpid/framing/FileReturnBody.h \
+    gen/qpid/framing/FileDeliverBody.h \
+    gen/qpid/framing/FileAckBody.h \
+    gen/qpid/framing/FileRejectBody.h \
+    gen/qpid/framing/StreamQosBody.h \
+    gen/qpid/framing/StreamQosOkBody.h \
+    gen/qpid/framing/StreamConsumeBody.h \
+    gen/qpid/framing/StreamConsumeOkBody.h \
+    gen/qpid/framing/StreamCancelBody.h \
+    gen/qpid/framing/StreamPublishBody.h \
+    gen/qpid/framing/StreamReturnBody.h \
+    gen/qpid/framing/StreamDeliverBody.h \
+    gen/qpid/framing/ClusterUpdateRequestBody.h \
+    gen/qpid/framing/ClusterUpdateOfferBody.h \
+    gen/qpid/framing/ClusterReadyBody.h \
+    gen/qpid/framing/ClusterConfigChangeBody.h \
+    gen/qpid/framing/ClusterMessageExpiredBody.h \
+    gen/qpid/framing/ClusterShutdownBody.h \
+    gen/qpid/framing/ClusterConnectionDeliverCloseBody.h \
+    gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.h \
+    gen/qpid/framing/ClusterConnectionConsumerStateBody.h \
+    gen/qpid/framing/ClusterConnectionDeliveryRecordBody.h \
+    gen/qpid/framing/ClusterConnectionTxStartBody.h \
+    gen/qpid/framing/ClusterConnectionTxAcceptBody.h \
+    gen/qpid/framing/ClusterConnectionTxDequeueBody.h \
+    gen/qpid/framing/ClusterConnectionTxEnqueueBody.h \
+    gen/qpid/framing/ClusterConnectionTxPublishBody.h \
+    gen/qpid/framing/ClusterConnectionTxEndBody.h \
+    gen/qpid/framing/ClusterConnectionAccumulatedAckBody.h \
+    gen/qpid/framing/ClusterConnectionSessionStateBody.h \
+    gen/qpid/framing/ClusterConnectionShadowReadyBody.h \
+    gen/qpid/framing/ClusterConnectionMembershipBody.h \
+    gen/qpid/framing/ClusterConnectionQueuePositionBody.h \
+    gen/qpid/framing/ClusterConnectionExchangeBody.h \
+    gen/qpid/framing/ClusterConnectionQueueBody.h \
+    gen/qpid/framing/ClusterConnectionExpiryIdBody.h \
+    gen/qpid/framing/amqp_structs.h \
+    gen/qpid/framing/constants.h \
+    gen/qpid/framing/enum.h \
+    gen/qpid/framing/reply_exceptions.h \
+    gen/qpid/framing/TypeCode.h \
+    gen/qpid/framing/AMQP_ClientOperations.h \
+    gen/qpid/framing/AMQP_ServerOperations.h \
+    gen/qpid/framing/AMQP_AllOperations.h \
+    gen/qpid/framing/all_method_bodies.h
+
+qpid_client_no_keyworddir = $(includedir)/qpid/client/no_keyword
+dist_qpid_client_no_keyword_HEADERS = gen/qpid/client/no_keyword/AsyncSession_0_10.h \
+    gen/qpid/client/no_keyword/Session_0_10.h
+
+qpid_clientdir = $(includedir)/qpid/client
+dist_qpid_client_HEADERS = gen/qpid/client/arg.h \
+    gen/qpid/client/AsyncSession_0_10.h \
+    gen/qpid/client/arg.h \
+    gen/qpid/client/Session_0_10.h
+
+qpid_brokerdir = $(includedir)/qpid/broker
+dist_qpid_broker_HEADERS = 
+mgen_generator = $(mgen_dir)/qmf-gen \
+    $(mgen_dir)/qmfgen/generate.py \
+    $(mgen_dir)/qmfgen/schema.py \
+    $(mgen_dir)/qmfgen/management-types.xml \
+    $(top_srcdir)/../specs/management-schema.xml \
+    $(mgen_dir)/qmfgen/templates/Class.h \
+    $(mgen_dir)/qmfgen/templates/Class.cpp \
+    $(mgen_dir)/qmfgen/templates/Args.h \
+    $(mgen_dir)/qmfgen/templates/Event.h \
+    $(mgen_dir)/qmfgen/templates/Event.cpp \
+    $(mgen_dir)/qmfgen/templates/Package.h \
+    $(mgen_dir)/qmfgen/templates/Package.cpp \
+    $(mgen_dir)/qmfgen/templates/Class.h \
+    $(mgen_dir)/qmfgen/templates/Class.cpp \
+    $(mgen_dir)/qmfgen/templates/Args.h \
+    $(mgen_dir)/qmfgen/templates/Event.h \
+    $(mgen_dir)/qmfgen/templates/Event.cpp \
+    $(mgen_dir)/qmfgen/templates/Package.h \
+    $(mgen_dir)/qmfgen/templates/Package.cpp \
+    $(mgen_dir)/qmfgen/templates/Class.h \
+    $(mgen_dir)/qmfgen/templates/Class.cpp \
+    $(mgen_dir)/qmfgen/templates/Args.h \
+    $(mgen_dir)/qmfgen/templates/Event.h \
+    $(mgen_dir)/qmfgen/templates/Event.cpp \
+    $(mgen_dir)/qmfgen/templates/Package.h \
+    $(mgen_dir)/qmfgen/templates/Package.cpp \
+    $(mgen_dir)/qmfgen/templates/Makefile.mk
+
+mgen_broker_cpp = gen/qmf/org/apache/qpid/broker/System.cpp \
+    gen/qmf/org/apache/qpid/broker/Broker.cpp \
+    gen/qmf/org/apache/qpid/broker/Agent.cpp \
+    gen/qmf/org/apache/qpid/broker/Vhost.cpp \
+    gen/qmf/org/apache/qpid/broker/Queue.cpp \
+    gen/qmf/org/apache/qpid/broker/Exchange.cpp \
+    gen/qmf/org/apache/qpid/broker/Binding.cpp \
+    gen/qmf/org/apache/qpid/broker/Connection.cpp \
+    gen/qmf/org/apache/qpid/broker/Link.cpp \
+    gen/qmf/org/apache/qpid/broker/Bridge.cpp \
+    gen/qmf/org/apache/qpid/broker/Session.cpp \
+    gen/qmf/org/apache/qpid/broker/EventClientConnect.cpp \
+    gen/qmf/org/apache/qpid/broker/EventClientConnectFail.cpp \
+    gen/qmf/org/apache/qpid/broker/EventClientDisconnect.cpp \
+    gen/qmf/org/apache/qpid/broker/EventBrokerLinkUp.cpp \
+    gen/qmf/org/apache/qpid/broker/EventBrokerLinkDown.cpp \
+    gen/qmf/org/apache/qpid/broker/EventQueueDeclare.cpp \
+    gen/qmf/org/apache/qpid/broker/EventQueueDelete.cpp \
+    gen/qmf/org/apache/qpid/broker/EventExchangeDeclare.cpp \
+    gen/qmf/org/apache/qpid/broker/EventExchangeDelete.cpp \
+    gen/qmf/org/apache/qpid/broker/EventBind.cpp \
+    gen/qmf/org/apache/qpid/broker/EventUnbind.cpp \
+    gen/qmf/org/apache/qpid/broker/EventSubscribe.cpp \
+    gen/qmf/org/apache/qpid/broker/EventUnsubscribe.cpp \
+    gen/qmf/org/apache/qpid/broker/Package.cpp \
+    gen/qmf/org/apache/qpid/acl/Acl.cpp \
+    gen/qmf/org/apache/qpid/acl/EventAllow.cpp \
+    gen/qmf/org/apache/qpid/acl/EventDeny.cpp \
+    gen/qmf/org/apache/qpid/acl/EventFileLoaded.cpp \
+    gen/qmf/org/apache/qpid/acl/EventFileLoadFailed.cpp \
+    gen/qmf/org/apache/qpid/acl/Package.cpp \
+    gen/qmf/org/apache/qpid/cluster/Cluster.cpp \
+    gen/qmf/org/apache/qpid/cluster/Package.cpp
+
+
+# Header file install rules.
+org_apache_qpid_brokerdir = $(includedir)/qmf/org/apache/qpid/broker
+dist_org_apache_qpid_broker_HEADERS = gen/qmf/org/apache/qpid/broker/System.h \
+    gen/qmf/org/apache/qpid/broker/Broker.h \
+    gen/qmf/org/apache/qpid/broker/Agent.h \
+    gen/qmf/org/apache/qpid/broker/Vhost.h \
+    gen/qmf/org/apache/qpid/broker/Queue.h \
+    gen/qmf/org/apache/qpid/broker/Exchange.h \
+    gen/qmf/org/apache/qpid/broker/Binding.h \
+    gen/qmf/org/apache/qpid/broker/Connection.h \
+    gen/qmf/org/apache/qpid/broker/Link.h \
+    gen/qmf/org/apache/qpid/broker/Bridge.h \
+    gen/qmf/org/apache/qpid/broker/Session.h \
+    gen/qmf/org/apache/qpid/broker/ArgsBrokerEcho.h \
+    gen/qmf/org/apache/qpid/broker/ArgsBrokerConnect.h \
+    gen/qmf/org/apache/qpid/broker/ArgsBrokerQueueMoveMessages.h \
+    gen/qmf/org/apache/qpid/broker/ArgsQueuePurge.h \
+    gen/qmf/org/apache/qpid/broker/ArgsLinkBridge.h \
+    gen/qmf/org/apache/qpid/broker/EventClientConnect.h \
+    gen/qmf/org/apache/qpid/broker/EventClientConnectFail.h \
+    gen/qmf/org/apache/qpid/broker/EventClientDisconnect.h \
+    gen/qmf/org/apache/qpid/broker/EventBrokerLinkUp.h \
+    gen/qmf/org/apache/qpid/broker/EventBrokerLinkDown.h \
+    gen/qmf/org/apache/qpid/broker/EventQueueDeclare.h \
+    gen/qmf/org/apache/qpid/broker/EventQueueDelete.h \
+    gen/qmf/org/apache/qpid/broker/EventExchangeDeclare.h \
+    gen/qmf/org/apache/qpid/broker/EventExchangeDelete.h \
+    gen/qmf/org/apache/qpid/broker/EventBind.h \
+    gen/qmf/org/apache/qpid/broker/EventUnbind.h \
+    gen/qmf/org/apache/qpid/broker/EventSubscribe.h \
+    gen/qmf/org/apache/qpid/broker/EventUnsubscribe.h \
+    gen/qmf/org/apache/qpid/broker/Package.h
+
+org_apache_qpid_acldir = $(includedir)/qmf/org/apache/qpid/acl
+dist_org_apache_qpid_acl_HEADERS = gen/qmf/org/apache/qpid/acl/Acl.h \
+    gen/qmf/org/apache/qpid/acl/EventAllow.h \
+    gen/qmf/org/apache/qpid/acl/EventDeny.h \
+    gen/qmf/org/apache/qpid/acl/EventFileLoaded.h \
+    gen/qmf/org/apache/qpid/acl/EventFileLoadFailed.h \
+    gen/qmf/org/apache/qpid/acl/Package.h
+
+org_apache_qpid_clusterdir = $(includedir)/qmf/org/apache/qpid/cluster
+dist_org_apache_qpid_cluster_HEADERS = gen/qmf/org/apache/qpid/cluster/Cluster.h \
+    gen/qmf/org/apache/qpid/cluster/ArgsClusterStopClusterNode.h \
+    gen/qmf/org/apache/qpid/cluster/Package.h
+
+qmfgen_sources = gen/qmf/org/apache/qpid/broker/System.h \
+    gen/qmf/org/apache/qpid/broker/Broker.h \
+    gen/qmf/org/apache/qpid/broker/Agent.h \
+    gen/qmf/org/apache/qpid/broker/Vhost.h \
+    gen/qmf/org/apache/qpid/broker/Queue.h \
+    gen/qmf/org/apache/qpid/broker/Exchange.h \
+    gen/qmf/org/apache/qpid/broker/Binding.h \
+    gen/qmf/org/apache/qpid/broker/Connection.h \
+    gen/qmf/org/apache/qpid/broker/Link.h \
+    gen/qmf/org/apache/qpid/broker/Bridge.h \
+    gen/qmf/org/apache/qpid/broker/Session.h \
+    gen/qmf/org/apache/qpid/broker/ArgsBrokerEcho.h \
+    gen/qmf/org/apache/qpid/broker/ArgsBrokerConnect.h \
+    gen/qmf/org/apache/qpid/broker/ArgsBrokerQueueMoveMessages.h \
+    gen/qmf/org/apache/qpid/broker/ArgsQueuePurge.h \
+    gen/qmf/org/apache/qpid/broker/ArgsLinkBridge.h \
+    gen/qmf/org/apache/qpid/broker/EventClientConnect.h \
+    gen/qmf/org/apache/qpid/broker/EventClientConnectFail.h \
+    gen/qmf/org/apache/qpid/broker/EventClientDisconnect.h \
+    gen/qmf/org/apache/qpid/broker/EventBrokerLinkUp.h \
+    gen/qmf/org/apache/qpid/broker/EventBrokerLinkDown.h \
+    gen/qmf/org/apache/qpid/broker/EventQueueDeclare.h \
+    gen/qmf/org/apache/qpid/broker/EventQueueDelete.h \
+    gen/qmf/org/apache/qpid/broker/EventExchangeDeclare.h \
+    gen/qmf/org/apache/qpid/broker/EventExchangeDelete.h \
+    gen/qmf/org/apache/qpid/broker/EventBind.h \
+    gen/qmf/org/apache/qpid/broker/EventUnbind.h \
+    gen/qmf/org/apache/qpid/broker/EventSubscribe.h \
+    gen/qmf/org/apache/qpid/broker/EventUnsubscribe.h \
+    gen/qmf/org/apache/qpid/broker/Package.h \
+    gen/qmf/org/apache/qpid/acl/Acl.h \
+    gen/qmf/org/apache/qpid/acl/EventAllow.h \
+    gen/qmf/org/apache/qpid/acl/EventDeny.h \
+    gen/qmf/org/apache/qpid/acl/EventFileLoaded.h \
+    gen/qmf/org/apache/qpid/acl/EventFileLoadFailed.h \
+    gen/qmf/org/apache/qpid/acl/Package.h \
+    gen/qmf/org/apache/qpid/cluster/Cluster.h \
+    gen/qmf/org/apache/qpid/cluster/ArgsClusterStopClusterNode.h \
+    gen/qmf/org/apache/qpid/cluster/Package.h \
+    gen/qmf/org/apache/qpid/broker/System.cpp \
+    gen/qmf/org/apache/qpid/broker/Broker.cpp \
+    gen/qmf/org/apache/qpid/broker/Agent.cpp \
+    gen/qmf/org/apache/qpid/broker/Vhost.cpp \
+    gen/qmf/org/apache/qpid/broker/Queue.cpp \
+    gen/qmf/org/apache/qpid/broker/Exchange.cpp \
+    gen/qmf/org/apache/qpid/broker/Binding.cpp \
+    gen/qmf/org/apache/qpid/broker/Connection.cpp \
+    gen/qmf/org/apache/qpid/broker/Link.cpp \
+    gen/qmf/org/apache/qpid/broker/Bridge.cpp \
+    gen/qmf/org/apache/qpid/broker/Session.cpp \
+    gen/qmf/org/apache/qpid/broker/EventClientConnect.cpp \
+    gen/qmf/org/apache/qpid/broker/EventClientConnectFail.cpp \
+    gen/qmf/org/apache/qpid/broker/EventClientDisconnect.cpp \
+    gen/qmf/org/apache/qpid/broker/EventBrokerLinkUp.cpp \
+    gen/qmf/org/apache/qpid/broker/EventBrokerLinkDown.cpp \
+    gen/qmf/org/apache/qpid/broker/EventQueueDeclare.cpp \
+    gen/qmf/org/apache/qpid/broker/EventQueueDelete.cpp \
+    gen/qmf/org/apache/qpid/broker/EventExchangeDeclare.cpp \
+    gen/qmf/org/apache/qpid/broker/EventExchangeDelete.cpp \
+    gen/qmf/org/apache/qpid/broker/EventBind.cpp \
+    gen/qmf/org/apache/qpid/broker/EventUnbind.cpp \
+    gen/qmf/org/apache/qpid/broker/EventSubscribe.cpp \
+    gen/qmf/org/apache/qpid/broker/EventUnsubscribe.cpp \
+    gen/qmf/org/apache/qpid/broker/Package.cpp \
+    gen/qmf/org/apache/qpid/acl/Acl.cpp \
+    gen/qmf/org/apache/qpid/acl/EventAllow.cpp \
+    gen/qmf/org/apache/qpid/acl/EventDeny.cpp \
+    gen/qmf/org/apache/qpid/acl/EventFileLoaded.cpp \
+    gen/qmf/org/apache/qpid/acl/EventFileLoadFailed.cpp \
+    gen/qmf/org/apache/qpid/acl/Package.cpp \
+    gen/qmf/org/apache/qpid/cluster/Cluster.cpp \
+    gen/qmf/org/apache/qpid/cluster/Package.cpp
+
 AM_CXXFLAGS = $(WARNING_CFLAGS)
 AM_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO_ARG)
 INCLUDES = -Igen -I$(srcdir)/gen
@@ -929,6 +2422,10 @@ module_hdr = qpid/agent/ManagementAgent.h \
 @HAVE_LIBCPG_TRUE@  qpid/cluster/Dispatchable.h			\
 @HAVE_LIBCPG_TRUE@  qpid/cluster/UpdateClient.cpp			\
 @HAVE_LIBCPG_TRUE@  qpid/cluster/UpdateClient.h			\
+@HAVE_LIBCPG_TRUE@  qpid/cluster/RetractClient.cpp                \
+@HAVE_LIBCPG_TRUE@  qpid/cluster/RetractClient.h                  \
+@HAVE_LIBCPG_TRUE@  qpid/cluster/ErrorCheck.cpp			\
+@HAVE_LIBCPG_TRUE@  qpid/cluster/ErrorCheck.h			\
 @HAVE_LIBCPG_TRUE@  qpid/cluster/Event.cpp			\
 @HAVE_LIBCPG_TRUE@  qpid/cluster/Event.h				\
 @HAVE_LIBCPG_TRUE@  qpid/cluster/EventFrame.h			\
@@ -943,6 +2440,7 @@ module_hdr = qpid/agent/ManagementAgent.h \
 @HAVE_LIBCPG_TRUE@  qpid/cluster/Multicaster.h			\
 @HAVE_LIBCPG_TRUE@  qpid/cluster/McastFrameHandler.h		\
 @HAVE_LIBCPG_TRUE@  qpid/cluster/NoOpConnectionOutputHandler.h	\
+@HAVE_LIBCPG_TRUE@  qpid/cluster/StallConnectionOutputHandler.h	\
 @HAVE_LIBCPG_TRUE@  qpid/cluster/OutputInterceptor.cpp		\
 @HAVE_LIBCPG_TRUE@  qpid/cluster/OutputInterceptor.h		\
 @HAVE_LIBCPG_TRUE@  qpid/cluster/PollerDispatch.cpp		\
@@ -1710,6 +3208,10 @@ qpid/cluster/Cpg.lo: qpid/cluster/$(am__dirstamp) \
 	qpid/cluster/$(DEPDIR)/$(am__dirstamp)
 qpid/cluster/UpdateClient.lo: qpid/cluster/$(am__dirstamp) \
 	qpid/cluster/$(DEPDIR)/$(am__dirstamp)
+qpid/cluster/RetractClient.lo: qpid/cluster/$(am__dirstamp) \
+	qpid/cluster/$(DEPDIR)/$(am__dirstamp)
+qpid/cluster/ErrorCheck.lo: qpid/cluster/$(am__dirstamp) \
+	qpid/cluster/$(DEPDIR)/$(am__dirstamp)
 qpid/cluster/Event.lo: qpid/cluster/$(am__dirstamp) \
 	qpid/cluster/$(DEPDIR)/$(am__dirstamp)
 qpid/cluster/EventFrame.lo: qpid/cluster/$(am__dirstamp) \
@@ -1768,6 +3270,123 @@ qpid/console/Value.lo: qpid/console/$(am__dirstamp) \
 	qpid/console/$(DEPDIR)/$(am__dirstamp)
 libqmfconsole.la: $(libqmfconsole_la_OBJECTS) $(libqmfconsole_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(libqmfconsole_la_LDFLAGS) $(libqmfconsole_la_OBJECTS) $(libqmfconsole_la_LIBADD) $(LIBS)
+gen/qmf/org/apache/qpid/broker/$(am__dirstamp):
+	@$(mkdir_p) gen/qmf/org/apache/qpid/broker
+	@: > gen/qmf/org/apache/qpid/broker/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp):
+	@$(mkdir_p) gen/qmf/org/apache/qpid/broker/$(DEPDIR)
+	@: > gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/System.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/Broker.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/Agent.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/Vhost.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/Queue.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/Exchange.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/Binding.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/Connection.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/Link.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/Bridge.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/Session.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/EventClientConnect.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/EventClientConnectFail.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/EventClientDisconnect.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/EventBrokerLinkUp.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/EventBrokerLinkDown.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/EventQueueDeclare.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/EventQueueDelete.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/EventExchangeDeclare.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/EventExchangeDelete.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/EventBind.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/EventUnbind.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/EventSubscribe.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/EventUnsubscribe.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/broker/Package.lo:  \
+	gen/qmf/org/apache/qpid/broker/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/acl/$(am__dirstamp):
+	@$(mkdir_p) gen/qmf/org/apache/qpid/acl
+	@: > gen/qmf/org/apache/qpid/acl/$(am__dirstamp)
+gen/qmf/org/apache/qpid/acl/$(DEPDIR)/$(am__dirstamp):
+	@$(mkdir_p) gen/qmf/org/apache/qpid/acl/$(DEPDIR)
+	@: > gen/qmf/org/apache/qpid/acl/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/acl/Acl.lo:  \
+	gen/qmf/org/apache/qpid/acl/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/acl/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/acl/EventAllow.lo:  \
+	gen/qmf/org/apache/qpid/acl/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/acl/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/acl/EventDeny.lo:  \
+	gen/qmf/org/apache/qpid/acl/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/acl/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/acl/EventFileLoaded.lo:  \
+	gen/qmf/org/apache/qpid/acl/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/acl/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/acl/EventFileLoadFailed.lo:  \
+	gen/qmf/org/apache/qpid/acl/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/acl/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/acl/Package.lo:  \
+	gen/qmf/org/apache/qpid/acl/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/acl/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/cluster/$(am__dirstamp):
+	@$(mkdir_p) gen/qmf/org/apache/qpid/cluster
+	@: > gen/qmf/org/apache/qpid/cluster/$(am__dirstamp)
+gen/qmf/org/apache/qpid/cluster/$(DEPDIR)/$(am__dirstamp):
+	@$(mkdir_p) gen/qmf/org/apache/qpid/cluster/$(DEPDIR)
+	@: > gen/qmf/org/apache/qpid/cluster/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/cluster/Cluster.lo:  \
+	gen/qmf/org/apache/qpid/cluster/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/cluster/$(DEPDIR)/$(am__dirstamp)
+gen/qmf/org/apache/qpid/cluster/Package.lo:  \
+	gen/qmf/org/apache/qpid/cluster/$(am__dirstamp) \
+	gen/qmf/org/apache/qpid/cluster/$(DEPDIR)/$(am__dirstamp)
 qpid/broker/posix/$(am__dirstamp):
 	@$(mkdir_p) qpid/broker/posix
 	@: > qpid/broker/posix/$(am__dirstamp)
@@ -1928,6 +3547,18 @@ qpid/sys/TCPIOPlugin.lo: qpid/sys/$(am__dirstamp) \
 	qpid/sys/$(DEPDIR)/$(am__dirstamp)
 libqpidbroker.la: $(libqpidbroker_la_OBJECTS) $(libqpidbroker_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(libqpidbroker_la_LDFLAGS) $(libqpidbroker_la_OBJECTS) $(libqpidbroker_la_LIBADD) $(LIBS)
+gen/qpid/client/no_keyword/$(am__dirstamp):
+	@$(mkdir_p) gen/qpid/client/no_keyword
+	@: > gen/qpid/client/no_keyword/$(am__dirstamp)
+gen/qpid/client/no_keyword/$(DEPDIR)/$(am__dirstamp):
+	@$(mkdir_p) gen/qpid/client/no_keyword/$(DEPDIR)
+	@: > gen/qpid/client/no_keyword/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/client/no_keyword/libqpidclient_la-AsyncSession_0_10.lo:  \
+	gen/qpid/client/no_keyword/$(am__dirstamp) \
+	gen/qpid/client/no_keyword/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/client/no_keyword/libqpidclient_la-Session_0_10.lo:  \
+	gen/qpid/client/no_keyword/$(am__dirstamp) \
+	gen/qpid/client/no_keyword/$(DEPDIR)/$(am__dirstamp)
 qpid/client/$(am__dirstamp):
 	@$(mkdir_p) qpid/client
 	@: > qpid/client/$(am__dirstamp)
@@ -2012,6 +3643,373 @@ qpid/client/libqpidclient_la-SubscriptionManager.lo:  \
 	qpid/client/$(DEPDIR)/$(am__dirstamp)
 libqpidclient.la: $(libqpidclient_la_OBJECTS) $(libqpidclient_la_DEPENDENCIES) 
 	$(CXXLINK) -rpath $(libdir) $(libqpidclient_la_LDFLAGS) $(libqpidclient_la_OBJECTS) $(libqpidclient_la_LIBADD) $(LIBS)
+gen/qpid/framing/$(am__dirstamp):
+	@$(mkdir_p) gen/qpid/framing
+	@: > gen/qpid/framing/$(am__dirstamp)
+gen/qpid/framing/$(DEPDIR)/$(am__dirstamp):
+	@$(mkdir_p) gen/qpid/framing/$(DEPDIR)
+	@: > gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClientInvoker.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ServerInvoker.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/AllInvoker.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MethodBodyDefaultVisitor.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/AMQP_ClientProxy.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/AMQP_ServerProxy.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/AMQP_AllProxy.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/Header.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/DeliveryProperties.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/FragmentProperties.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ReplyTo.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MessageProperties.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MessageAcquireResult.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MessageResumeResult.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/XaResult.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/Xid.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/DtxGetTimeoutResult.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/DtxRecoverResult.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ExchangeQueryResult.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ExchangeBoundResult.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/QueueQueryResult.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/FileProperties.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/StreamProperties.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ConnectionStartBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ConnectionStartOkBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ConnectionSecureBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ConnectionSecureOkBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ConnectionTuneBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ConnectionTuneOkBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ConnectionOpenBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ConnectionOpenOkBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ConnectionRedirectBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ConnectionHeartbeatBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ConnectionCloseBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ConnectionCloseOkBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/SessionAttachBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/SessionAttachedBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/SessionDetachBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/SessionDetachedBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/SessionRequestTimeoutBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/SessionTimeoutBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/SessionCommandPointBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/SessionExpectedBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/SessionConfirmedBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/SessionCompletedBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/SessionKnownCompletedBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/SessionFlushBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/SessionGapBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ExecutionSyncBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ExecutionResultBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ExecutionExceptionBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MessageTransferBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MessageAcceptBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MessageRejectBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MessageReleaseBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MessageAcquireBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MessageResumeBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MessageSubscribeBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MessageCancelBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MessageSetFlowModeBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MessageFlowBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MessageFlushBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MessageStopBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/TxSelectBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/TxCommitBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/TxRollbackBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/DtxSelectBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/DtxStartBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/DtxEndBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/DtxCommitBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/DtxForgetBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/DtxGetTimeoutBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/DtxPrepareBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/DtxRecoverBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/DtxRollbackBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/DtxSetTimeoutBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ExchangeDeclareBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ExchangeDeleteBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ExchangeQueryBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ExchangeBindBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ExchangeUnbindBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ExchangeBoundBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/QueueDeclareBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/QueueDeleteBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/QueuePurgeBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/QueueQueryBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/FileQosBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/FileQosOkBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/FileConsumeBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/FileConsumeOkBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/FileCancelBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/FileOpenBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/FileOpenOkBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/FileStageBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/FilePublishBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/FileReturnBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/FileDeliverBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/FileAckBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/FileRejectBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/StreamQosBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/StreamQosOkBody.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/StreamConsumeBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/StreamConsumeOkBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/StreamCancelBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/StreamPublishBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/StreamReturnBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/StreamDeliverBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterUpdateRequestBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterUpdateOfferBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterReadyBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConfigChangeBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterMessageExpiredBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterShutdownBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionDeliverCloseBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionConsumerStateBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionDeliveryRecordBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionTxStartBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionTxAcceptBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionTxDequeueBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionTxEnqueueBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionTxPublishBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionTxEndBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionAccumulatedAckBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionSessionStateBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionShadowReadyBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionMembershipBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionQueuePositionBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionExchangeBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionQueueBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionExpiryIdBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/reply_exceptions.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/TypeCode.lo: gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/MethodBodyFactory.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
 qpid/log/posix/$(am__dirstamp):
 	@$(mkdir_p) qpid/log/posix
 	@: > qpid/log/posix/$(am__dirstamp)
@@ -2334,6 +4332,344 @@ qpidd$(EXEEXT): $(qpidd_OBJECTS) $(qpidd_DEPENDENCIES)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/acl/Acl.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/acl/Acl.lo
+	-rm -f gen/qmf/org/apache/qpid/acl/EventAllow.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/acl/EventAllow.lo
+	-rm -f gen/qmf/org/apache/qpid/acl/EventDeny.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/acl/EventDeny.lo
+	-rm -f gen/qmf/org/apache/qpid/acl/EventFileLoadFailed.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/acl/EventFileLoadFailed.lo
+	-rm -f gen/qmf/org/apache/qpid/acl/EventFileLoaded.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/acl/EventFileLoaded.lo
+	-rm -f gen/qmf/org/apache/qpid/acl/Package.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/acl/Package.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/Agent.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/Agent.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/Binding.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/Binding.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/Bridge.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/Bridge.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/Broker.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/Broker.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/Connection.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/Connection.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/EventBind.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/EventBind.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/EventBrokerLinkDown.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/EventBrokerLinkDown.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/EventBrokerLinkUp.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/EventBrokerLinkUp.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/EventClientConnect.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/EventClientConnect.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/EventClientConnectFail.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/EventClientConnectFail.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/EventClientDisconnect.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/EventClientDisconnect.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/EventExchangeDeclare.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/EventExchangeDeclare.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/EventExchangeDelete.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/EventExchangeDelete.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/EventQueueDeclare.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/EventQueueDeclare.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/EventQueueDelete.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/EventQueueDelete.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/EventSubscribe.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/EventSubscribe.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/EventUnbind.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/EventUnbind.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/EventUnsubscribe.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/EventUnsubscribe.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/Exchange.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/Exchange.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/Link.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/Link.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/Package.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/Package.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/Queue.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/Queue.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/Session.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/Session.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/System.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/System.lo
+	-rm -f gen/qmf/org/apache/qpid/broker/Vhost.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/broker/Vhost.lo
+	-rm -f gen/qmf/org/apache/qpid/cluster/Cluster.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/cluster/Cluster.lo
+	-rm -f gen/qmf/org/apache/qpid/cluster/Package.$(OBJEXT)
+	-rm -f gen/qmf/org/apache/qpid/cluster/Package.lo
+	-rm -f gen/qpid/client/no_keyword/libqpidclient_la-AsyncSession_0_10.$(OBJEXT)
+	-rm -f gen/qpid/client/no_keyword/libqpidclient_la-AsyncSession_0_10.lo
+	-rm -f gen/qpid/client/no_keyword/libqpidclient_la-Session_0_10.$(OBJEXT)
+	-rm -f gen/qpid/client/no_keyword/libqpidclient_la-Session_0_10.lo
+	-rm -f gen/qpid/framing/AMQP_AllProxy.$(OBJEXT)
+	-rm -f gen/qpid/framing/AMQP_AllProxy.lo
+	-rm -f gen/qpid/framing/AMQP_ClientProxy.$(OBJEXT)
+	-rm -f gen/qpid/framing/AMQP_ClientProxy.lo
+	-rm -f gen/qpid/framing/AMQP_ServerProxy.$(OBJEXT)
+	-rm -f gen/qpid/framing/AMQP_ServerProxy.lo
+	-rm -f gen/qpid/framing/AllInvoker.$(OBJEXT)
+	-rm -f gen/qpid/framing/AllInvoker.lo
+	-rm -f gen/qpid/framing/ClientInvoker.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClientInvoker.lo
+	-rm -f gen/qpid/framing/ClusterConfigChangeBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConfigChangeBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionAccumulatedAckBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionAccumulatedAckBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionConsumerStateBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionConsumerStateBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionDeliverCloseBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionDeliverCloseBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionDeliveryRecordBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionDeliveryRecordBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionExchangeBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionExchangeBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionExpiryIdBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionExpiryIdBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionMembershipBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionMembershipBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionQueueBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionQueueBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionQueuePositionBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionQueuePositionBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionSessionStateBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionSessionStateBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionShadowReadyBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionShadowReadyBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionTxAcceptBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionTxAcceptBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionTxDequeueBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionTxDequeueBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionTxEndBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionTxEndBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionTxEnqueueBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionTxEnqueueBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionTxPublishBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionTxPublishBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionTxStartBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionTxStartBody.lo
+	-rm -f gen/qpid/framing/ClusterMessageExpiredBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterMessageExpiredBody.lo
+	-rm -f gen/qpid/framing/ClusterReadyBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterReadyBody.lo
+	-rm -f gen/qpid/framing/ClusterShutdownBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterShutdownBody.lo
+	-rm -f gen/qpid/framing/ClusterUpdateOfferBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterUpdateOfferBody.lo
+	-rm -f gen/qpid/framing/ClusterUpdateRequestBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterUpdateRequestBody.lo
+	-rm -f gen/qpid/framing/ConnectionCloseBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ConnectionCloseBody.lo
+	-rm -f gen/qpid/framing/ConnectionCloseOkBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ConnectionCloseOkBody.lo
+	-rm -f gen/qpid/framing/ConnectionHeartbeatBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ConnectionHeartbeatBody.lo
+	-rm -f gen/qpid/framing/ConnectionOpenBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ConnectionOpenBody.lo
+	-rm -f gen/qpid/framing/ConnectionOpenOkBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ConnectionOpenOkBody.lo
+	-rm -f gen/qpid/framing/ConnectionRedirectBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ConnectionRedirectBody.lo
+	-rm -f gen/qpid/framing/ConnectionSecureBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ConnectionSecureBody.lo
+	-rm -f gen/qpid/framing/ConnectionSecureOkBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ConnectionSecureOkBody.lo
+	-rm -f gen/qpid/framing/ConnectionStartBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ConnectionStartBody.lo
+	-rm -f gen/qpid/framing/ConnectionStartOkBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ConnectionStartOkBody.lo
+	-rm -f gen/qpid/framing/ConnectionTuneBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ConnectionTuneBody.lo
+	-rm -f gen/qpid/framing/ConnectionTuneOkBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ConnectionTuneOkBody.lo
+	-rm -f gen/qpid/framing/DeliveryProperties.$(OBJEXT)
+	-rm -f gen/qpid/framing/DeliveryProperties.lo
+	-rm -f gen/qpid/framing/DtxCommitBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/DtxCommitBody.lo
+	-rm -f gen/qpid/framing/DtxEndBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/DtxEndBody.lo
+	-rm -f gen/qpid/framing/DtxForgetBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/DtxForgetBody.lo
+	-rm -f gen/qpid/framing/DtxGetTimeoutBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/DtxGetTimeoutBody.lo
+	-rm -f gen/qpid/framing/DtxGetTimeoutResult.$(OBJEXT)
+	-rm -f gen/qpid/framing/DtxGetTimeoutResult.lo
+	-rm -f gen/qpid/framing/DtxPrepareBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/DtxPrepareBody.lo
+	-rm -f gen/qpid/framing/DtxRecoverBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/DtxRecoverBody.lo
+	-rm -f gen/qpid/framing/DtxRecoverResult.$(OBJEXT)
+	-rm -f gen/qpid/framing/DtxRecoverResult.lo
+	-rm -f gen/qpid/framing/DtxRollbackBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/DtxRollbackBody.lo
+	-rm -f gen/qpid/framing/DtxSelectBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/DtxSelectBody.lo
+	-rm -f gen/qpid/framing/DtxSetTimeoutBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/DtxSetTimeoutBody.lo
+	-rm -f gen/qpid/framing/DtxStartBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/DtxStartBody.lo
+	-rm -f gen/qpid/framing/ExchangeBindBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ExchangeBindBody.lo
+	-rm -f gen/qpid/framing/ExchangeBoundBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ExchangeBoundBody.lo
+	-rm -f gen/qpid/framing/ExchangeBoundResult.$(OBJEXT)
+	-rm -f gen/qpid/framing/ExchangeBoundResult.lo
+	-rm -f gen/qpid/framing/ExchangeDeclareBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ExchangeDeclareBody.lo
+	-rm -f gen/qpid/framing/ExchangeDeleteBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ExchangeDeleteBody.lo
+	-rm -f gen/qpid/framing/ExchangeQueryBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ExchangeQueryBody.lo
+	-rm -f gen/qpid/framing/ExchangeQueryResult.$(OBJEXT)
+	-rm -f gen/qpid/framing/ExchangeQueryResult.lo
+	-rm -f gen/qpid/framing/ExchangeUnbindBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ExchangeUnbindBody.lo
+	-rm -f gen/qpid/framing/ExecutionExceptionBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ExecutionExceptionBody.lo
+	-rm -f gen/qpid/framing/ExecutionResultBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ExecutionResultBody.lo
+	-rm -f gen/qpid/framing/ExecutionSyncBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ExecutionSyncBody.lo
+	-rm -f gen/qpid/framing/FileAckBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/FileAckBody.lo
+	-rm -f gen/qpid/framing/FileCancelBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/FileCancelBody.lo
+	-rm -f gen/qpid/framing/FileConsumeBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/FileConsumeBody.lo
+	-rm -f gen/qpid/framing/FileConsumeOkBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/FileConsumeOkBody.lo
+	-rm -f gen/qpid/framing/FileDeliverBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/FileDeliverBody.lo
+	-rm -f gen/qpid/framing/FileOpenBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/FileOpenBody.lo
+	-rm -f gen/qpid/framing/FileOpenOkBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/FileOpenOkBody.lo
+	-rm -f gen/qpid/framing/FileProperties.$(OBJEXT)
+	-rm -f gen/qpid/framing/FileProperties.lo
+	-rm -f gen/qpid/framing/FilePublishBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/FilePublishBody.lo
+	-rm -f gen/qpid/framing/FileQosBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/FileQosBody.lo
+	-rm -f gen/qpid/framing/FileQosOkBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/FileQosOkBody.lo
+	-rm -f gen/qpid/framing/FileRejectBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/FileRejectBody.lo
+	-rm -f gen/qpid/framing/FileReturnBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/FileReturnBody.lo
+	-rm -f gen/qpid/framing/FileStageBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/FileStageBody.lo
+	-rm -f gen/qpid/framing/FragmentProperties.$(OBJEXT)
+	-rm -f gen/qpid/framing/FragmentProperties.lo
+	-rm -f gen/qpid/framing/Header.$(OBJEXT)
+	-rm -f gen/qpid/framing/Header.lo
+	-rm -f gen/qpid/framing/MessageAcceptBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/MessageAcceptBody.lo
+	-rm -f gen/qpid/framing/MessageAcquireBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/MessageAcquireBody.lo
+	-rm -f gen/qpid/framing/MessageAcquireResult.$(OBJEXT)
+	-rm -f gen/qpid/framing/MessageAcquireResult.lo
+	-rm -f gen/qpid/framing/MessageCancelBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/MessageCancelBody.lo
+	-rm -f gen/qpid/framing/MessageFlowBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/MessageFlowBody.lo
+	-rm -f gen/qpid/framing/MessageFlushBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/MessageFlushBody.lo
+	-rm -f gen/qpid/framing/MessageProperties.$(OBJEXT)
+	-rm -f gen/qpid/framing/MessageProperties.lo
+	-rm -f gen/qpid/framing/MessageRejectBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/MessageRejectBody.lo
+	-rm -f gen/qpid/framing/MessageReleaseBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/MessageReleaseBody.lo
+	-rm -f gen/qpid/framing/MessageResumeBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/MessageResumeBody.lo
+	-rm -f gen/qpid/framing/MessageResumeResult.$(OBJEXT)
+	-rm -f gen/qpid/framing/MessageResumeResult.lo
+	-rm -f gen/qpid/framing/MessageSetFlowModeBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/MessageSetFlowModeBody.lo
+	-rm -f gen/qpid/framing/MessageStopBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/MessageStopBody.lo
+	-rm -f gen/qpid/framing/MessageSubscribeBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/MessageSubscribeBody.lo
+	-rm -f gen/qpid/framing/MessageTransferBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/MessageTransferBody.lo
+	-rm -f gen/qpid/framing/MethodBodyDefaultVisitor.$(OBJEXT)
+	-rm -f gen/qpid/framing/MethodBodyDefaultVisitor.lo
+	-rm -f gen/qpid/framing/MethodBodyFactory.$(OBJEXT)
+	-rm -f gen/qpid/framing/MethodBodyFactory.lo
+	-rm -f gen/qpid/framing/QueueDeclareBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/QueueDeclareBody.lo
+	-rm -f gen/qpid/framing/QueueDeleteBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/QueueDeleteBody.lo
+	-rm -f gen/qpid/framing/QueuePurgeBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/QueuePurgeBody.lo
+	-rm -f gen/qpid/framing/QueueQueryBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/QueueQueryBody.lo
+	-rm -f gen/qpid/framing/QueueQueryResult.$(OBJEXT)
+	-rm -f gen/qpid/framing/QueueQueryResult.lo
+	-rm -f gen/qpid/framing/ReplyTo.$(OBJEXT)
+	-rm -f gen/qpid/framing/ReplyTo.lo
+	-rm -f gen/qpid/framing/ServerInvoker.$(OBJEXT)
+	-rm -f gen/qpid/framing/ServerInvoker.lo
+	-rm -f gen/qpid/framing/SessionAttachBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/SessionAttachBody.lo
+	-rm -f gen/qpid/framing/SessionAttachedBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/SessionAttachedBody.lo
+	-rm -f gen/qpid/framing/SessionCommandPointBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/SessionCommandPointBody.lo
+	-rm -f gen/qpid/framing/SessionCompletedBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/SessionCompletedBody.lo
+	-rm -f gen/qpid/framing/SessionConfirmedBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/SessionConfirmedBody.lo
+	-rm -f gen/qpid/framing/SessionDetachBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/SessionDetachBody.lo
+	-rm -f gen/qpid/framing/SessionDetachedBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/SessionDetachedBody.lo
+	-rm -f gen/qpid/framing/SessionExpectedBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/SessionExpectedBody.lo
+	-rm -f gen/qpid/framing/SessionFlushBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/SessionFlushBody.lo
+	-rm -f gen/qpid/framing/SessionGapBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/SessionGapBody.lo
+	-rm -f gen/qpid/framing/SessionKnownCompletedBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/SessionKnownCompletedBody.lo
+	-rm -f gen/qpid/framing/SessionRequestTimeoutBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/SessionRequestTimeoutBody.lo
+	-rm -f gen/qpid/framing/SessionTimeoutBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/SessionTimeoutBody.lo
+	-rm -f gen/qpid/framing/StreamCancelBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/StreamCancelBody.lo
+	-rm -f gen/qpid/framing/StreamConsumeBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/StreamConsumeBody.lo
+	-rm -f gen/qpid/framing/StreamConsumeOkBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/StreamConsumeOkBody.lo
+	-rm -f gen/qpid/framing/StreamDeliverBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/StreamDeliverBody.lo
+	-rm -f gen/qpid/framing/StreamProperties.$(OBJEXT)
+	-rm -f gen/qpid/framing/StreamProperties.lo
+	-rm -f gen/qpid/framing/StreamPublishBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/StreamPublishBody.lo
+	-rm -f gen/qpid/framing/StreamQosBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/StreamQosBody.lo
+	-rm -f gen/qpid/framing/StreamQosOkBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/StreamQosOkBody.lo
+	-rm -f gen/qpid/framing/StreamReturnBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/StreamReturnBody.lo
+	-rm -f gen/qpid/framing/TxCommitBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/TxCommitBody.lo
+	-rm -f gen/qpid/framing/TxRollbackBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/TxRollbackBody.lo
+	-rm -f gen/qpid/framing/TxSelectBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/TxSelectBody.lo
+	-rm -f gen/qpid/framing/TypeCode.$(OBJEXT)
+	-rm -f gen/qpid/framing/TypeCode.lo
+	-rm -f gen/qpid/framing/XaResult.$(OBJEXT)
+	-rm -f gen/qpid/framing/XaResult.lo
+	-rm -f gen/qpid/framing/Xid.$(OBJEXT)
+	-rm -f gen/qpid/framing/Xid.lo
+	-rm -f gen/qpid/framing/reply_exceptions.$(OBJEXT)
+	-rm -f gen/qpid/framing/reply_exceptions.lo
 	-rm -f posix/qpidd-QpiddBroker.$(OBJEXT)
 	-rm -f qpid/Address.$(OBJEXT)
 	-rm -f qpid/Address.lo
@@ -2563,6 +4899,8 @@ mostlyclean-compile:
 	-rm -f qpid/cluster/Cpg.lo
 	-rm -f qpid/cluster/Decoder.$(OBJEXT)
 	-rm -f qpid/cluster/Decoder.lo
+	-rm -f qpid/cluster/ErrorCheck.$(OBJEXT)
+	-rm -f qpid/cluster/ErrorCheck.lo
 	-rm -f qpid/cluster/Event.$(OBJEXT)
 	-rm -f qpid/cluster/Event.lo
 	-rm -f qpid/cluster/EventFrame.$(OBJEXT)
@@ -2579,6 +4917,8 @@ mostlyclean-compile:
 	-rm -f qpid/cluster/PollerDispatch.lo
 	-rm -f qpid/cluster/Quorum_cman.$(OBJEXT)
 	-rm -f qpid/cluster/Quorum_cman.lo
+	-rm -f qpid/cluster/RetractClient.$(OBJEXT)
+	-rm -f qpid/cluster/RetractClient.lo
 	-rm -f qpid/cluster/UpdateClient.$(OBJEXT)
 	-rm -f qpid/cluster/UpdateClient.lo
 	-rm -f qpid/cluster/WriteEstimate.$(OBJEXT)
@@ -2760,6 +5100,175 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/qpidd-qpidd.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/acl/$(DEPDIR)/Acl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/acl/$(DEPDIR)/EventAllow.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/acl/$(DEPDIR)/EventDeny.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/acl/$(DEPDIR)/EventFileLoadFailed.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/acl/$(DEPDIR)/EventFileLoaded.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/acl/$(DEPDIR)/Package.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/Agent.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/Binding.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/Bridge.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/Broker.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/Connection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/EventBind.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/EventBrokerLinkDown.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/EventBrokerLinkUp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/EventClientConnect.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/EventClientConnectFail.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/EventClientDisconnect.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/EventExchangeDeclare.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/EventExchangeDelete.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/EventQueueDeclare.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/EventQueueDelete.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/EventSubscribe.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/EventUnbind.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/EventUnsubscribe.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/Exchange.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/Link.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/Package.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/Queue.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/Session.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/System.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/broker/$(DEPDIR)/Vhost.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/cluster/$(DEPDIR)/Cluster.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qmf/org/apache/qpid/cluster/$(DEPDIR)/Package.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/client/no_keyword/$(DEPDIR)/libqpidclient_la-AsyncSession_0_10.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/client/no_keyword/$(DEPDIR)/libqpidclient_la-Session_0_10.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/AMQP_AllProxy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/AMQP_ClientProxy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/AMQP_ServerProxy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/AllInvoker.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClientInvoker.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConfigChangeBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionAccumulatedAckBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionConsumerStateBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionDeliverCloseBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionDeliverDoOutputBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionDeliveryRecordBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionExchangeBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionExpiryIdBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionMembershipBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionQueueBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionQueuePositionBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionSessionStateBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionShadowReadyBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionTxAcceptBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionTxDequeueBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionTxEndBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionTxEnqueueBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionTxPublishBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterConnectionTxStartBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterMessageExpiredBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterReadyBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterShutdownBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterUpdateOfferBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ClusterUpdateRequestBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ConnectionCloseBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ConnectionCloseOkBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ConnectionHeartbeatBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ConnectionOpenBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ConnectionOpenOkBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ConnectionRedirectBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ConnectionSecureBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ConnectionSecureOkBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ConnectionStartBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ConnectionStartOkBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ConnectionTuneBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ConnectionTuneOkBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/DeliveryProperties.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/DtxCommitBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/DtxEndBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/DtxForgetBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/DtxGetTimeoutBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/DtxGetTimeoutResult.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/DtxPrepareBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/DtxRecoverBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/DtxRecoverResult.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/DtxRollbackBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/DtxSelectBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/DtxSetTimeoutBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/DtxStartBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ExchangeBindBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ExchangeBoundBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ExchangeBoundResult.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ExchangeDeclareBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ExchangeDeleteBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ExchangeQueryBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ExchangeQueryResult.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ExchangeUnbindBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ExecutionExceptionBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ExecutionResultBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ExecutionSyncBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/FileAckBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/FileCancelBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/FileConsumeBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/FileConsumeOkBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/FileDeliverBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/FileOpenBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/FileOpenOkBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/FileProperties.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/FilePublishBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/FileQosBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/FileQosOkBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/FileRejectBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/FileReturnBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/FileStageBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/FragmentProperties.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/Header.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MessageAcceptBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MessageAcquireBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MessageAcquireResult.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MessageCancelBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MessageFlowBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MessageFlushBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MessageProperties.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MessageRejectBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MessageReleaseBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MessageResumeBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MessageResumeResult.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MessageSetFlowModeBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MessageStopBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MessageSubscribeBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MessageTransferBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MethodBodyDefaultVisitor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/MethodBodyFactory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/QueueDeclareBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/QueueDeleteBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/QueuePurgeBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/QueueQueryBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/QueueQueryResult.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ReplyTo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/ServerInvoker.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/SessionAttachBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/SessionAttachedBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/SessionCommandPointBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/SessionCompletedBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/SessionConfirmedBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/SessionDetachBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/SessionDetachedBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/SessionExpectedBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/SessionFlushBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/SessionGapBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/SessionKnownCompletedBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/SessionRequestTimeoutBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/SessionTimeoutBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/StreamCancelBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/StreamConsumeBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/StreamConsumeOkBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/StreamDeliverBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/StreamProperties.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/StreamPublishBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/StreamQosBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/StreamQosOkBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/StreamReturnBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/TxCommitBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/TxRollbackBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/TxSelectBody.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/TypeCode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/XaResult.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/Xid.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@gen/qpid/framing/$(DEPDIR)/reply_exceptions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@posix/$(DEPDIR)/qpidd-QpiddBroker.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@qpid/$(DEPDIR)/Address.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@qpid/$(DEPDIR)/DataDir.Plo@am__quote@
@@ -2875,6 +5384,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@qpid/cluster/$(DEPDIR)/ConnectionCodec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@qpid/cluster/$(DEPDIR)/Cpg.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@qpid/cluster/$(DEPDIR)/Decoder.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@qpid/cluster/$(DEPDIR)/ErrorCheck.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@qpid/cluster/$(DEPDIR)/Event.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@qpid/cluster/$(DEPDIR)/EventFrame.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@qpid/cluster/$(DEPDIR)/ExpiryPolicy.Plo@am__quote@
@@ -2883,6 +5393,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@qpid/cluster/$(DEPDIR)/OutputInterceptor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@qpid/cluster/$(DEPDIR)/PollerDispatch.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@qpid/cluster/$(DEPDIR)/Quorum_cman.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@qpid/cluster/$(DEPDIR)/RetractClient.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@qpid/cluster/$(DEPDIR)/UpdateClient.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@qpid/cluster/$(DEPDIR)/WriteEstimate.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@qpid/console/$(DEPDIR)/Agent.Plo@am__quote@
@@ -2996,6 +5507,20 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
+
+gen/qpid/client/no_keyword/libqpidclient_la-AsyncSession_0_10.lo: gen/qpid/client/no_keyword/AsyncSession_0_10.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libqpidclient_la_CXXFLAGS) $(CXXFLAGS) -MT gen/qpid/client/no_keyword/libqpidclient_la-AsyncSession_0_10.lo -MD -MP -MF "gen/qpid/client/no_keyword/$(DEPDIR)/libqpidclient_la-AsyncSession_0_10.Tpo" -c -o gen/qpid/client/no_keyword/libqpidclient_la-AsyncSession_0_10.lo `test -f 'gen/qpid/client/no_keyword/AsyncSession_0_10.cpp' || echo '$(srcdir)/'`gen/qpid/client/no_keyword/AsyncSession_0_10.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "gen/qpid/client/no_keyword/$(DEPDIR)/libqpidclient_la-AsyncSession_0_10.Tpo" "gen/qpid/client/no_keyword/$(DEPDIR)/libqpidclient_la-AsyncSession_0_10.Plo"; else rm -f "gen/qpid/client/no_keyword/$(DEPDIR)/libqpidclient_la-AsyncSession_0_10.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gen/qpid/client/no_keyword/AsyncSession_0_10.cpp' object='gen/qpid/client/no_keyword/libqpidclient_la-AsyncSession_0_10.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libqpidclient_la_CXXFLAGS) $(CXXFLAGS) -c -o gen/qpid/client/no_keyword/libqpidclient_la-AsyncSession_0_10.lo `test -f 'gen/qpid/client/no_keyword/AsyncSession_0_10.cpp' || echo '$(srcdir)/'`gen/qpid/client/no_keyword/AsyncSession_0_10.cpp
+
+gen/qpid/client/no_keyword/libqpidclient_la-Session_0_10.lo: gen/qpid/client/no_keyword/Session_0_10.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libqpidclient_la_CXXFLAGS) $(CXXFLAGS) -MT gen/qpid/client/no_keyword/libqpidclient_la-Session_0_10.lo -MD -MP -MF "gen/qpid/client/no_keyword/$(DEPDIR)/libqpidclient_la-Session_0_10.Tpo" -c -o gen/qpid/client/no_keyword/libqpidclient_la-Session_0_10.lo `test -f 'gen/qpid/client/no_keyword/Session_0_10.cpp' || echo '$(srcdir)/'`gen/qpid/client/no_keyword/Session_0_10.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "gen/qpid/client/no_keyword/$(DEPDIR)/libqpidclient_la-Session_0_10.Tpo" "gen/qpid/client/no_keyword/$(DEPDIR)/libqpidclient_la-Session_0_10.Plo"; else rm -f "gen/qpid/client/no_keyword/$(DEPDIR)/libqpidclient_la-Session_0_10.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='gen/qpid/client/no_keyword/Session_0_10.cpp' object='gen/qpid/client/no_keyword/libqpidclient_la-Session_0_10.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libqpidclient_la_CXXFLAGS) $(CXXFLAGS) -c -o gen/qpid/client/no_keyword/libqpidclient_la-Session_0_10.lo `test -f 'gen/qpid/client/no_keyword/Session_0_10.cpp' || echo '$(srcdir)/'`gen/qpid/client/no_keyword/Session_0_10.cpp
 
 qpid/client/libqpidclient_la-Bounds.lo: qpid/client/Bounds.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libqpidclient_la_CXXFLAGS) $(CXXFLAGS) -MT qpid/client/libqpidclient_la-Bounds.lo -MD -MP -MF "qpid/client/$(DEPDIR)/libqpidclient_la-Bounds.Tpo" -c -o qpid/client/libqpidclient_la-Bounds.lo `test -f 'qpid/client/Bounds.cpp' || echo '$(srcdir)/'`qpid/client/Bounds.cpp; \
@@ -3317,6 +5842,11 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+	-rm -rf gen/qmf/org/apache/qpid/acl/.libs gen/qmf/org/apache/qpid/acl/_libs
+	-rm -rf gen/qmf/org/apache/qpid/broker/.libs gen/qmf/org/apache/qpid/broker/_libs
+	-rm -rf gen/qmf/org/apache/qpid/cluster/.libs gen/qmf/org/apache/qpid/cluster/_libs
+	-rm -rf gen/qpid/client/no_keyword/.libs gen/qpid/client/no_keyword/_libs
+	-rm -rf gen/qpid/framing/.libs gen/qpid/framing/_libs
 	-rm -rf qpid/.libs qpid/_libs
 	-rm -rf qpid/acl/.libs qpid/acl/_libs
 	-rm -rf qpid/agent/.libs qpid/agent/_libs
@@ -3343,6 +5873,142 @@ clean-libtool:
 distclean-libtool:
 	-rm -f libtool
 uninstall-info-am:
+install-dist_org_apache_qpid_aclHEADERS: $(dist_org_apache_qpid_acl_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(org_apache_qpid_acldir)" || $(mkdir_p) "$(DESTDIR)$(org_apache_qpid_acldir)"
+	@list='$(dist_org_apache_qpid_acl_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(dist_org_apache_qpid_aclHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(org_apache_qpid_acldir)/$$f'"; \
+	  $(dist_org_apache_qpid_aclHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(org_apache_qpid_acldir)/$$f"; \
+	done
+
+uninstall-dist_org_apache_qpid_aclHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_org_apache_qpid_acl_HEADERS)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(org_apache_qpid_acldir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(org_apache_qpid_acldir)/$$f"; \
+	done
+install-dist_org_apache_qpid_brokerHEADERS: $(dist_org_apache_qpid_broker_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(org_apache_qpid_brokerdir)" || $(mkdir_p) "$(DESTDIR)$(org_apache_qpid_brokerdir)"
+	@list='$(dist_org_apache_qpid_broker_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(dist_org_apache_qpid_brokerHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(org_apache_qpid_brokerdir)/$$f'"; \
+	  $(dist_org_apache_qpid_brokerHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(org_apache_qpid_brokerdir)/$$f"; \
+	done
+
+uninstall-dist_org_apache_qpid_brokerHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_org_apache_qpid_broker_HEADERS)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(org_apache_qpid_brokerdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(org_apache_qpid_brokerdir)/$$f"; \
+	done
+install-dist_org_apache_qpid_clusterHEADERS: $(dist_org_apache_qpid_cluster_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(org_apache_qpid_clusterdir)" || $(mkdir_p) "$(DESTDIR)$(org_apache_qpid_clusterdir)"
+	@list='$(dist_org_apache_qpid_cluster_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(dist_org_apache_qpid_clusterHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(org_apache_qpid_clusterdir)/$$f'"; \
+	  $(dist_org_apache_qpid_clusterHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(org_apache_qpid_clusterdir)/$$f"; \
+	done
+
+uninstall-dist_org_apache_qpid_clusterHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_org_apache_qpid_cluster_HEADERS)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(org_apache_qpid_clusterdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(org_apache_qpid_clusterdir)/$$f"; \
+	done
+install-dist_qpid_amqp_0_10HEADERS: $(dist_qpid_amqp_0_10_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(qpid_amqp_0_10dir)" || $(mkdir_p) "$(DESTDIR)$(qpid_amqp_0_10dir)"
+	@list='$(dist_qpid_amqp_0_10_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(dist_qpid_amqp_0_10HEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(qpid_amqp_0_10dir)/$$f'"; \
+	  $(dist_qpid_amqp_0_10HEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(qpid_amqp_0_10dir)/$$f"; \
+	done
+
+uninstall-dist_qpid_amqp_0_10HEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_qpid_amqp_0_10_HEADERS)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(qpid_amqp_0_10dir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(qpid_amqp_0_10dir)/$$f"; \
+	done
+install-dist_qpid_brokerHEADERS: $(dist_qpid_broker_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(qpid_brokerdir)" || $(mkdir_p) "$(DESTDIR)$(qpid_brokerdir)"
+	@list='$(dist_qpid_broker_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(dist_qpid_brokerHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(qpid_brokerdir)/$$f'"; \
+	  $(dist_qpid_brokerHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(qpid_brokerdir)/$$f"; \
+	done
+
+uninstall-dist_qpid_brokerHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_qpid_broker_HEADERS)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(qpid_brokerdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(qpid_brokerdir)/$$f"; \
+	done
+install-dist_qpid_clientHEADERS: $(dist_qpid_client_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(qpid_clientdir)" || $(mkdir_p) "$(DESTDIR)$(qpid_clientdir)"
+	@list='$(dist_qpid_client_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(dist_qpid_clientHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(qpid_clientdir)/$$f'"; \
+	  $(dist_qpid_clientHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(qpid_clientdir)/$$f"; \
+	done
+
+uninstall-dist_qpid_clientHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_qpid_client_HEADERS)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(qpid_clientdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(qpid_clientdir)/$$f"; \
+	done
+install-dist_qpid_client_no_keywordHEADERS: $(dist_qpid_client_no_keyword_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(qpid_client_no_keyworddir)" || $(mkdir_p) "$(DESTDIR)$(qpid_client_no_keyworddir)"
+	@list='$(dist_qpid_client_no_keyword_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(dist_qpid_client_no_keywordHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(qpid_client_no_keyworddir)/$$f'"; \
+	  $(dist_qpid_client_no_keywordHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(qpid_client_no_keyworddir)/$$f"; \
+	done
+
+uninstall-dist_qpid_client_no_keywordHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_qpid_client_no_keyword_HEADERS)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(qpid_client_no_keyworddir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(qpid_client_no_keyworddir)/$$f"; \
+	done
+install-dist_qpid_framingHEADERS: $(dist_qpid_framing_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(qpid_framingdir)" || $(mkdir_p) "$(DESTDIR)$(qpid_framingdir)"
+	@list='$(dist_qpid_framing_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(dist_qpid_framingHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(qpid_framingdir)/$$f'"; \
+	  $(dist_qpid_framingHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(qpid_framingdir)/$$f"; \
+	done
+
+uninstall-dist_qpid_framingHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(dist_qpid_framing_HEADERS)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(qpid_framingdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(qpid_framingdir)/$$f"; \
+	done
 install-nobase_includeHEADERS: $(nobase_include_HEADERS)
 	@$(NORMAL_INSTALL)
 	test -z "$(includedir)" || $(mkdir_p) "$(DESTDIR)$(includedir)"
@@ -3496,7 +6162,7 @@ distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
 distdir: $(DISTFILES)
-	$(mkdir_p) $(distdir)/qpid $(distdir)/qpid/agent $(distdir)/qpid/amqp_0_10 $(distdir)/qpid/broker $(distdir)/qpid/broker/windows $(distdir)/qpid/client $(distdir)/qpid/client/windows $(distdir)/qpid/cluster $(distdir)/qpid/console $(distdir)/qpid/framing $(distdir)/qpid/log $(distdir)/qpid/log/posix $(distdir)/qpid/log/windows $(distdir)/qpid/management $(distdir)/qpid/sys $(distdir)/qpid/sys/posix $(distdir)/qpid/sys/windows $(distdir)/windows
+	$(mkdir_p) $(distdir)/gen/qmf/org/apache/qpid/acl $(distdir)/gen/qmf/org/apache/qpid/broker $(distdir)/gen/qmf/org/apache/qpid/cluster $(distdir)/gen/qpid/amqp_0_10 $(distdir)/gen/qpid/client $(distdir)/gen/qpid/client/no_keyword $(distdir)/gen/qpid/framing $(distdir)/gen/tests $(distdir)/qpid $(distdir)/qpid/agent $(distdir)/qpid/amqp_0_10 $(distdir)/qpid/broker $(distdir)/qpid/broker/windows $(distdir)/qpid/client $(distdir)/qpid/client/windows $(distdir)/qpid/cluster $(distdir)/qpid/console $(distdir)/qpid/framing $(distdir)/qpid/log $(distdir)/qpid/log/posix $(distdir)/qpid/log/windows $(distdir)/qpid/management $(distdir)/qpid/sys $(distdir)/qpid/sys/posix $(distdir)/qpid/sys/windows $(distdir)/windows
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
@@ -3546,7 +6212,7 @@ check: check-recursive
 all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(HEADERS) config.h
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(cmoduledir)" "$(DESTDIR)$(dmoduledir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(sbindir)" "$(DESTDIR)$(includedir)"; do \
+	for dir in "$(DESTDIR)$(cmoduledir)" "$(DESTDIR)$(dmoduledir)" "$(DESTDIR)$(libdir)" "$(DESTDIR)$(sbindir)" "$(DESTDIR)$(org_apache_qpid_acldir)" "$(DESTDIR)$(org_apache_qpid_brokerdir)" "$(DESTDIR)$(org_apache_qpid_clusterdir)" "$(DESTDIR)$(qpid_amqp_0_10dir)" "$(DESTDIR)$(qpid_brokerdir)" "$(DESTDIR)$(qpid_clientdir)" "$(DESTDIR)$(qpid_client_no_keyworddir)" "$(DESTDIR)$(qpid_framingdir)" "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
 	done
 install: install-recursive
@@ -3569,6 +6235,16 @@ clean-generic:
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
+	-rm -f gen/qmf/org/apache/qpid/acl/$(DEPDIR)/$(am__dirstamp)
+	-rm -f gen/qmf/org/apache/qpid/acl/$(am__dirstamp)
+	-rm -f gen/qmf/org/apache/qpid/broker/$(DEPDIR)/$(am__dirstamp)
+	-rm -f gen/qmf/org/apache/qpid/broker/$(am__dirstamp)
+	-rm -f gen/qmf/org/apache/qpid/cluster/$(DEPDIR)/$(am__dirstamp)
+	-rm -f gen/qmf/org/apache/qpid/cluster/$(am__dirstamp)
+	-rm -f gen/qpid/client/no_keyword/$(DEPDIR)/$(am__dirstamp)
+	-rm -f gen/qpid/client/no_keyword/$(am__dirstamp)
+	-rm -f gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+	-rm -f gen/qpid/framing/$(am__dirstamp)
 	-rm -f posix/$(DEPDIR)/$(am__dirstamp)
 	-rm -f posix/$(am__dirstamp)
 	-rm -f qpid/$(DEPDIR)/$(am__dirstamp)
@@ -3626,7 +6302,7 @@ clean-am: clean-cmoduleLTLIBRARIES clean-dmoduleLTLIBRARIES \
 	clean-noinstPROGRAMS clean-sbinPROGRAMS mostlyclean-am
 
 distclean: distclean-recursive
-	-rm -rf ./$(DEPDIR) posix/$(DEPDIR) qpid/$(DEPDIR) qpid/acl/$(DEPDIR) qpid/agent/$(DEPDIR) qpid/amqp_0_10/$(DEPDIR) qpid/broker/$(DEPDIR) qpid/broker/posix/$(DEPDIR) qpid/client/$(DEPDIR) qpid/cluster/$(DEPDIR) qpid/console/$(DEPDIR) qpid/framing/$(DEPDIR) qpid/log/$(DEPDIR) qpid/log/posix/$(DEPDIR) qpid/management/$(DEPDIR) qpid/replication/$(DEPDIR) qpid/sys/$(DEPDIR) qpid/sys/cyrus/$(DEPDIR) qpid/sys/epoll/$(DEPDIR) qpid/sys/posix/$(DEPDIR) qpid/sys/rdma/$(DEPDIR) qpid/sys/solaris/$(DEPDIR) qpid/sys/ssl/$(DEPDIR) qpid/xml/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) gen/qmf/org/apache/qpid/acl/$(DEPDIR) gen/qmf/org/apache/qpid/broker/$(DEPDIR) gen/qmf/org/apache/qpid/cluster/$(DEPDIR) gen/qpid/client/no_keyword/$(DEPDIR) gen/qpid/framing/$(DEPDIR) posix/$(DEPDIR) qpid/$(DEPDIR) qpid/acl/$(DEPDIR) qpid/agent/$(DEPDIR) qpid/amqp_0_10/$(DEPDIR) qpid/broker/$(DEPDIR) qpid/broker/posix/$(DEPDIR) qpid/client/$(DEPDIR) qpid/cluster/$(DEPDIR) qpid/console/$(DEPDIR) qpid/framing/$(DEPDIR) qpid/log/$(DEPDIR) qpid/log/posix/$(DEPDIR) qpid/management/$(DEPDIR) qpid/replication/$(DEPDIR) qpid/sys/$(DEPDIR) qpid/sys/cyrus/$(DEPDIR) qpid/sys/epoll/$(DEPDIR) qpid/sys/posix/$(DEPDIR) qpid/sys/rdma/$(DEPDIR) qpid/sys/solaris/$(DEPDIR) qpid/sys/ssl/$(DEPDIR) qpid/xml/$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-libtool distclean-tags
@@ -3642,7 +6318,15 @@ info: info-recursive
 info-am:
 
 install-data-am: install-cmoduleLTLIBRARIES install-data-local \
-	install-dmoduleLTLIBRARIES install-nobase_includeHEADERS
+	install-dist_org_apache_qpid_aclHEADERS \
+	install-dist_org_apache_qpid_brokerHEADERS \
+	install-dist_org_apache_qpid_clusterHEADERS \
+	install-dist_qpid_amqp_0_10HEADERS \
+	install-dist_qpid_brokerHEADERS \
+	install-dist_qpid_clientHEADERS \
+	install-dist_qpid_client_no_keywordHEADERS \
+	install-dist_qpid_framingHEADERS install-dmoduleLTLIBRARIES \
+	install-nobase_includeHEADERS
 
 install-exec-am: install-libLTLIBRARIES install-sbinPROGRAMS
 
@@ -3653,7 +6337,7 @@ install-man:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
-	-rm -rf ./$(DEPDIR) posix/$(DEPDIR) qpid/$(DEPDIR) qpid/acl/$(DEPDIR) qpid/agent/$(DEPDIR) qpid/amqp_0_10/$(DEPDIR) qpid/broker/$(DEPDIR) qpid/broker/posix/$(DEPDIR) qpid/client/$(DEPDIR) qpid/cluster/$(DEPDIR) qpid/console/$(DEPDIR) qpid/framing/$(DEPDIR) qpid/log/$(DEPDIR) qpid/log/posix/$(DEPDIR) qpid/management/$(DEPDIR) qpid/replication/$(DEPDIR) qpid/sys/$(DEPDIR) qpid/sys/cyrus/$(DEPDIR) qpid/sys/epoll/$(DEPDIR) qpid/sys/posix/$(DEPDIR) qpid/sys/rdma/$(DEPDIR) qpid/sys/solaris/$(DEPDIR) qpid/sys/ssl/$(DEPDIR) qpid/xml/$(DEPDIR)
+	-rm -rf ./$(DEPDIR) gen/qmf/org/apache/qpid/acl/$(DEPDIR) gen/qmf/org/apache/qpid/broker/$(DEPDIR) gen/qmf/org/apache/qpid/cluster/$(DEPDIR) gen/qpid/client/no_keyword/$(DEPDIR) gen/qpid/framing/$(DEPDIR) posix/$(DEPDIR) qpid/$(DEPDIR) qpid/acl/$(DEPDIR) qpid/agent/$(DEPDIR) qpid/amqp_0_10/$(DEPDIR) qpid/broker/$(DEPDIR) qpid/broker/posix/$(DEPDIR) qpid/client/$(DEPDIR) qpid/cluster/$(DEPDIR) qpid/console/$(DEPDIR) qpid/framing/$(DEPDIR) qpid/log/$(DEPDIR) qpid/log/posix/$(DEPDIR) qpid/management/$(DEPDIR) qpid/replication/$(DEPDIR) qpid/sys/$(DEPDIR) qpid/sys/cyrus/$(DEPDIR) qpid/sys/epoll/$(DEPDIR) qpid/sys/posix/$(DEPDIR) qpid/sys/rdma/$(DEPDIR) qpid/sys/solaris/$(DEPDIR) qpid/sys/ssl/$(DEPDIR) qpid/xml/$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -3671,6 +6355,14 @@ ps: ps-recursive
 ps-am:
 
 uninstall-am: uninstall-cmoduleLTLIBRARIES \
+	uninstall-dist_org_apache_qpid_aclHEADERS \
+	uninstall-dist_org_apache_qpid_brokerHEADERS \
+	uninstall-dist_org_apache_qpid_clusterHEADERS \
+	uninstall-dist_qpid_amqp_0_10HEADERS \
+	uninstall-dist_qpid_brokerHEADERS \
+	uninstall-dist_qpid_clientHEADERS \
+	uninstall-dist_qpid_client_no_keywordHEADERS \
+	uninstall-dist_qpid_framingHEADERS \
 	uninstall-dmoduleLTLIBRARIES uninstall-info-am \
 	uninstall-libLTLIBRARIES uninstall-nobase_includeHEADERS \
 	uninstall-sbinPROGRAMS
@@ -3686,8 +6378,15 @@ uninstall-info: uninstall-info-recursive
 	distclean-recursive distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am \
 	install-cmoduleLTLIBRARIES install-data install-data-am \
-	install-data-local install-dmoduleLTLIBRARIES install-exec \
-	install-exec-am install-info install-info-am \
+	install-data-local install-dist_org_apache_qpid_aclHEADERS \
+	install-dist_org_apache_qpid_brokerHEADERS \
+	install-dist_org_apache_qpid_clusterHEADERS \
+	install-dist_qpid_amqp_0_10HEADERS \
+	install-dist_qpid_brokerHEADERS \
+	install-dist_qpid_clientHEADERS \
+	install-dist_qpid_client_no_keywordHEADERS \
+	install-dist_qpid_framingHEADERS install-dmoduleLTLIBRARIES \
+	install-exec install-exec-am install-info install-info-am \
 	install-libLTLIBRARIES install-man \
 	install-nobase_includeHEADERS install-sbinPROGRAMS \
 	install-strip installcheck installcheck-am installdirs \
@@ -3695,9 +6394,18 @@ uninstall-info: uninstall-info-recursive
 	maintainer-clean-recursive mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool mostlyclean-recursive \
 	pdf pdf-am ps ps-am tags tags-recursive uninstall uninstall-am \
-	uninstall-cmoduleLTLIBRARIES uninstall-dmoduleLTLIBRARIES \
-	uninstall-info-am uninstall-libLTLIBRARIES \
-	uninstall-nobase_includeHEADERS uninstall-sbinPROGRAMS
+	uninstall-cmoduleLTLIBRARIES \
+	uninstall-dist_org_apache_qpid_aclHEADERS \
+	uninstall-dist_org_apache_qpid_brokerHEADERS \
+	uninstall-dist_org_apache_qpid_clusterHEADERS \
+	uninstall-dist_qpid_amqp_0_10HEADERS \
+	uninstall-dist_qpid_brokerHEADERS \
+	uninstall-dist_qpid_clientHEADERS \
+	uninstall-dist_qpid_client_no_keywordHEADERS \
+	uninstall-dist_qpid_framingHEADERS \
+	uninstall-dmoduleLTLIBRARIES uninstall-info-am \
+	uninstall-libLTLIBRARIES uninstall-nobase_includeHEADERS \
+	uninstall-sbinPROGRAMS
 
 
 # Note: generated soure and makefiles included in distribution so a
@@ -3716,10 +6424,11 @@ force:
 @GENERATE_TRUE@mgen.timestamp: $(mgen_generator)
 @GENERATE_TRUE@	$(mgen_cmd); touch $@
 @GENERATE_TRUE@$(mgen_generator):
-$(srcdir)/rubygen.mk: force
-	$(rgen_cmd)
-$(srcdir)/managementgen.mk: force
-	$(mgen_cmd)
+
+@GENERATE_TRUE@$(srcdir)/managementgen.mk: $(mgen_generator)
+@GENERATE_TRUE@	$(mgen_cmd)
+
+@GENERATE_TRUE@$(mgen_generator):
 
 # Force build of qpidd during dist phase so help2man will work.
 dist-hook: $(BUILT_SOURCES)
