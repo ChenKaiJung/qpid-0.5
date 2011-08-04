@@ -22,7 +22,6 @@
 #define _QPID_CONSOLE_CLASSKEY_H_
 
 #include <string>
-#include "ConsoleImportExport.h"
 #include "Package.h"
 #include "qpid/framing/Buffer.h"
 
@@ -33,7 +32,7 @@ namespace console {
      *
      * \ingroup qmfconsoleapi
      */
-    class QPID_CONSOLE_EXTERN ClassKey {
+    class ClassKey {
     public:
         static const int HASH_SIZE = 16;
 
@@ -58,7 +57,7 @@ namespace console {
         uint8_t hash[HASH_SIZE];
     };
 
-    QPID_CONSOLE_EXTERN std::ostream& operator<<(std::ostream& o, const ClassKey& k);
+    std::ostream& operator<<(std::ostream& o, const ClassKey& k);
 }
 }
 

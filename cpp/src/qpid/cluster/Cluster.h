@@ -23,6 +23,7 @@
 #include "ClusterSettings.h"
 #include "Cpg.h"
 #include "Decoder.h"
+#include "ErrorCheck.h"
 #include "Event.h"
 #include "EventFrame.h"
 #include "ExpiryPolicy.h"
@@ -33,6 +34,7 @@
 #include "PollableQueue.h"
 #include "PollerDispatch.h"
 #include "Quorum.h"
+#include "UpdateReceiver.h"
 
 #include "qmf/org/apache/qpid/cluster/Cluster.h"
 #include "qpid/Url.h"
@@ -93,23 +95,26 @@ class Cluster : private Cpg::Handler, public management::Manageable {
 
     // Update completed - called in update thread
     void updateInDone(const ClusterMap&);
+    void updateInRetracted();
 
     MemberId getId() const;
     broker::Broker& getBroker() const;
     Multicaster& getMulticast() { return mcast; }
 
-    void checkQuorum();
-
-    size_t getReadMax() { return readMax; }
-    size_t getWriteEstimate() { return writeEstimate; }
+    const ClusterSettings& getSettings() const { return settings; }
 
     void deliverFrame(const EventFrame&);
+
+    // Called in deliverFrame thread to indicate an error from the broker.
+    void flagError(Connection&, ErrorCheck::ErrorType, const std::string& msg);
 
     // Called only during update by Connection::shadowReady
     Decoder& getDecoder() { return decoder; }
 
     ExpiryPolicy& getExpiryPolicy() { return *expiryPolicy; }
     
+    UpdateReceiver& getUpdateReceiver() { return updateReceiver; }
+
   private:
     typedef sys::Monitor::ScopedLock Lock;
 
@@ -117,6 +122,9 @@ class Cluster : private Cpg::Handler, public management::Manageable {
     typedef PollableQueue<EventFrame> PollableFrameQueue;
     typedef std::map<ConnectionId, ConnectionPtr> ConnectionMap;
 
+    /** Version number of the cluster protocol, to avoid mixed versions. */
+    static const uint32_t CLUSTER_VERSION;
+    
     // NB: A dummy Lock& parameter marks functions that must only be
     // called with Cluster::lock  locked.
  
@@ -132,23 +140,29 @@ class Cluster : private Cpg::Handler, public management::Manageable {
 
     // == Called in deliverFrameQueue thread
     void deliveredFrame(const EventFrame&); 
+    void processFrame(const EventFrame&, Lock&); 
 
     // Cluster controls implement XML methods from cluster.xml.
     void updateRequest(const MemberId&, const std::string&, Lock&);
-    void updateOffer(const MemberId& updater, uint64_t updatee, const framing::Uuid&, Lock&);
+    void updateOffer(const MemberId& updater, uint64_t updatee, const framing::Uuid&,
+                     uint32_t version, Lock&);
+    void retractOffer(const MemberId& updater, uint64_t updatee, Lock&);
     void ready(const MemberId&, const std::string&, Lock&);
-    void configChange(const MemberId&, const std::string& addresses, Lock& l);
+    void configChange(const MemberId&, const std::string& current, Lock& l);
     void messageExpired(const MemberId&, uint64_t, Lock& l);
+    void errorCheck(const MemberId&, uint8_t type, SequenceNumber frameSeq, Lock&);
+
     void shutdown(const MemberId&, Lock&);
 
     // Helper functions
-    ConnectionPtr getConnection(const ConnectionId&, Lock&);
+    ConnectionPtr getConnection(const EventFrame&, Lock&);
     ConnectionVector getConnections(Lock&);
     void updateStart(const MemberId& updatee, const Url& url, Lock&);
     void makeOffer(const MemberId&, Lock&);
     void setReady(Lock&);
     void memberUpdate(Lock&);
     void setClusterId(const framing::Uuid&, Lock&);
+    void erase(const ConnectionId&, Lock&);       
 
     // == Called in CPG dispatch thread
     void deliver( // CPG deliver callback. 
@@ -185,7 +199,7 @@ class Cluster : private Cpg::Handler, public management::Manageable {
     void updateOutDone(Lock&);
 
     // Immutable members set on construction, never changed.
-    ClusterSettings settings;
+    const ClusterSettings settings;
     broker::Broker& broker;
     qmf::org::apache::qpid::cluster::Cluster* mgmtObject; // mgnt owns lifecycle
     boost::shared_ptr<sys::Poller> poller;
@@ -193,8 +207,6 @@ class Cluster : private Cpg::Handler, public management::Manageable {
     const std::string name;
     Url myUrl;
     const MemberId self;
-    const size_t readMax;
-    const size_t writeEstimate;
     framing::Uuid clusterId;
     NoOpConnectionOutputHandler shadowOut;
     qpid::management::ManagementAgent* mAgent;
@@ -216,11 +228,13 @@ class Cluster : private Cpg::Handler, public management::Manageable {
     Decoder decoder;
     bool discarding;
     
+
     // Remaining members are protected by lock.
-    // FIXME aconway 2009-03-06: Most of these members are also only used in
+
+    // TODO aconway 2009-03-06: Most of these members are also only used in
     // deliverFrameQueue thread or during stall. Review and separate members
     // that require a lock, drop lock when not needed.
-    // 
+
     mutable sys::Monitor lock;
 
 
@@ -243,8 +257,10 @@ class Cluster : private Cpg::Handler, public management::Manageable {
     bool lastBroker;
     sys::Thread updateThread;
     boost::optional<ClusterMap> updatedMap;
-
-
+    bool updateRetracted;
+    ErrorCheck error;
+    UpdateReceiver updateReceiver;
+    
   friend std::ostream& operator<<(std::ostream&, const Cluster&);
   friend class ClusterDispatcher;
 };

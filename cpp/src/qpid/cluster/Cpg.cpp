@@ -75,11 +75,14 @@ Cpg::Cpg(Handler& h) : IOHandle(new sys::IOHandlePrivate), handler(h), isShutdow
     ::memset(&callbacks, sizeof(callbacks), 0);
     callbacks.cpg_deliver_fn = &globalDeliver;
     callbacks.cpg_confchg_fn = &globalConfigChange;
+
+    QPID_LOG(info, "Initializing CPG");
     cpg_error_t err = cpg_initialize(&handle, &callbacks);
-    if (err == CPG_ERR_TRY_AGAIN) {
-        QPID_LOG(notice, "Waiting for CPG initialization.");
-        while (CPG_ERR_TRY_AGAIN == (err = cpg_initialize(&handle, &callbacks)))
-            sys::sleep(5);
+    int retries = 6; // FIXME aconway 2009-08-06: configure, use same config for cman connection.
+    while (err == CPG_ERR_TRY_AGAIN && --retries) {
+        QPID_LOG(notice, "Re-trying CPG initialization.");
+        sys::sleep(5);
+        err = cpg_initialize(&handle, &callbacks);
     }
     check(err, "Failed to initialize CPG.");
     check(cpg_context_set(handle, this), "Cannot set CPG context");
@@ -87,7 +90,6 @@ Cpg::Cpg(Handler& h) : IOHandle(new sys::IOHandlePrivate), handler(h), isShutdow
     // windows then this needs to be refactored into
     // qpid::sys::<platform>
     IOHandle::impl->fd = getFd();
-    QPID_LOG(debug, "Initialized CPG handle 0x" << std::hex << handle);
 }
 
 Cpg::~Cpg() {
@@ -148,13 +150,9 @@ void Cpg::dispatchBlocking() {
 string Cpg::errorStr(cpg_error_t err, const std::string& msg) {
     std::ostringstream  os;
     os << msg << ": ";
-    // FIXME aconway 2009-03-11: The commented out cases below are
-    // because of mistakes in the latest corosync header files.
-    // The code should be re-instated when that is sorted out.
-    // 
     switch (err) {
       case CPG_OK: os << "ok"; break;
-        // case CPG_ERR_LIBRARY: os << "library"; break;
+      case CPG_ERR_LIBRARY: os << "library"; break;
       case CPG_ERR_TIMEOUT: os << "timeout"; break;
       case CPG_ERR_TRY_AGAIN: os << "try again"; break;
       case CPG_ERR_INVALID_PARAM: os << "invalid param"; break;
@@ -164,8 +162,8 @@ string Cpg::errorStr(cpg_error_t err, const std::string& msg) {
       case CPG_ERR_NOT_EXIST: os << "not exist"; break;
       case CPG_ERR_EXIST: os << "exist"; break;
       case CPG_ERR_NOT_SUPPORTED: os << "not supported"; break;
-        // case CPG_ERR_SECURITY: os << "security"; break;
-        // case CPG_ERR_TOO_MANY_GROUPS: os << "too many groups"; break;
+      case CPG_ERR_SECURITY: os << "security"; break;
+      case CPG_ERR_TOO_MANY_GROUPS: os << "too many groups"; break;
       default: os << ": unknown cpg error " << err;
     };
     os << " (" << err << ")";

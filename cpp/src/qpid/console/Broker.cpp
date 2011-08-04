@@ -57,6 +57,8 @@ Broker::Broker(SessionManager& sm, ConnectionSettings& settings) :
 
 Broker::~Broker()
 {
+    connThreadBody.shutdown();
+    connThread.join();
 }
 
 string Broker::getUrl() const
@@ -92,25 +94,29 @@ bool Broker::checkHeader(Buffer& buf, uint8_t *opcode, uint32_t *seq) const
 
 void Broker::received(qpid::client::Message& msg)
 {
+#define QMF_HEADER_SIZE 8
     string   data = msg.getData();
     Buffer   inBuffer(const_cast<char*>(data.c_str()), data.size());
     uint8_t  opcode;
     uint32_t sequence;
 
-    if (checkHeader(inBuffer, &opcode, &sequence)) {
-        QPID_LOG(trace, "Broker::received: opcode=" << opcode << " seq=" << sequence);
+    while (inBuffer.available() >= QMF_HEADER_SIZE) {
+        if (checkHeader(inBuffer, &opcode, &sequence)) {
+            QPID_LOG(trace, "Broker::received: opcode=" << opcode << " seq=" << sequence);
 
-        if      (opcode == 'b') sessionManager.handleBrokerResp(this, inBuffer, sequence);
-        else if (opcode == 'p') sessionManager.handlePackageInd(this, inBuffer, sequence);
-        else if (opcode == 'z') sessionManager.handleCommandComplete(this, inBuffer, sequence);
-        else if (opcode == 'q') sessionManager.handleClassInd(this, inBuffer, sequence);
-        else if (opcode == 'm') sessionManager.handleMethodResp(this, inBuffer, sequence);
-        else if (opcode == 'h') sessionManager.handleHeartbeatInd(this, inBuffer, sequence);
-        else if (opcode == 'e') sessionManager.handleEventInd(this, inBuffer, sequence);
-        else if (opcode == 's') sessionManager.handleSchemaResp(this, inBuffer, sequence);
-        else if (opcode == 'c') sessionManager.handleContentInd(this, inBuffer, sequence, true, false);
-        else if (opcode == 'i') sessionManager.handleContentInd(this, inBuffer, sequence, false, true);
-        else if (opcode == 'g') sessionManager.handleContentInd(this, inBuffer, sequence, true, true);
+            if      (opcode == 'b') sessionManager.handleBrokerResp(this, inBuffer, sequence);
+            else if (opcode == 'p') sessionManager.handlePackageInd(this, inBuffer, sequence);
+            else if (opcode == 'z') sessionManager.handleCommandComplete(this, inBuffer, sequence);
+            else if (opcode == 'q') sessionManager.handleClassInd(this, inBuffer, sequence);
+            else if (opcode == 'm') sessionManager.handleMethodResp(this, inBuffer, sequence);
+            else if (opcode == 'h') sessionManager.handleHeartbeatInd(this, inBuffer, sequence);
+            else if (opcode == 'e') sessionManager.handleEventInd(this, inBuffer, sequence);
+            else if (opcode == 's') sessionManager.handleSchemaResp(this, inBuffer, sequence);
+            else if (opcode == 'c') sessionManager.handleContentInd(this, inBuffer, sequence, true, false);
+            else if (opcode == 'i') sessionManager.handleContentInd(this, inBuffer, sequence, false, true);
+            else if (opcode == 'g') sessionManager.handleContentInd(this, inBuffer, sequence, true, true);
+        } else
+            return;
     }
 }
 
@@ -180,6 +186,8 @@ void Broker::ConnectionThread::run()
             subscriptions->setFlowControl(dest, FlowControl::unlimited());
             {
                 Mutex::ScopedLock _lock(connLock);
+                if (shuttingDown)
+                    return;
                 operational = true;
                 broker.resetAgents();
                 broker.connected = true;
@@ -195,16 +203,26 @@ void Broker::ConnectionThread::run()
                 broker.sessionManager.handleBrokerDisconnect(&broker);
             }
             delay = delayMin;
+            connection.close();
             delete subscriptions;
             subscriptions = 0;
-            session.close();
         } catch (std::exception &e) {
             QPID_LOG(debug, "  outer exception: " << e.what());
             if (delay < delayMax)
                 delay *= delayFactor;
         }
 
-        ::sleep(delay);
+            {
+                Mutex::ScopedLock _lock(connLock);
+                if (shuttingDown)
+                    return;
+                {
+                    Mutex::ScopedUnlock _unlock(connLock);
+                    ::sleep(delay);
+                }
+                if (shuttingDown)
+                    return;
+            }
     }
 }
 
@@ -247,6 +265,16 @@ void Broker::ConnectionThread::bindExchange(const std::string& exchange, const s
     QPID_LOG(debug, "Broker::ConnectionThread::bindExchange: exchange=" << exchange << " key=" << key);
     session.exchangeBind(arg::exchange=exchange, arg::queue=queueName.str(),
                           arg::bindingKey=key);
+}
+
+void Broker::ConnectionThread::shutdown()
+{
+    {
+        Mutex::ScopedLock _lock(connLock);
+        shuttingDown = true;
+    }
+    if (subscriptions)
+        subscriptions->stop();
 }
 
 void Broker::waitForStable()

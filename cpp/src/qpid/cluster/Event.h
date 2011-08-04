@@ -25,7 +25,6 @@
 #include "types.h"
 #include "qpid/RefCountedBuffer.h"
 #include "qpid/framing/AMQFrame.h"
-#include "qpid/sys/LatencyMetric.h"
 #include <sys/uio.h>            // For iovec
 #include <iosfwd>
 
@@ -42,7 +41,7 @@ class Buffer;
 namespace cluster {
 
 /** Header data for a multicast event */
-class EventHeader : public ::qpid::sys::LatencyMetricTimestamp {
+class EventHeader {
   public:
     EventHeader(EventType t=DATA, const ConnectionId& c=ConnectionId(), size_t size=0);
     void decode(const MemberId& m, framing::Buffer&);
@@ -55,7 +54,7 @@ class EventHeader : public ::qpid::sys::LatencyMetricTimestamp {
     /** Size of payload data, excluding header. */
     size_t getSize() const { return size; }
     /** Size of header + payload. */ 
-    size_t getStoreSize() { return size + HEADER_SIZE; }
+    size_t getStoreSize() const { return size + HEADER_SIZE; }
 
     bool isCluster() const { return connectionId.getNumber() == 0; }
     bool isConnection() const { return connectionId.getNumber() != 0; }
@@ -96,18 +95,20 @@ class Event : public EventHeader {
     char* getStore() { return store; }
     const char* getStore() const { return store; }
 
-    framing::AMQFrame getFrame() const;        
+    const framing::AMQFrame& getFrame() const;        
     
     operator framing::Buffer() const;
 
-    iovec toIovec();
+    iovec toIovec() const;
     
   private:
-    void encodeHeader();
+    void encodeHeader() const;
 
     RefCountedBuffer::pointer store;
+    mutable framing::AMQFrame frame;
 };
 
+std::ostream& operator << (std::ostream&, const Event&);
 std::ostream& operator << (std::ostream&, const EventHeader&);
 
 }} // namespace qpid::cluster

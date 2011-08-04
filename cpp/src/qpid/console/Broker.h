@@ -21,7 +21,6 @@
 #ifndef _QPID_CONSOLE_BROKER_H_
 #define _QPID_CONSOLE_BROKER_H_
 
-#include "ConsoleImportExport.h"
 #include "qpid/client/Connection.h"
 #include "qpid/client/ConnectionSettings.h"
 #include "qpid/client/SubscriptionManager.h"
@@ -51,9 +50,8 @@ namespace console {
      */
     class Broker : public client::MessageListener {
     public:
-        QPID_CONSOLE_EXTERN Broker(SessionManager& sm,
-                                   client::ConnectionSettings& settings);
-        QPID_CONSOLE_EXTERN ~Broker();
+        Broker(SessionManager& sm, client::ConnectionSettings& settings);
+        ~Broker();
         
         bool isConnected() const { return connected; }
         const std::string& getError() const { return error; }
@@ -63,7 +61,7 @@ namespace console {
         void addBinding(const std::string& key) {
             connThreadBody.bindExchange("qpid.management", key);
         }
-        QPID_CONSOLE_EXTERN std::string getUrl() const;
+        std::string getUrl() const;
 
     private:
         friend class SessionManager;
@@ -73,7 +71,6 @@ namespace console {
 
         SessionManager& sessionManager;
         AgentMap agents;
-        client::SubscriptionManager* subscription;
         bool connected;
         std::string error;
         std::string amqpSessionId;
@@ -88,25 +85,27 @@ namespace console {
 
         friend class ConnectionThread;
         class ConnectionThread : public sys::Runnable {
-                bool operational;
-                Broker&              broker;
-                framing::Uuid        sessionId;
-                client::Connection   connection;
-                client::Session      session;
-                client::SubscriptionManager* subscriptions;
-                std::stringstream queueName;
-                sys::Mutex        connLock;
-                void run();
-            public:
+            bool operational;
+            bool shuttingDown;
+            Broker&              broker;
+            framing::Uuid        sessionId;
+            client::Connection   connection;
+            client::Session      session;
+            client::SubscriptionManager* subscriptions;
+            std::stringstream queueName;
+            sys::Mutex        connLock;
+            void run();
+        public:
             ConnectionThread(Broker& _broker) :
-                operational(false), broker(_broker), subscriptions(0) {}
-                ~ConnectionThread();
-                void sendBuffer(qpid::framing::Buffer& buf,
-                                uint32_t               length,
-                                const std::string&     exchange = "qpid.management",
-                                const std::string&     routingKey = "broker");
-                void bindExchange(const std::string& exchange, const std::string& key);
-            };
+                operational(false), shuttingDown(false), broker(_broker), subscriptions(0) {}
+            ~ConnectionThread();
+            void sendBuffer(qpid::framing::Buffer& buf,
+                            uint32_t               length,
+                            const std::string&     exchange = "qpid.management",
+                            const std::string&     routingKey = "broker");
+            void bindExchange(const std::string& exchange, const std::string& key);
+            void shutdown();
+        };
 
         ConnectionThread connThreadBody;
         sys::Thread      connThread;
@@ -122,10 +121,10 @@ namespace console {
         void setBrokerId(const framing::Uuid& id) { brokerId = id; }
         void appendAgents(std::vector<Agent*>& agents) const;
 
-        friend QPID_CONSOLE_EXTERN std::ostream& operator<<(std::ostream& o, const Broker& k);
+        friend std::ostream& operator<<(std::ostream& o, const Broker& k);
     };
 
-    QPID_CONSOLE_EXTERN std::ostream& operator<<(std::ostream& o, const Broker& k);
+    std::ostream& operator<<(std::ostream& o, const Broker& k);
 }
 }
 

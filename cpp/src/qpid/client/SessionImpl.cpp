@@ -63,7 +63,8 @@ SessionImpl::SessionImpl(const std::string& name, shared_ptr<ConnectionImpl> con
       proxy(ioHandler),
       nextIn(0),
       nextOut(0),
-      sendMsgCredit(0)
+      sendMsgCredit(0),
+      autoDetach(true)
 {
     channel.next = connectionShared.get();
 }
@@ -71,8 +72,13 @@ SessionImpl::SessionImpl(const std::string& name, shared_ptr<ConnectionImpl> con
 SessionImpl::~SessionImpl() {
     {
         Lock l(state);
-        if (state != DETACHED) {
-            QPID_LOG(warning, "Session was not closed cleanly");
+        if (state != DETACHED && state != DETACHING) {
+            QPID_LOG(warning, "Session was not closed cleanly: " << id);
+            try {
+                // Inform broker but don't wait for detached as that deadlocks.
+                // The detached will be ignored as the channel will be invalid.
+                if (autoDetach) detach();
+            } catch (...) {}    // ignore errors.
             setState(DETACHED);
             handleClosed();
             state.waitWaiters();
@@ -297,6 +303,25 @@ struct SendContentFn {
     }
     SendContentFn(FrameHandler& h) : handler(h) {}
 };
+
+// Adaptor to make FrameSet look like MethodContent; used in cluster update client
+struct MethodContentAdaptor : MethodContent
+{
+    AMQHeaderBody header;
+    const std::string content;
+
+    MethodContentAdaptor(const FrameSet& f) : header(*f.getHeaders()), content(f.getContent()) {}
+
+    AMQHeaderBody getHeader() const
+    {
+        return header;
+    }
+    const std::string& getData() const
+    {
+        return content;
+    }
+};
+
 }
     
 Future SessionImpl::send(const AMQBody& command, const FrameSet& content) {
@@ -317,8 +342,13 @@ Future SessionImpl::send(const AMQBody& command, const FrameSet& content) {
     frame.setEof(false);
     handleOut(frame);
 
-    SendContentFn send(out);
-    content.map(send);
+    if (content.isComplete()) {
+        MethodContentAdaptor c(content);
+        sendContent(c);
+    } else {
+        SendContentFn send(out);
+        content.map(send);
+    }
     return f;
 }
 
@@ -774,5 +804,7 @@ shared_ptr<ConnectionImpl> SessionImpl::getConnection()
 {
     return connectionWeak.lock();
 }
+
+void SessionImpl::disableAutoDetach() { autoDetach = false; }
 
 }}

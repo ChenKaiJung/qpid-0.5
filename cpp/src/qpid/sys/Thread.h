@@ -22,7 +22,6 @@
  *
  */
 #include <boost/shared_ptr.hpp>
-#include "qpid/CommonImportExport.h"
 
 #ifdef _WIN32
 #  define QPID_TSS __declspec(thread)
@@ -45,15 +44,15 @@ class Thread
     boost::shared_ptr<ThreadPrivate> impl;
 
   public:
-    QPID_COMMON_EXTERN Thread();
-    QPID_COMMON_EXTERN explicit Thread(qpid::sys::Runnable*);
-    QPID_COMMON_EXTERN explicit Thread(qpid::sys::Runnable&);
+    Thread();
+    explicit Thread(qpid::sys::Runnable*);
+    explicit Thread(qpid::sys::Runnable&);
     
-    QPID_COMMON_EXTERN void join();
+    void join();
 
-    QPID_COMMON_EXTERN unsigned long id();
+    unsigned long id();
         
-    QPID_COMMON_EXTERN static Thread current();
+    static Thread current();
 
     /** ID of current thread for logging.
      * Workaround for broken Thread::current() in APR

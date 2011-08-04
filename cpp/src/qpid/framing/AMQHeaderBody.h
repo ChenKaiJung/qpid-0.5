@@ -26,7 +26,6 @@
 #include "Buffer.h"
 #include "qpid/framing/DeliveryProperties.h"
 #include "qpid/framing/MessageProperties.h"
-#include "qpid/CommonImportExport.h"
 #include <iostream>
 
 #include <boost/optional.hpp>
@@ -84,12 +83,12 @@ public:
 
     inline uint8_t type() const { return HEADER_BODY; }
 
-    QPID_COMMON_EXTERN uint32_t encodedSize() const;
-    QPID_COMMON_EXTERN void encode(Buffer& buffer) const;
-    QPID_COMMON_EXTERN void decode(Buffer& buffer, uint32_t size);
-    QPID_COMMON_EXTERN uint64_t getContentLength() const;
-    QPID_COMMON_EXTERN void print(std::ostream& out) const;
-    QPID_COMMON_EXTERN void accept(AMQBodyConstVisitor&) const;
+    uint32_t encodedSize() const;
+    void encode(Buffer& buffer) const;
+    void decode(Buffer& buffer, uint32_t size);
+    uint64_t getContentLength() const;
+    void print(std::ostream& out) const;
+    void accept(AMQBodyConstVisitor&) const;
 
     template <class T> T* get(bool create) {
         boost::optional<T>& p=properties.OptProps<T>::props;

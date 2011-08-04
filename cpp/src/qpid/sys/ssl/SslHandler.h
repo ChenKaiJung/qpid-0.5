@@ -56,7 +56,7 @@ class SslHandler : public OutputControl {
     void setClient() { isClient = true; }
 
     // Output side
-    void close();
+    void abort();
     void activateOutput();
     void giveReadCredit(int32_t);
 

@@ -19,7 +19,6 @@
  *
  */
 
-#include "qpid/CommonImportExport.h"
 #include "qpid/sys/uuid.h"
 #include "qpid/sys/IntegerTypes.h"
 
@@ -65,12 +64,12 @@ struct Uuid : public boost::array<uint8_t, 16> {
     // Default op= and copy ctor are fine.
     // boost::array gives us ==, < etc.
 
-    QPID_COMMON_EXTERN void encode(framing::Buffer& buf) const;
-    QPID_COMMON_EXTERN void decode(framing::Buffer& buf);
-    QPID_COMMON_EXTERN uint32_t encodedSize() const { return size(); }
+    void encode(framing::Buffer& buf) const;
+    void decode(framing::Buffer& buf);
+    uint32_t encodedSize() const { return size(); }
 
     /** String value in format 1b4e28ba-2fa1-11d2-883f-b9a761bde3fb. */
-    QPID_COMMON_EXTERN std::string str() const;
+    std::string str() const;
 
     template <class S> void serialize(S& s) {
         s.raw(begin(), size());
@@ -78,10 +77,10 @@ struct Uuid : public boost::array<uint8_t, 16> {
 };
 
 /** Print in format 1b4e28ba-2fa1-11d2-883f-b9a761bde3fb. */
-QPID_COMMON_EXTERN std::ostream& operator<<(std::ostream&, Uuid);
+std::ostream& operator<<(std::ostream&, Uuid);
 
 /** Read from format 1b4e28ba-2fa1-11d2-883f-b9a761bde3fb. */
-QPID_COMMON_EXTERN std::istream& operator>>(std::istream&, Uuid&);
+std::istream& operator>>(std::istream&, Uuid&);
 
 }} // namespace qpid::framing
 

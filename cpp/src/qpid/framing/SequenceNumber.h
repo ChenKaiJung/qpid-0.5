@@ -23,7 +23,6 @@
 
 #include "amqp_types.h"
 #include <iosfwd>
-#include "qpid/CommonImportExport.h"
 
 namespace qpid {
 namespace framing {
@@ -38,22 +37,22 @@ class SequenceNumber
     int32_t value;
 
  public:
-    QPID_COMMON_EXTERN SequenceNumber();
-    QPID_COMMON_EXTERN SequenceNumber(uint32_t v);
+    SequenceNumber();
+    SequenceNumber(uint32_t v);
 
-    QPID_COMMON_EXTERN SequenceNumber& operator++();//prefix ++
-    QPID_COMMON_EXTERN const SequenceNumber operator++(int);//postfix ++
-    QPID_COMMON_EXTERN SequenceNumber& operator--();//prefix ++
-    QPID_COMMON_EXTERN bool operator==(const SequenceNumber& other) const;
-    QPID_COMMON_EXTERN bool operator!=(const SequenceNumber& other) const;
-    QPID_COMMON_EXTERN bool operator<(const SequenceNumber& other) const;
-    QPID_COMMON_EXTERN bool operator>(const SequenceNumber& other) const;
-    QPID_COMMON_EXTERN bool operator<=(const SequenceNumber& other) const;
-    QPID_COMMON_EXTERN bool operator>=(const SequenceNumber& other) const;
+    SequenceNumber& operator++();//prefix ++
+    const SequenceNumber operator++(int);//postfix ++
+    SequenceNumber& operator--();//prefix ++
+    bool operator==(const SequenceNumber& other) const;
+    bool operator!=(const SequenceNumber& other) const;
+    bool operator<(const SequenceNumber& other) const;
+    bool operator>(const SequenceNumber& other) const;
+    bool operator<=(const SequenceNumber& other) const;
+    bool operator>=(const SequenceNumber& other) const;
     uint32_t getValue() const { return (uint32_t) value; }
     operator uint32_t() const { return (uint32_t) value; }
 
-    QPID_COMMON_EXTERN friend int32_t operator-(const SequenceNumber& a, const SequenceNumber& b);
+    friend int32_t operator-(const SequenceNumber& a, const SequenceNumber& b);
 
     void encode(Buffer& buffer) const;
     void decode(Buffer& buffer);
@@ -68,7 +67,7 @@ struct Window
     SequenceNumber lwm;
 };
 
-QPID_COMMON_EXTERN std::ostream& operator<<(std::ostream& o, const SequenceNumber& n);
+std::ostream& operator<<(std::ostream& o, const SequenceNumber& n);
 
 }} // namespace qpid::framing
 

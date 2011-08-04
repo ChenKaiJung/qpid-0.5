@@ -22,7 +22,6 @@
  *
  */
 
-#include "BrokerImportExport.h"
 #include "QueuedMessage.h"
 #include "qpid/sys/Mutex.h"
 #include "qpid/sys/PollableQueue.h"
@@ -49,22 +48,23 @@ class QueueEvents
         EventType type;
         QueuedMessage msg;
 
-        QPID_BROKER_EXTERN Event(EventType, const QueuedMessage&);
+        Event(EventType, const QueuedMessage&);
     };
 
     typedef boost::function<void (Event)> EventListener;
 
-    QPID_BROKER_EXTERN QueueEvents(const boost::shared_ptr<sys::Poller>& poller);
-    QPID_BROKER_EXTERN ~QueueEvents();
-    QPID_BROKER_EXTERN void enqueued(const QueuedMessage&);
-    QPID_BROKER_EXTERN void dequeued(const QueuedMessage&);
-    QPID_BROKER_EXTERN void registerListener(const std::string& id,
+    QueueEvents(const boost::shared_ptr<sys::Poller>& poller, bool isSync = false);
+    ~QueueEvents();
+    void enqueued(const QueuedMessage&);
+    void dequeued(const QueuedMessage&);
+    void registerListener(const std::string& id,
                                              const EventListener&);
-    QPID_BROKER_EXTERN void unregisterListener(const std::string& id);
+    void unregisterListener(const std::string& id);
     void enable();
     void disable();
     //process all outstanding events
-    QPID_BROKER_EXTERN void shutdown();
+    void shutdown();
+    bool isSync();
   private:
     typedef qpid::sys::PollableQueue<Event> EventQueue;
     typedef std::map<std::string, EventListener> Listeners;
@@ -73,8 +73,9 @@ class QueueEvents
     Listeners listeners;
     volatile bool enabled;
     qpid::sys::Mutex lock;//protect listeners from concurrent access
+    bool sync;
     
-    void handle(EventQueue::Queue& e);
+    EventQueue::Batch::const_iterator handle(const EventQueue::Batch& e);
 
 };
 }} // namespace qpid::broker

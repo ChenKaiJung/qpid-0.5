@@ -21,7 +21,6 @@
 #ifndef _TxPublish_
 #define _TxPublish_
 
-#include "BrokerImportExport.h"
 #include "Queue.h"
 #include "Deliverable.h"
 #include "Message.h"
@@ -47,13 +46,6 @@ namespace qpid {
          * dispatch or to be added to the in-memory queue.
          */
         class TxPublish : public TxOp, public Deliverable{
-            class Prepare{
-                TransactionContext* ctxt;
-                boost::intrusive_ptr<Message>& msg;
-            public:
-                Prepare(TransactionContext* ctxt, boost::intrusive_ptr<Message>& msg);
-                void operator()(const boost::shared_ptr<Queue>& queue);            
-            };
 
             class Commit{
                 boost::intrusive_ptr<Message>& msg;
@@ -61,24 +53,33 @@ namespace qpid {
                 Commit(boost::intrusive_ptr<Message>& msg);
                 void operator()(const boost::shared_ptr<Queue>& queue);            
             };
+            class Rollback{
+                boost::intrusive_ptr<Message>& msg;
+            public:
+                Rollback(boost::intrusive_ptr<Message>& msg);
+                void operator()(const boost::shared_ptr<Queue>& queue);            
+            };
 
             boost::intrusive_ptr<Message> msg;
             std::list<Queue::shared_ptr> queues;
+            std::list<Queue::shared_ptr> prepared;
+
+            void prepare(TransactionContext* ctxt, boost::shared_ptr<Queue>);
 
         public:
-            QPID_BROKER_EXTERN TxPublish(boost::intrusive_ptr<Message> msg);
-            QPID_BROKER_EXTERN virtual bool prepare(TransactionContext* ctxt) throw();
-            QPID_BROKER_EXTERN virtual void commit() throw();
-            QPID_BROKER_EXTERN virtual void rollback() throw();
+            TxPublish(boost::intrusive_ptr<Message> msg);
+            virtual bool prepare(TransactionContext* ctxt) throw();
+            virtual void commit() throw();
+            virtual void rollback() throw();
 
 	    virtual Message& getMessage() { return *msg; };
             
-            QPID_BROKER_EXTERN virtual void deliverTo(const boost::shared_ptr<Queue>& queue);
+            virtual void deliverTo(const boost::shared_ptr<Queue>& queue);
 
             virtual ~TxPublish(){}
             virtual void accept(TxOpConstVisitor& visitor) const { visitor(*this); }
 
-            QPID_BROKER_EXTERN uint64_t contentSize();
+            uint64_t contentSize();
 
             boost::intrusive_ptr<Message> getMessage() const { return msg; }
             const std::list<Queue::shared_ptr> getQueues() const { return queues; }

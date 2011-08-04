@@ -59,7 +59,7 @@ void Bridge::PushHandler::handle(framing::AMQFrame& frame)
 Bridge::Bridge(Link* _link, framing::ChannelId _id, CancellationListener l,
                const _qmf::ArgsLinkBridge& _args) : 
     link(_link), id(_id), args(_args), mgmtObject(0),
-    listener(l), name(Uuid(true).str()), queueName("bridge_queue_"), persistenceId(0)
+    listener(l), name("qmf_bridge_" + Uuid(true).str()), queueName("bridge_queue_"), persistenceId(0)
 {
     std::stringstream title;
     title << id << "_" << link->getBroker()->getFederationTag();

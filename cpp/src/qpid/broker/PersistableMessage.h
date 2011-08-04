@@ -26,7 +26,6 @@
 #include <list>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
-#include "BrokerImportExport.h"
 #include "Persistable.h"
 #include "qpid/framing/amqp_types.h"
 #include "qpid/sys/Mutex.h"
@@ -65,8 +64,19 @@ class PersistableMessage : public Persistable
      */
     int asyncDequeueCounter;
 
-    bool contentReleased;
+    void enqueueAsync();
+    void dequeueAsync();
+
     syncList synclist;
+    struct ContentReleaseState
+    {
+        bool blocked;
+        bool requested;
+        bool released;
+        
+        ContentReleaseState();
+    };
+    ContentReleaseState contentReleaseState;
 
   protected:
     /** Called when all enqueues are complete for this message. */
@@ -93,24 +103,30 @@ class PersistableMessage : public Persistable
     void flush();
     
     bool isContentReleased() const;
-	
-    QPID_BROKER_EXTERN bool isEnqueueComplete();
 
-    QPID_BROKER_EXTERN void enqueueComplete();
+    void setStore(MessageStore*);
+    void requestContentRelease();
+    void blockContentRelease();
+    bool checkContentReleasable();
 
-    QPID_BROKER_EXTERN void enqueueAsync(PersistableQueue::shared_ptr queue,
-                                         MessageStore* _store);
+    virtual bool isPersistent() const = 0;
 
-    QPID_BROKER_EXTERN void enqueueAsync();
+    bool isEnqueueComplete();
 
-    QPID_BROKER_EXTERN bool isDequeueComplete();
+    void enqueueComplete();
+
+    void enqueueAsync(PersistableQueue::shared_ptr queue, MessageStore* _store);
+
+    bool isDequeueComplete();
     
-    QPID_BROKER_EXTERN void dequeueComplete();
+    void dequeueComplete();
 
-    QPID_BROKER_EXTERN void dequeueAsync(PersistableQueue::shared_ptr queue,
-                                         MessageStore* _store);
+    void dequeueAsync(PersistableQueue::shared_ptr queue, MessageStore* _store);
+    
+    void addToSyncList(PersistableQueue::shared_ptr queue, MessageStore* _store);
 
-    QPID_BROKER_EXTERN void dequeueAsync();
+    bool isStoredOnQueue(PersistableQueue::shared_ptr queue);
+
 };
 
 }}

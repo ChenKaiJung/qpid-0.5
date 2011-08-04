@@ -26,6 +26,8 @@
 #include "qpid/framing/ProtocolInitiation.h"
 #include "qpid/log/Statement.h"
 
+#include <boost/bind.hpp>
+
 namespace qpid {
 namespace sys {
 namespace ssl {
@@ -76,6 +78,10 @@ void SslHandler::write(const framing::ProtocolInitiation& data)
     aio->queueWrite(buff);
 }
 
+void SslHandler::abort() {
+    // TODO: can't implement currently as underlying functionality not implemented
+    // aio->requestCallback(boost::bind(&SslHandler::eof, this, _1));
+}
 void SslHandler::activateOutput() {
     aio->notifyPendingWrite();
 }

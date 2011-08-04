@@ -27,7 +27,6 @@
 #include "qpid/sys/ConnectionInputHandler.h"
 #include "qpid/sys/ConnectionOutputHandler.h"
 #include "qpid/sys/Mutex.h"
-#include "qpid/broker/BrokerImportExport.h"
 #include <boost/intrusive_ptr.hpp>
 #include <memory>
 #include <deque>
@@ -57,12 +56,13 @@ class Connection  : public sys::ConnectionCodec,
     size_t buffered;
 
   public:
-    QPID_BROKER_EXTERN Connection(sys::OutputControl&, const std::string& id, bool isClient);
-    QPID_BROKER_EXTERN void setInputHandler(std::auto_ptr<sys::ConnectionInputHandler> c);
+    Connection(sys::OutputControl&, const std::string& id, bool isClient);
+    void setInputHandler(std::auto_ptr<sys::ConnectionInputHandler> c);
     size_t decode(const char* buffer, size_t size);
     size_t encode(const char* buffer, size_t size);
     bool isClosed() const;
     bool canEncode();
+    void abort();
     void activateOutput();
     void giveReadCredit(int32_t);
     void closed();              // connection closed by peer.

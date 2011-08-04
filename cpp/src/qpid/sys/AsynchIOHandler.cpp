@@ -26,6 +26,8 @@
 #include "qpid/framing/ProtocolInitiation.h"
 #include "qpid/log/Statement.h"
 
+#include <boost/bind.hpp>
+
 namespace qpid {
 namespace sys {
 
@@ -73,6 +75,13 @@ void AsynchIOHandler::write(const framing::ProtocolInitiation& data)
     data.encode(out);
     buff->dataCount = data.encodedSize();
     aio->queueWrite(buff);
+}
+
+void AsynchIOHandler::abort() {
+    // Don't disconnect if we're already disconnecting
+    if (!readError) {
+        aio->requestCallback(boost::bind(&AsynchIOHandler::eof, this, _1));
+    }
 }
 
 void AsynchIOHandler::activateOutput() {
@@ -159,6 +168,7 @@ bool AsynchIOHandler::readbuff(AsynchIO& , AsynchIO::BufferBase* buff) {
 void AsynchIOHandler::eof(AsynchIO&) {
     QPID_LOG(debug, "DISCONNECTED [" << identifier << "]");
     if (codec) codec->closed();
+    readError = true;
     aio->queueWriteClose();
 }
 
@@ -197,10 +207,13 @@ void AsynchIOHandler::idle(AsynchIO&){
             buff->dataCount = encoded;
             aio->queueWrite(buff);
         }
-        if (codec->isClosed())
+        if (codec->isClosed()) {
+            readError = true;
             aio->queueWriteClose();       
+        }
     } catch (const std::exception& e) {
         QPID_LOG(error, e.what());
+        readError = true;
         aio->queueWriteClose();
     }
 }

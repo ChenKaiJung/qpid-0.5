@@ -26,7 +26,6 @@
 #include "qpid/Exception.h"
 #include "qpid/framing/MessageProperties.h"
 #include "qpid/framing/DeliveryProperties.h"
-#include "qpid/CommonImportExport.h"
 
 namespace qpid {
 namespace framing {
@@ -37,27 +36,27 @@ class TransferContent : public MethodContent
     AMQHeaderBody header;
     std::string data;
 public:
-    QPID_COMMON_EXTERN	TransferContent(const std::string& data = std::string(), const std::string& key=std::string());
+    TransferContent(const std::string& data = std::string(), const std::string& key=std::string());
 
     ///@internal
-    QPID_COMMON_EXTERN AMQHeaderBody getHeader() const;
+    AMQHeaderBody getHeader() const;
 
-    QPID_COMMON_EXTERN void setData(const std::string&);
-    QPID_COMMON_EXTERN const std::string& getData() const;
-    QPID_COMMON_EXTERN std::string& getData();
+    void setData(const std::string&);
+    const std::string& getData() const;
+    std::string& getData();
 
-    QPID_COMMON_EXTERN void appendData(const std::string&);
+    void appendData(const std::string&);
 
-    QPID_COMMON_EXTERN bool hasMessageProperties() const;
-    QPID_COMMON_EXTERN MessageProperties& getMessageProperties();
-    QPID_COMMON_EXTERN const MessageProperties& getMessageProperties() const;
+    bool hasMessageProperties() const;
+    MessageProperties& getMessageProperties();
+    const MessageProperties& getMessageProperties() const;
 
-    QPID_COMMON_EXTERN bool hasDeliveryProperties() const;
-    QPID_COMMON_EXTERN DeliveryProperties& getDeliveryProperties();
-    QPID_COMMON_EXTERN const DeliveryProperties& getDeliveryProperties() const;
+    bool hasDeliveryProperties() const;
+    DeliveryProperties& getDeliveryProperties();
+    const DeliveryProperties& getDeliveryProperties() const;
 
     ///@internal
-    QPID_COMMON_EXTERN void populate(const FrameSet& frameset);
+    void populate(const FrameSet& frameset);
 };
 
 }}

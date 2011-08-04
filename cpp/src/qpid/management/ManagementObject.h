@@ -25,7 +25,6 @@
 #include "qpid/sys/Time.h"
 #include "qpid/sys/Mutex.h"
 #include <qpid/framing/Buffer.h>
-#include "qpid/CommonImportExport.h"
 #include <map>
 
 namespace qpid { 
@@ -42,7 +41,7 @@ private:
     uint64_t first;
 public:
     AgentAttachment() : first(0) {}
-    QPID_COMMON_EXTERN void setBanks(uint32_t broker, uint32_t bank);
+    void setBanks(uint32_t broker, uint32_t bank);
     uint64_t getFirst() const { return first; }
 };
 
@@ -54,17 +53,17 @@ protected:
     uint64_t second;
     void fromString(const std::string&);
 public:
-    QPID_COMMON_EXTERN ObjectId() : agent(0), first(0), second(0) {}
-    QPID_COMMON_EXTERN ObjectId(framing::Buffer& buf) : agent(0) { decode(buf); }
-    QPID_COMMON_EXTERN ObjectId(uint8_t flags, uint16_t seq, uint32_t broker, uint32_t bank, uint64_t object);
-    QPID_COMMON_EXTERN ObjectId(AgentAttachment* _agent, uint8_t flags, uint16_t seq, uint64_t object);
-    QPID_COMMON_EXTERN ObjectId(std::istream&);
-    QPID_COMMON_EXTERN ObjectId(const std::string&);
-    QPID_COMMON_EXTERN bool operator==(const ObjectId &other) const;
-    QPID_COMMON_EXTERN bool operator<(const ObjectId &other) const;
-    QPID_COMMON_EXTERN void encode(framing::Buffer& buffer);
-    QPID_COMMON_EXTERN void decode(framing::Buffer& buffer);
-    friend QPID_COMMON_EXTERN std::ostream& operator<<(std::ostream&, const ObjectId&);
+    ObjectId() : agent(0), first(0), second(0) {}
+    ObjectId(framing::Buffer& buf) : agent(0) { decode(buf); }
+    ObjectId(uint8_t flags, uint16_t seq, uint32_t broker, uint32_t bank, uint64_t object);
+    ObjectId(AgentAttachment* _agent, uint8_t flags, uint16_t seq, uint64_t object);
+    ObjectId(std::istream&);
+    ObjectId(const std::string&);
+    bool operator==(const ObjectId &other) const;
+    bool operator<(const ObjectId &other) const;
+    void encode(framing::Buffer& buffer);
+    void decode(framing::Buffer& buffer);
+    friend std::ostream& operator<<(std::ostream&, const ObjectId&);
 };
 
 class ManagementItem {
@@ -129,8 +128,8 @@ class ManagementObject : public ManagementItem
     static int nextThreadIndex;
     bool             forcePublish;
         
-    QPID_COMMON_EXTERN int  getThreadIndex();
-    QPID_COMMON_EXTERN void writeTimestamps(qpid::framing::Buffer& buf);
+    int  getThreadIndex();
+    void writeTimestamps(qpid::framing::Buffer& buf);
 
   public:
     typedef void (*writeSchemaCall_t) (qpid::framing::Buffer&);
@@ -149,7 +148,7 @@ class ManagementObject : public ManagementItem
     virtual void doMethod(std::string&           methodName,
                           qpid::framing::Buffer& inBuf,
                           qpid::framing::Buffer& outBuf) = 0;
-    QPID_COMMON_EXTERN virtual void setReference(ObjectId objectId);
+    virtual void setReference(ObjectId objectId);
 
     virtual std::string& getClassName() const = 0;
     virtual std::string& getPackageName() const = 0;

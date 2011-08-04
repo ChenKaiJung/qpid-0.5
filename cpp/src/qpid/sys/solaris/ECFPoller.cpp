@@ -203,7 +203,6 @@ class PollerPrivate {
         portId(::port_create()),
         isShutdown(false) {
         QPID_POSIX_CHECK(portId);
-        QPID_LOG(trace, "port_create returned port Id: " << portId);
     }
 
     ~PollerPrivate() {
@@ -213,7 +212,6 @@ class PollerPrivate {
         //Send an Alarm to the port
         //We need to send a nonzero event mask, using POLLHUP,
         //nevertheless the wait method will only look for a PORT_ALERT_SET
-        QPID_LOG(trace, "Sending a port_alert to " << portId);
         QPID_POSIX_CHECK(::port_alert(portId, PORT_ALERT_SET, POLLHUP,
                                       &static_cast<PollerHandle&>(interruptHandle)));        
     }
@@ -344,16 +342,13 @@ Poller::Event Poller::wait(Duration timeout) {
 
     do {
         PollerHandleDeletionManager.markAllUnusedInThisThread();
-        QPID_LOG(trace, "About to enter port_get on " << impl->portId
-                 << ". Thread " << pthread_self()
+        QPID_LOG(trace, "About to enter port_get. Thread "
+                 << pthread_self()
                  << ", timeout=" << timeout);
 
 
         int rc = ::port_get(impl->portId, &pe, ptout);
 
-        QPID_LOG(trace, "port_get on " << impl->portId
-                 << " returned " << rc);
-        
         if (impl->isShutdown) {
             PollerHandleDeletionManager.markAllUnusedInThisThread();
             return Event(0, SHUTDOWN);
@@ -374,12 +369,9 @@ Poller::Event Poller::wait(Duration timeout) {
             ScopedLock<Mutex> l(eh.lock);
 
             if (eh.isActive()) {
-                QPID_LOG(trace, "Handle is active");
                 //We use alert mode to notify interrupts
                 if (pe.portev_source == PORT_SOURCE_ALERT &&
                     handle == &impl->interruptHandle) {
-                    QPID_LOG(trace, "Interrupt notified");
-                    
                     PollerHandle* wrappedHandle = impl->interruptHandle.getHandle();
 
                     if (impl->interruptHandle.queuedHandles()) {
@@ -391,6 +383,8 @@ Poller::Event Poller::wait(Duration timeout) {
                     return Event(wrappedHandle, INTERRUPTED);
                 }
                 
+                return Event(0, SHUTDOWN);            
+
                 if (pe.portev_source == PORT_SOURCE_FD) {
                     QPID_LOG(trace, "About to send handle: " << handle);
                     if (pe.portev_events & POLLHUP) {

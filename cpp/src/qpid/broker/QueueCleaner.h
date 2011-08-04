@@ -22,7 +22,6 @@
  *
  */
 
-#include "BrokerImportExport.h"
 #include "Timer.h"
 
 namespace qpid {
@@ -35,8 +34,8 @@ class QueueRegistry;
 class QueueCleaner
 {
   public:
-    QPID_BROKER_EXTERN QueueCleaner(QueueRegistry& queues, Timer& timer);
-    QPID_BROKER_EXTERN void start(qpid::sys::Duration period);
+    QueueCleaner(QueueRegistry& queues, Timer& timer);
+    void start(qpid::sys::Duration period);
   private:
     class Task : public TimerTask
     {

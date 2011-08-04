@@ -22,7 +22,6 @@
 #define _QPID_CONSOLE_OBJECTID_H
 
 #include <iostream>
-#include "ConsoleImportExport.h"
 #include "qpid/sys/IntegerTypes.h"
 
 namespace qpid {
@@ -35,7 +34,7 @@ namespace console {
      *
      * \ingroup qmfconsoleapi
      */
-    class QPID_CONSOLE_EXTERN ObjectId {
+    class ObjectId {
     public:
         ObjectId() : first(0), second(0) {}
         ObjectId(framing::Buffer& buffer);
@@ -62,7 +61,7 @@ namespace console {
         uint64_t second;
     };
 
-    QPID_CONSOLE_EXTERN std::ostream& operator<<(std::ostream& o, const ObjectId& id);
+    std::ostream& operator<<(std::ostream& o, const ObjectId& id);
 }
 }
 

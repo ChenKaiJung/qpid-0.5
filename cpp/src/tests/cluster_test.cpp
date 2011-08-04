@@ -73,7 +73,7 @@ const sys::Duration TIMEOUT=sys::TIME_SEC/4;
 
 
 ostream& operator<<(ostream& o, const cpg_name* n) {
-    return o << cluster::Cpg::str(*n);
+    return o << Cpg::str(*n);
 }
 
 ostream& operator<<(ostream& o, const cpg_address& a) {
@@ -89,26 +89,9 @@ ostream& operator<<(ostream& o, const pair<T*, int>& array) {
     return o;
 }
 
-template <class C> set<uint16_t> makeSet(const C& c) {
-    set<uint16_t> s;
+template <class C> set<int> makeSet(const C& c) {
+    set<int> s;
     copy(c.begin(), c.end(), inserter(s, s.begin()));
-    return s;
-}
-
-template <class T>  set<uint16_t> knownBrokerPorts(T& source, int n=-1) {
-    vector<Url> urls = source.getKnownBrokers();
-    if (n >= 0 && unsigned(n) != urls.size()) {
-        BOOST_MESSAGE("knownBrokerPorts waiting for " << n << ": " << urls);
-        // Retry up to 10 secs in .1 second intervals.
-        for (size_t retry=100; urls.size() != unsigned(n) && retry != 0; --retry) {
-            sys::usleep(1000*100); // 0.1 secs
-            urls = source.getKnownBrokers();
-        }
-    }
-    BOOST_MESSAGE("knownBrokerPorts expecting " << n << ": " << urls);
-    set<uint16_t> s;
-    for (vector<Url>::const_iterator i = urls.begin(); i != urls.end(); ++i) 
-        s.insert((*i)[0].get<TcpAddress>()->port);
     return s;
 }
 
@@ -169,13 +152,59 @@ ConnectionSettings aclSettings(int port, const std::string& id) {
     return settings;
 }
 
+// An illegal frame body
+struct PoisonPill : public AMQBody {
+    virtual uint8_t type() const { return 0xFF; }
+    virtual void encode(Buffer& ) const {}
+    virtual void decode(Buffer& , uint32_t=0) {}
+    virtual uint32_t encodedSize() const { return 0; }
+
+    virtual void print(std::ostream&) const {};
+    virtual void accept(AMQBodyConstVisitor&) const {};
+
+    virtual AMQMethodBody* getMethod() { return 0; }
+    virtual const AMQMethodBody* getMethod() const { return 0; }
+
+    /** Match if same type and same class/method ID for methods */
+    static bool match(const AMQBody& , const AMQBody& ) { return false; }
+    virtual boost::intrusive_ptr<AMQBody> clone() const { return new PoisonPill; }
+};
+    
+QPID_AUTO_TEST_CASE(testBadClientData) {
+    // Ensure that bad data on a client connection closes the
+    // connection but does not stop the broker.
+
+    // Set log-enable=critical to suppress expected errors.
+    ClusterFixture::Args args = list_of<string>
+        ("--log-enable=critical")
+        ("--no-data-dir")
+        ("--auth=no")
+        ("--cluster-mechanism=PLAIN")
+        ("--cluster-username=cluster")
+        ("--cluster-password=cluster")
+        ("--load-module=../.libs/acl.so");
+    ClusterFixture cluster(2, -1, args);
+    Client c0(cluster[0]);
+    Client c1(cluster[1]);
+    boost::shared_ptr<client::ConnectionImpl> ci =
+        client::ConnectionAccess::getImpl(c0.connection);
+    AMQFrame poison(boost::intrusive_ptr<AMQBody>(new PoisonPill));
+    ci->handle(poison);
+    {
+        ScopedSuppressLogging sl;
+        BOOST_CHECK_THROW(c0.session.queueQuery("q0"), TransportFailure);
+    }
+    Client c00(cluster[0]);
+    BOOST_CHECK_EQUAL(c00.session.queueQuery("q00").getQueue(), "");
+    BOOST_CHECK_EQUAL(c1.session.queueQuery("q1").getQueue(), "");
+}
+
 #if 0
 // FIXME aconway 2009-03-10: This test passes but exposes a memory leak in the SASL client code.
 // Enable it when the leak is fixed.
 
 QPID_AUTO_TEST_CASE(testAcl) {
     ofstream policyFile("cluster_test.acl");
-    // FIXME aconway 2009-02-12: guest -> qpidd?
     policyFile << "acl allow foo@QPID create queue name=foo" << endl
                << "acl allow foo@QPID create queue name=foo2" << endl
                << "acl deny foo@QPID create queue name=bar" << endl
@@ -446,13 +475,13 @@ QPID_AUTO_TEST_CASE(testUpdateMessageBuilder) {
 QPID_AUTO_TEST_CASE(testConnectionKnownHosts) {
     ClusterFixture cluster(1);
     Client c0(cluster[0], "c0");
-    set<uint16_t> kb0 = knownBrokerPorts(c0.connection);
+    set<int> kb0 = knownBrokerPorts(c0.connection);
     BOOST_CHECK_EQUAL(kb0.size(), 1u);
     BOOST_CHECK_EQUAL(kb0, makeSet(cluster));
 
     cluster.add();
     Client c1(cluster[1], "c1");
-    set<uint16_t> kb1 = knownBrokerPorts(c1.connection);
+    set<int> kb1 = knownBrokerPorts(c1.connection);
     kb0 = knownBrokerPorts(c0.connection, 2);
     BOOST_CHECK_EQUAL(kb1.size(), 2u);
     BOOST_CHECK_EQUAL(kb1, makeSet(cluster));
@@ -460,7 +489,7 @@ QPID_AUTO_TEST_CASE(testConnectionKnownHosts) {
 
     cluster.add();
     Client c2(cluster[2], "c2");
-    set<uint16_t> kb2 = knownBrokerPorts(c2.connection);
+    set<int> kb2 = knownBrokerPorts(c2.connection);
     kb1 = knownBrokerPorts(c1.connection, 3);
     kb0 = knownBrokerPorts(c0.connection, 3);
     BOOST_CHECK_EQUAL(kb2.size(), 3u);
@@ -681,9 +710,9 @@ QPID_AUTO_TEST_CASE(testHeartbeatCancelledOnFailover)
         std::string expectedContent;
         qpid::client::Subscription subscription;
         qpid::sys::Monitor lock;
-        bool ready;
+        bool ready, failed;
 
-        Receiver(FailoverManager& m, const std::string& q, const std::string& c) : mgr(m), queue(q), expectedContent(c), ready(false) {}
+        Receiver(FailoverManager& m, const std::string& q, const std::string& c) : mgr(m), queue(q), expectedContent(c), ready(false), failed(false) {}
 
         void received(Message& message) 
         {
@@ -705,7 +734,13 @@ QPID_AUTO_TEST_CASE(testHeartbeatCancelledOnFailover)
 
         void run()
         {
+            try { 
             mgr.execute(*this);
+        }
+            catch (const std::exception& e) {
+                BOOST_MESSAGE("Exception in mgr.execute: " << e.what());
+                failed = true;
+            }
         }
 
         void waitForReady()
@@ -738,6 +773,7 @@ QPID_AUTO_TEST_CASE(testHeartbeatCancelledOnFailover)
     ::usleep(2*1000*1000);
     fmgr.execute(sender);
     runner.join();
+    BOOST_CHECK(!receiver.failed);
     fmgr.close();
 }
 

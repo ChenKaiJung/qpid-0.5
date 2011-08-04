@@ -22,7 +22,6 @@
  *
  */
 
-#include "BrokerImportExport.h"
 #include "PersistableMessage.h"
 #include "MessageAdapter.h"
 #include "qpid/framing/amqp_types.h"
@@ -52,8 +51,8 @@ class Message : public PersistableMessage {
 public:
     typedef boost::function<void (const boost::intrusive_ptr<Message>&)> MessageCallback;
     
-    QPID_BROKER_EXTERN Message(const framing::SequenceNumber& id = framing::SequenceNumber());
-    QPID_BROKER_EXTERN ~Message();
+    Message(const framing::SequenceNumber& id = framing::SequenceNumber());
+    ~Message();
         
     uint64_t getPersistenceId() const { return persistenceId; }
     void setPersistenceId(uint64_t _persistenceId) const { persistenceId = _persistenceId; }
@@ -66,18 +65,18 @@ public:
 
     const framing::SequenceNumber& getCommandId() { return frames.getId(); }
 
-    QPID_BROKER_EXTERN uint64_t contentSize() const;
+    uint64_t contentSize() const;
 
-    QPID_BROKER_EXTERN std::string getRoutingKey() const;
+    std::string getRoutingKey() const;
     const boost::shared_ptr<Exchange> getExchange(ExchangeRegistry&) const;
-    QPID_BROKER_EXTERN std::string getExchangeName() const;
+    std::string getExchangeName() const;
     bool isImmediate() const;
-    QPID_BROKER_EXTERN const framing::FieldTable* getApplicationHeaders() const;
+    const framing::FieldTable* getApplicationHeaders() const;
     framing::FieldTable& getOrInsertHeaders();
-    QPID_BROKER_EXTERN bool isPersistent();
+    bool isPersistent() const;
     bool requiresAccept();
 
-    QPID_BROKER_EXTERN void setTimestamp(const boost::intrusive_ptr<ExpiryPolicy>& e);
+    void setTimestamp(const boost::intrusive_ptr<ExpiryPolicy>& e);
     void setExpiryPolicy(const boost::intrusive_ptr<ExpiryPolicy>& e);
     bool hasExpired();
     sys::AbsTime getExpiration() const { return expiration; }
@@ -108,7 +107,7 @@ public:
         return frames.isA<T>();
     }
 
-    uint32_t getRequiredCredit() const;
+    uint32_t getRequiredCredit();
 
     void encode(framing::Buffer& buffer) const;
     void encodeContent(framing::Buffer& buffer) const;
@@ -126,27 +125,25 @@ public:
     uint32_t encodedHeaderSize() const;
     uint32_t encodedContentSize() const;
 
-    QPID_BROKER_EXTERN void decodeHeader(framing::Buffer& buffer);
-    QPID_BROKER_EXTERN void decodeContent(framing::Buffer& buffer);
+    void decodeHeader(framing::Buffer& buffer);
+    void decodeContent(framing::Buffer& buffer);
             
-    /**
-     * Releases the in-memory content data held by this
-     * message. Must pass in a store from which the data can
-     * be reloaded.
-     */
-    void releaseContent(MessageStore* store);
+    void tryReleaseContent();
+    void releaseContent();
+    void releaseContent(MessageStore* s);//deprecated, use 'setStore(store); releaseContent();' instead
     void destroy();
 
     bool getContentFrame(const Queue& queue, framing::AMQFrame& frame, uint16_t maxContentSize, uint64_t offset) const;
     void sendContent(const Queue& queue, framing::FrameHandler& out, uint16_t maxFrameSize) const;
     void sendHeader(framing::FrameHandler& out, uint16_t maxFrameSize) const;
 
-    QPID_BROKER_EXTERN bool isContentLoaded() const;
+    bool isContentLoaded() const;
 
     bool isExcluded(const std::vector<std::string>& excludes) const;
     void addTraceId(const std::string& id);
 	
 	void forcePersistent();
+        bool isForcedPersistent();
     
     boost::intrusive_ptr<Message>& getReplacementMessage(const Queue* qfor) const;
     void setReplacementMessage(boost::intrusive_ptr<Message> msg, const Queue* qfor);
@@ -158,6 +155,9 @@ public:
     /** Call cb when dequeue is complete, may call immediately. Holds cb by reference. */
     void setDequeueCompleteCallback(MessageCallback& cb);
     void resetDequeueCompleteCallback();
+
+    bool isUpdateMessage();
+    static void setUpdateDestination(const std::string&);
 
   private:
     typedef std::map<const Queue*,boost::intrusive_ptr<Message> > Replacement;
@@ -185,6 +185,8 @@ public:
     mutable boost::intrusive_ptr<Message> empty;
     MessageCallback* enqueueCallback;
     MessageCallback* dequeueCallback;
+    uint32_t requiredCredit;
+    static std::string updateDestination;
 };
 
 }}

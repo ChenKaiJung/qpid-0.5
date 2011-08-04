@@ -30,7 +30,6 @@
 #include "FutureCompletion.h"
 #include "FutureResult.h"
 #include "SessionImpl.h"
-#include "ClientImportExport.h"
 
 namespace qpid {
 namespace client {
@@ -55,9 +54,9 @@ public:
         }
     }
 
-    QPID_CLIENT_EXTERN void wait(SessionImpl& session);
-    QPID_CLIENT_EXTERN bool isComplete(SessionImpl& session);
-    QPID_CLIENT_EXTERN void setFutureResult(boost::shared_ptr<FutureResult> r);
+    void wait(SessionImpl& session);
+    bool isComplete(SessionImpl& session);
+    void setFutureResult(boost::shared_ptr<FutureResult> r);
 };
 
 }}

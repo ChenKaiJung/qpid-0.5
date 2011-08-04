@@ -21,7 +21,6 @@
 #include "amqp_types.h"
 #include "AMQBody.h"
 #include "Buffer.h"
-#include "qpid/CommonImportExport.h"
 
 #ifndef _AMQHeartbeatBody_
 #define _AMQHeartbeatBody_
@@ -32,12 +31,12 @@ namespace framing {
 class AMQHeartbeatBody :  public AMQBody
 {
 public:
-    QPID_COMMON_EXTERN virtual ~AMQHeartbeatBody();
+    virtual ~AMQHeartbeatBody();
     inline uint32_t encodedSize() const { return 0; }
     inline uint8_t type() const { return HEARTBEAT_BODY; }
     inline void encode(Buffer& ) const {}
     inline void decode(Buffer& , uint32_t /*size*/) {}
-    QPID_COMMON_EXTERN virtual void print(std::ostream& out) const;
+    virtual void print(std::ostream& out) const;
     void accept(AMQBodyConstVisitor& v) const { v.visit(*this); }
     boost::intrusive_ptr<AMQBody> clone() const { return BodyFactory::copy(*this); }
 };

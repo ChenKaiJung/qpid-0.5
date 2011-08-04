@@ -33,7 +33,6 @@
 #include "qpid/client/SessionImpl.h"
 #include "qpid/client/TypedResult.h"
 #include "qpid/shared_ptr.h"
-#include "qpid/client/ClientImportExport.h"
 #include <string>
 
 namespace qpid {
@@ -66,19 +65,19 @@ class SessionBase_0_10 {
     typedef framing::TransferContent DefaultContent;
 
     ///@internal
-    QPID_CLIENT_EXTERN SessionBase_0_10();
-    QPID_CLIENT_EXTERN ~SessionBase_0_10();
+    SessionBase_0_10();
+    ~SessionBase_0_10();
 
     /** Get the next message frame-set from the session. */
-    QPID_CLIENT_EXTERN framing::FrameSet::shared_ptr get();
+    framing::FrameSet::shared_ptr get();
     
     /** Get the session ID */
-    QPID_CLIENT_EXTERN SessionId getId() const;         
+    SessionId getId() const;         
 
     /** Close the session.
      * A session is automatically closed when all handles to it are destroyed.
      */
-    QPID_CLIENT_EXTERN void close();
+    void close();
     
     /**
      * Synchronize the session: sync() waits until all commands issued
@@ -89,25 +88,27 @@ class SessionBase_0_10 {
      * AsyncSession::executionSync() directly in the unusual event
      * that you want to do an asynchronous sync.
      */
-    QPID_CLIENT_EXTERN void sync();
+    void sync();
 
     /** Set the timeout for this session. */
-    QPID_CLIENT_EXTERN uint32_t timeout(uint32_t seconds);
+    uint32_t timeout(uint32_t seconds);
 
     /** Suspend the session - detach it from its connection */
-    QPID_CLIENT_EXTERN void suspend();
+    void suspend();
 
     /** Resume a suspended session with a new connection */
-    QPID_CLIENT_EXTERN void resume(Connection);
+    void resume(Connection);
 
     /** Get the channel associated with this session */
-    QPID_CLIENT_EXTERN uint16_t getChannel() const;
+    uint16_t getChannel() const;
 
-    QPID_CLIENT_EXTERN Execution& getExecution();  
-    QPID_CLIENT_EXTERN void flush();
-    QPID_CLIENT_EXTERN void markCompleted(const framing::SequenceSet& ids, bool notifyPeer);
-    QPID_CLIENT_EXTERN void markCompleted(const framing::SequenceNumber& id, bool cumulative, bool notifyPeer);
-    QPID_CLIENT_EXTERN void sendCompletion();
+    Execution& getExecution();  
+    void flush();
+    void markCompleted(const framing::SequenceSet& ids, bool notifyPeer);
+    void markCompleted(const framing::SequenceNumber& id, bool cumulative, bool notifyPeer);
+    void sendCompletion();
+
+    bool isValid() const;
 
   protected:
     boost::shared_ptr<SessionImpl> impl;

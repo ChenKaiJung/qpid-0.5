@@ -23,13 +23,13 @@
  */
 
 #include "types.h"
-#include "WriteEstimate.h"
 #include "OutputInterceptor.h"
-#include "NoOpConnectionOutputHandler.h"
 #include "EventFrame.h"
 #include "McastFrameHandler.h"
+#include "UpdateReceiver.h"
 
 #include "qpid/broker/Connection.h"
+#include "qpid/broker/SemanticState.h"
 #include "qpid/amqp_0_10/Connection.h"
 #include "qpid/sys/AtomicValue.h"
 #include "qpid/sys/ConnectionInputHandler.h"
@@ -58,12 +58,11 @@ class Event;
 class Connection :
         public RefCounted,
         public sys::ConnectionInputHandler,
-        public framing::AMQP_AllOperations::ClusterConnectionHandler
+        public framing::AMQP_AllOperations::ClusterConnectionHandler,
+        private broker::Connection::ErrorListener
         
 {
   public:
-    typedef sys::PollableQueue<EventFrame> PollableFrameQueue;
-
     /** Local connection. */
     Connection(Cluster&, sys::ConnectionOutputHandler& out, const std::string& logId, MemberId, bool catchUp, bool isLink);
     /** Shadow connection. */
@@ -116,11 +115,14 @@ class Connection :
                       const framing::SequenceSet& sentIncomplete,
                       const framing::SequenceNumber& expected,
                       const framing::SequenceNumber& received,
-                      const framing::SequenceSet& unknownCompleted, const SequenceSet& receivedIncomplete);
+                      const framing::SequenceSet& unknownCompleted,
+                      const SequenceSet& receivedIncomplete);
     
-    void shadowReady(uint64_t memberId, uint64_t connectionId, const std::string& username, const std::string& fragment);
+    void shadowReady(uint64_t memberId, uint64_t connectionId, const std::string& username, const std::string& fragment, uint32_t sendMax);
 
-    void membership(const framing::FieldTable&, const framing::FieldTable&);
+    void membership(const framing::FieldTable&, const framing::FieldTable&, const framing::SequenceNumber& frameSeq);
+
+    void retractOffer();
 
     void deliveryRecord(const std::string& queue,
                         const framing::SequenceNumber& position,
@@ -132,6 +134,7 @@ class Connection :
                         bool completed,
                         bool ended,
                         bool windowing,
+                        bool enqueued,
                         uint32_t credit);
 
     void queuePosition(const std::string&, const framing::SequenceNumber&);
@@ -141,38 +144,47 @@ class Connection :
     void txAccept(const framing::SequenceSet&);
     void txDequeue(const std::string&);
     void txEnqueue(const std::string&);
-    void txPublish(const qpid::framing::Array&, bool);
+    void txPublish(const framing::Array&, bool);
     void txEnd();
-    void accumulatedAck(const qpid::framing::SequenceSet&);
+    void accumulatedAck(const framing::SequenceSet&);
 
     // Encoded queue/exchange replication.
     void queue(const std::string& encoded);
     void exchange(const std::string& encoded);
 
     void giveReadCredit(int credit);
+    void announce() {}          // handled by Cluster.
+    void abort();
+    void deliverClose();
+
+    OutputInterceptor& getOutput() { return output; }
+
+    void addQueueListener(const std::string& queue, uint32_t listener);
 
   private:
     struct NullFrameHandler : public framing::FrameHandler {
         void handle(framing::AMQFrame&) {}
     };
     
+
+    static NullFrameHandler nullFrameHandler;
+
+    // Error listener functions
+    void connectionError(const std::string&);
+    void sessionError(uint16_t channel, const std::string&);
+    
     void init();
     bool checkUnsupported(const framing::AMQBody& body);
-    void deliverClose();
-    void deliverDoOutput(uint32_t requested);
-    void sendDoOutput();
+    void deliverDoOutput(uint32_t limit) { output.deliverDoOutput(limit); }
 
     boost::shared_ptr<broker::Queue> findQueue(const std::string& qname);
     broker::SessionState& sessionState();
     broker::SemanticState& semanticState();
     broker::QueuedMessage getUpdateMessage();
 
-    static NoOpConnectionOutputHandler discardHandler;
-
     Cluster& cluster;
     ConnectionId self;
     bool catchUp;
-    WriteEstimate writeEstimate;
     OutputInterceptor output;
     framing::FrameDecoder localDecoder;
     broker::Connection connection;
@@ -181,7 +193,7 @@ class Connection :
     boost::shared_ptr<broker::TxBuffer> txBuffer;
     bool expectProtocolHeader;
     McastFrameHandler mcastFrameHandler;
-    NullFrameHandler nullFrameHandler;
+    UpdateReceiver::ConsumerNumbering& consumerNumbering;
 
     static qpid::sys::AtomicValue<uint64_t> catchUpId;
     

@@ -26,6 +26,9 @@
 #include "ExpiryPolicy.h"
 #include "qpid/client/SessionBase_0_10Access.h" 
 #include "qpid/client/ConnectionAccess.h" 
+#include "qpid/client/SessionImpl.h" 
+#include "qpid/client/ConnectionImpl.h"
+#include "qpid/client/Future.h"
 #include "qpid/broker/Broker.h"
 #include "qpid/broker/Queue.h"
 #include "qpid/broker/QueueRegistry.h"
@@ -61,6 +64,7 @@ using broker::Exchange;
 using broker::Queue;
 using broker::QueueBinding;
 using broker::Message;
+using broker::SemanticState;
 using namespace framing;
 namespace arg=client::arg;
 using client::SessionBase_0_10Access;
@@ -73,7 +77,7 @@ struct ClusterConnectionProxy : public AMQP_AllProxy::ClusterConnection {
 };
 
 // Create a connection with special version that marks it as a catch-up connection.
-client::Connection catchUpConnection() {
+client::Connection UpdateClient::catchUpConnection() {
     client::Connection c;
     client::ConnectionAccess::setVersion(c, ProtocolVersion(0x80 , 0x80 + 10));
     return c;
@@ -98,10 +102,7 @@ UpdateClient::UpdateClient(const MemberId& updater, const MemberId& updatee, con
       expiry(expiry_), connections(cons), decoder(decoder_),
       connection(catchUpConnection()), shadowConnection(catchUpConnection()),
       done(ok), failed(fail), connectionSettings(cs)
-{
-    connection.open(url, cs);
-    session = connection.newSession(UPDATE);
-}
+{}
 
 UpdateClient::~UpdateClient() {}
 
@@ -110,6 +111,8 @@ const std::string UpdateClient::UPDATE("qpid.cluster-update");
 
 void UpdateClient::run() {
     try {
+        connection.open(updateeUrl, connectionSettings);
+        session = connection.newSession(UPDATE);
         update();
         done();
     } catch (const std::exception& e) {
@@ -122,21 +125,28 @@ void UpdateClient::update() {
     QPID_LOG(debug, updaterId << " updating state to " << updateeId << " at " << updateeUrl);
     Broker& b = updaterBroker;
     b.getExchanges().eachExchange(boost::bind(&UpdateClient::updateExchange, this, _1));
-    b.getQueues().eachQueue(boost::bind(&UpdateClient::updateQueue, this, _1));
-    // Update queue is used to transfer acquired messages that are no longer on their original queue.
+    b.getQueues().eachQueue(boost::bind(&UpdateClient::updateNonExclusiveQueue, this, _1));
+
+    // Update queue is used to transfer acquired messages that are no
+    // longer on their original queue.
     session.queueDeclare(arg::queue=UPDATE, arg::autoDelete=true);
     session.sync();
+    std::for_each(connections.begin(), connections.end(), boost::bind(&UpdateClient::updateConnection, this, _1));
+    session.queueDelete(arg::queue=UPDATE);
     session.close();
 
-    std::for_each(connections.begin(), connections.end(), boost::bind(&UpdateClient::updateConnection, this, _1));
+    // Update queue listeners: must come after sessions so consumerNumbering is populated.
+    b.getQueues().eachQueue(boost::bind(&UpdateClient::updateQueueListeners, this, _1));
 
     ClusterConnectionProxy(session).expiryId(expiry.getId());
     ClusterConnectionMembershipBody membership;
     map.toMethodBody(membership);
     AMQFrame frame(membership);
     client::ConnectionAccess::getImpl(connection)->handle(frame);
+
     connection.close();
-    QPID_LOG(debug,  updaterId << " updated state to " << updateeId << " at " << updateeUrl);
+    QPID_LOG(debug,  updaterId << " update completed to " << updateeId
+             << " at " << updateeUrl << ": " << membership);
 }
 
 namespace {
@@ -203,7 +213,6 @@ class MessageUpdater {
         sb.get()->send(transfer, message.payload->getFrames());
         if (message.payload->isContentReleased()){
             uint16_t maxFrameSize = sb.get()->getConnection()->getNegotiatedSettings().maxFrameSize;
-
             uint16_t maxContentSize = maxFrameSize - AMQFrame::frameOverhead();
             bool morecontent = true;
             for (uint64_t offset = 0; morecontent; offset += maxContentSize)
@@ -220,18 +229,36 @@ class MessageUpdater {
     }
 };
 
-void UpdateClient::updateQueue(const boost::shared_ptr<Queue>& q) {
-    QPID_LOG(debug, updaterId << " updating queue " << q->getName());
-    ClusterConnectionProxy proxy(session);
-    proxy.queue(encode(*q));
-    MessageUpdater updater(q->getName(), session, expiry);
+void UpdateClient::updateQueue(client::AsyncSession& s, const boost::shared_ptr<Queue>& q) {
+    broker::Exchange::shared_ptr alternateExchange = q->getAlternateExchange();
+    s.queueDeclare(
+        arg::queue = q->getName(),
+        arg::durable = q->isDurable(),
+        arg::autoDelete = q->isAutoDelete(),
+        arg::alternateExchange = alternateExchange ? alternateExchange->getName() : "",
+        arg::arguments = q->getSettings(),
+        arg::exclusive = q->hasExclusiveOwner()
+    );
+    MessageUpdater updater(q->getName(), s, expiry);
     q->eachMessage(boost::bind(&MessageUpdater::updateQueuedMessage, &updater, _1));
-    q->eachBinding(boost::bind(&UpdateClient::updateBinding, this, q->getName(), _1));
+    q->eachBinding(boost::bind(&UpdateClient::updateBinding, this, s, q->getName(), _1));
+    ClusterConnectionProxy(s).queuePosition(q->getName(), q->getPosition());
 }
 
+void UpdateClient::updateExclusiveQueue(const boost::shared_ptr<broker::Queue>& q) {
+    QPID_LOG(debug, updaterId << " updating exclusive queue " << q->getName() << " on " << shadowSession.getId());
+    updateQueue(shadowSession, q);
+}
 
-void UpdateClient::updateBinding(const std::string& queue, const QueueBinding& binding) {
-    session.exchangeBind(queue, binding.exchange, binding.key, binding.args);
+void UpdateClient::updateNonExclusiveQueue(const boost::shared_ptr<broker::Queue>& q) {
+    if (!q->hasExclusiveOwner()) {
+        QPID_LOG(debug, updaterId << " updating queue " << q->getName());
+        updateQueue(session, q);
+    }//else queue will be updated as part of session state of owning session
+}
+
+void UpdateClient::updateBinding(client::AsyncSession& s, const std::string& queue, const QueueBinding& binding) {
+    s.exchangeBind(queue, binding.exchange, binding.key, binding.args);
 }
 
 void UpdateClient::updateConnection(const boost::intrusive_ptr<Connection>& updateConnection) {
@@ -248,29 +275,36 @@ void UpdateClient::updateConnection(const boost::intrusive_ptr<Connection>& upda
         updateConnection->getId().getMember(),
         updateConnection->getId().getNumber(),
         bc.getUserId(),
-        string(fragment.first, fragment.second)
+        string(fragment.first, fragment.second),
+        updateConnection->getOutput().getSendMax()
     );
     shadowConnection.close();
     QPID_LOG(debug, updaterId << " updated connection " << *updateConnection);
 }
 
 void UpdateClient::updateSession(broker::SessionHandler& sh) {
-    QPID_LOG(debug, updaterId << " updating session " << &sh.getConnection()  << "[" << sh.getChannel() << "] = "
-             << sh.getSession()->getId());
     broker::SessionState* ss = sh.getSession();
     if (!ss) return;            // no session.
+
+    QPID_LOG(debug, updaterId << " updating session " << &sh.getConnection()
+             << "[" << sh.getChannel() << "] = " << ss->getId());
 
     // Create a client session to update session state. 
     boost::shared_ptr<client::ConnectionImpl> cimpl = client::ConnectionAccess::getImpl(shadowConnection);
     boost::shared_ptr<client::SessionImpl> simpl = cimpl->newSession(ss->getId().getName(), ss->getTimeout(), sh.getChannel());
+    simpl->disableAutoDetach();
     client::SessionBase_0_10Access(shadowSession).set(simpl);
     AMQP_AllProxy::ClusterConnection proxy(simpl->out);
 
     // Re-create session state on remote connection.
 
+    QPID_LOG(debug, updaterId << " updating exclusive queues.");
+    ss->getSessionAdapter().eachExclusiveQueue(boost::bind(&UpdateClient::updateExclusiveQueue, this, _1));
+
     // Update consumers. For reasons unknown, boost::bind does not work here with boost 1.33.
     QPID_LOG(debug, updaterId << " updating consumers.");
-    ss->getSemanticState().eachConsumer(std::bind1st(std::mem_fun(&UpdateClient::updateConsumer),this));
+    ss->getSemanticState().eachConsumer(
+        boost::bind(&UpdateClient::updateConsumer, this, _1));
 
     QPID_LOG(debug, updaterId << " updating unacknowledged messages.");
     broker::DeliveryRecords& drs = ss->getSemanticState().getUnacked();
@@ -302,8 +336,12 @@ void UpdateClient::updateSession(broker::SessionHandler& sh) {
     QPID_LOG(debug, updaterId << " updated session " << sh.getSession()->getId());
 }
 
-void UpdateClient::updateConsumer(const broker::SemanticState::ConsumerImpl* ci) {
-    QPID_LOG(debug, updaterId << " updating consumer " << ci->getName() << " on " << shadowSession.getId());
+void UpdateClient::updateConsumer(
+    const broker::SemanticState::ConsumerImpl::shared_ptr& ci)
+{
+    QPID_LOG(debug, updaterId << " updating consumer " << ci->getName() << " on "
+             << shadowSession.getId());
+
     using namespace message;
     shadowSession.messageSubscribe(
         arg::queue       = ci->getQueue()->getName(),
@@ -318,14 +356,15 @@ void UpdateClient::updateConsumer(const broker::SemanticState::ConsumerImpl* ci)
     shadowSession.messageSetFlowMode(ci->getName(), ci->isWindowing() ? FLOW_MODE_WINDOW : FLOW_MODE_CREDIT);
     shadowSession.messageFlow(ci->getName(), CREDIT_UNIT_MESSAGE, ci->getMsgCredit());
     shadowSession.messageFlow(ci->getName(), CREDIT_UNIT_BYTE, ci->getByteCredit());
-    ClusterConnectionConsumerStateBody state(
-        ProtocolVersion(),
+    ClusterConnectionProxy(shadowSession).consumerState(
         ci->getName(),
         ci->isBlocked(),
         ci->isNotifyEnabled()
     );
-    client::SessionBase_0_10Access(shadowSession).get()->send(state);
-    QPID_LOG(debug, updaterId << " updated consumer " << ci->getName() << " on " << shadowSession.getId());
+    consumerNumbering.add(ci);
+
+    QPID_LOG(debug, updaterId << " updated consumer " << ci->getName()
+             << " on " << shadowSession.getId());
 }
     
 void UpdateClient::updateUnacked(const broker::DeliveryRecord& dr) {
@@ -346,6 +385,7 @@ void UpdateClient::updateUnacked(const broker::DeliveryRecord& dr) {
         dr.isComplete(),
         dr.isEnded(),
         dr.isWindowing(),
+        dr.getQueue()->isEnqueued(dr.getMessage()),
         dr.getCredit()
     );
 }
@@ -400,6 +440,24 @@ void UpdateClient::updateTxState(broker::SemanticState& s) {
         txBuffer->accept(updater);
         proxy.txEnd();
     }
+}
+
+void UpdateClient::updateQueueListeners(const boost::shared_ptr<broker::Queue>& queue) {
+    queue->getListeners().eachListener(
+        boost::bind(&UpdateClient::updateQueueListener, this, queue->getName(), _1));
+}
+
+void UpdateClient::updateQueueListener(
+    std::string& q, const boost::shared_ptr<broker::Consumer>& c)
+    
+{
+    SemanticState::ConsumerImpl::shared_ptr ci =
+        boost::dynamic_pointer_cast<SemanticState::ConsumerImpl>(c);
+    assert(ci);
+    size_t n = consumerNumbering[ci];
+    if (n >= consumerNumbering.size())
+        throw Exception(QPID_MSG("Unexpected listener on queue " << q));
+    ClusterConnectionProxy(session).addQueueListener(q, n);
 }
 
 }} // namespace qpid::cluster

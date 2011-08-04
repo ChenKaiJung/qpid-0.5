@@ -25,6 +25,7 @@
 #include "types.h"
 #include "qpid/Url.h"
 #include "qpid/framing/ClusterConnectionMembershipBody.h"
+#include "qpid/framing/SequenceNumber.h"
 
 #include <boost/function.hpp>
 #include <boost/optional.hpp>
@@ -38,26 +39,26 @@
 namespace qpid {
 namespace cluster {
 
+typedef std::set<MemberId> MemberSet;
+
 /**
- * Map of established cluster members and joiners waiting for an update.
+ * Map of established cluster members and joiners waiting for an update,
+ * along with other cluster state that must be updated.
  */
 class ClusterMap {
   public:
     typedef std::map<MemberId, Url> Map;
     typedef std::set<MemberId> Set;
 
+    static Set decode(const std::string&);
+        
     ClusterMap();
     ClusterMap(const MemberId& id, const Url& url, bool isReady);
-    ClusterMap(const framing::FieldTable& urls, const framing::FieldTable& states);
+    ClusterMap(const framing::FieldTable& joiners, const framing::FieldTable& members, framing::SequenceNumber frameSeq);
 
     /** Update from config change.
      *@return true if member set changed.
      */
-    bool configChange(
-        cpg_address *current, int nCurrent,
-        cpg_address *left, int nLeft,
-        cpg_address *joined, int nJoined);
-
     bool configChange(const std::string& addresses);
 
     bool isJoiner(const MemberId& id) const { return joiners.find(id) != joiners.end(); }
@@ -78,6 +79,7 @@ class ClusterMap {
     std::vector<std::string> memberIds() const;
     std::vector<Url> memberUrls() const;
     Set getAlive() const;
+    Set getMembers() const;
 
     bool updateRequest(const MemberId& id, const std::string& url);       
     /** Return non-empty Url if accepted */
@@ -90,11 +92,19 @@ class ClusterMap {
      * Utility method to return intersection of two member sets
      */
     static Set intersection(const Set& a, const Set& b);
+
+    framing::SequenceNumber getFrameSeq() { return frameSeq; }
+    framing::SequenceNumber incrementFrameSeq() { return ++frameSeq; }
+
+    /** Clear out all knowledge of joiners & members, just keep alive set */
+    void clearStatus() { joiners.clear(); members.clear(); }
+    
   private:
     Url getUrl(const Map& map, const  MemberId& id);
     
     Map joiners, members;
     Set alive;
+    framing::SequenceNumber frameSeq;
 
   friend std::ostream& operator<<(std::ostream&, const Map&);
   friend std::ostream& operator<<(std::ostream&, const ClusterMap&);

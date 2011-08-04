@@ -26,6 +26,8 @@
 namespace qpid {
 namespace sys {
     
+void AggregateOutput::abort() { control.abort(); }
+
 void AggregateOutput::activateOutput() { control.activateOutput(); }
 
 void AggregateOutput::giveReadCredit(int32_t credit) { control.giveReadCredit(credit); }

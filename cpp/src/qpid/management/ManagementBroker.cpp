@@ -80,7 +80,8 @@ ManagementBroker::RemoteAgent::~RemoteAgent ()
 }
 
 ManagementBroker::ManagementBroker () :
-    threadPoolSize(1), interval(10), broker(0), startTime(uint64_t(Duration(now())))
+    threadPoolSize(1), interval(10), broker(0), startTime(uint64_t(Duration(now()))),
+    shuttingDown(false)
 {
     nextObjectId   = 1;
     brokerBank     = 1;
@@ -92,7 +93,13 @@ ManagementBroker::ManagementBroker () :
 
 ManagementBroker::~ManagementBroker ()
 {
+    {
+        Mutex::ScopedLock lock (userLock);
+        shuttingDown = true;
+    }
+
     timer.stop();
+
     {
         Mutex::ScopedLock lock (userLock);
 
@@ -228,6 +235,9 @@ void ManagementBroker::raiseEvent(const ManagementEvent& event, severity_t sever
     uint32_t outLen;
     uint8_t sev = (severity == SEV_DEFAULT) ? event.getSeverity() : (uint8_t) severity;
 
+    if (shuttingDown)
+        return;
+
     encodeHeader(outBuffer, 'e');
     outBuffer.putShortString(event.getPackageName());
     outBuffer.putShortString(event.getEventName());
@@ -298,7 +308,7 @@ void ManagementBroker::sendBuffer(Buffer&  buf,
                                   qpid::broker::Exchange::shared_ptr exchange,
                                   string   routingKey)
 {
-    if (exchange.get() == 0)
+    if (shuttingDown || exchange.get() == 0)
         return;
 
     intrusive_ptr<Message> msg(new Message());
@@ -340,60 +350,90 @@ void ManagementBroker::moveNewObjectsLH()
 void ManagementBroker::periodicProcessing (void)
 {
 #define BUFSIZE   65536
+#define HEADROOM  4096
     Mutex::ScopedLock lock (userLock);
     char                msgChars[BUFSIZE];
     uint32_t            contentSize;
     string              routingKey;
     list<pair<ObjectId, ManagementObject*> > deleteList;
 
+    if (shuttingDown)
+        return;
+
     uint64_t uptime = uint64_t(Duration(now())) - startTime;
     static_cast<_qmf::Broker*>(broker->GetManagementObject())->set_uptime(uptime);
 
     moveNewObjectsLH();
 
-    if (clientWasAdded) {
-        clientWasAdded = false;
-        for (ManagementObjectMap::iterator iter = managementObjects.begin ();
-             iter != managementObjects.end ();
-             iter++) {
-            ManagementObject* object = iter->second;
+    //
+    //  Clear the been-here flag on all objects in the map.
+    //
+    for (ManagementObjectMap::iterator iter = managementObjects.begin();
+         iter != managementObjects.end();
+         iter++) {
+        ManagementObject* object = iter->second;
+        object->setFlags(0);
+        if (clientWasAdded) {
             object->setForcePublish(true);
         }
     }
 
-    for (ManagementObjectMap::iterator iter = managementObjects.begin ();
-         iter != managementObjects.end ();
-         iter++) {
-        ManagementObject* object = iter->second;
+    clientWasAdded = false;
 
-        if (object->getConfigChanged() || object->getInstChanged())
-            object->setUpdateTime();
+    //
+    //  Process the entire object map.
+    //
+    for (ManagementObjectMap::iterator baseIter = managementObjects.begin();
+         baseIter != managementObjects.end();
+         baseIter++) {
+        ManagementObject* baseObject = baseIter->second;
 
-        if (object->getConfigChanged() || object->getForcePublish() || object->isDeleted()) {
-            Buffer msgBuffer (msgChars, BUFSIZE);
-            encodeHeader (msgBuffer, 'c');
-            object->writeProperties(msgBuffer);
+        //
+        //  Skip until we find a base object requiring a sent message.
+        //
+        if (baseObject->getFlags() == 1 ||
+            (!baseObject->getConfigChanged() &&
+             !baseObject->getInstChanged() &&
+             !baseObject->getForcePublish() &&
+             !baseObject->isDeleted()))
+            continue;
 
-            contentSize = BUFSIZE - msgBuffer.available ();
-            msgBuffer.reset ();
-            routingKey = "console.obj.1.0." + object->getPackageName() + "." + object->getClassName();
-            sendBuffer (msgBuffer, contentSize, mExchange, routingKey);
-        }
+        Buffer msgBuffer(msgChars, BUFSIZE);
+        for (ManagementObjectMap::iterator iter = baseIter;
+             iter != managementObjects.end();
+             iter++) {
+            ManagementObject* object = iter->second;
+            if (baseObject->isSameClass(*object) && object->getFlags() == 0) {
+                object->setFlags(1);
+                if (object->getConfigChanged() || object->getInstChanged())
+                    object->setUpdateTime();
+
+                if (object->getConfigChanged() || object->getForcePublish() || object->isDeleted()) {
+                    encodeHeader(msgBuffer, 'c');
+                    object->writeProperties(msgBuffer);
+                }
         
-        if (object->hasInst() && (object->getInstChanged() || object->getForcePublish())) {
-            Buffer msgBuffer (msgChars, BUFSIZE);
-            encodeHeader (msgBuffer, 'i');
-            object->writeStatistics(msgBuffer);
+                if (object->hasInst() && (object->getInstChanged() || object->getForcePublish())) {
+                    encodeHeader(msgBuffer, 'i');
+                    object->writeStatistics(msgBuffer);
+                }
 
-            contentSize = BUFSIZE - msgBuffer.available ();
-            msgBuffer.reset ();
-            routingKey = "console.obj.1.0." + object->getPackageName() + "." + object->getClassName();
-            sendBuffer (msgBuffer, contentSize, mExchange, routingKey);
+                if (object->isDeleted())
+                    deleteList.push_back(pair<ObjectId, ManagementObject*>(iter->first, object));
+                object->setForcePublish(false);
+
+                if (msgBuffer.available() < HEADROOM)
+                    break;
+            }
         }
 
-        if (object->isDeleted())
-            deleteList.push_back(pair<ObjectId, ManagementObject*>(iter->first, object));
-        object->setForcePublish(false);
+        contentSize = BUFSIZE - msgBuffer.available();
+        if (contentSize > 0) {
+            msgBuffer.reset();
+            stringstream key;
+            key << "console.obj.1.0." << baseObject->getPackageName() << "." << baseObject->getClassName();
+            sendBuffer(msgBuffer, contentSize, mExchange, key.str());
+        }
     }
 
     // Delete flagged objects
@@ -488,6 +528,16 @@ void ManagementBroker::handleMethodRequestLH (Buffer& inBuffer, string replyToKe
     inBuffer.getBin128(hash);
     inBuffer.getShortString(methodName);
     encodeHeader(outBuffer, 'm', sequence);
+
+    DisallowedMethods::const_iterator i = disallowed.find(std::make_pair(className, methodName));
+    if (i != disallowed.end()) {
+        outBuffer.putLong(Manageable::STATUS_FORBIDDEN);
+        outBuffer.putMediumString(i->second);
+        outLen = MA_BUFFER_SIZE - outBuffer.available();
+        outBuffer.reset();
+        sendBuffer(outBuffer, outLen, dExchange, replyToKey);
+        return;
+    }
 
     if (acl != 0) {
         string userId = ((const qpid::broker::ConnectionState*) connToken)->getUserId();
@@ -1158,4 +1208,15 @@ uint64_t ManagementBroker::allocateId(Manageable* object)
     Mutex::ScopedLock lock (addLock);
     if (allocator.get()) return allocator->getIdFor(object);
     return 0;
+}
+
+void ManagementBroker::disallow(const std::string& className, const std::string& methodName, const std::string& message)
+{
+    disallowed[std::make_pair(className, methodName)] = message;
+}
+
+void ManagementBroker::shutdown()
+{
+    Mutex::ScopedLock lock (addLock);
+    shuttingDown = true;
 }

@@ -21,8 +21,6 @@
  * under the License.
  *
  */
-
-#include "BrokerImportExport.h"
 #include "OwnershipToken.h"
 #include "Consumer.h"
 #include "Message.h"
@@ -154,14 +152,13 @@ namespace qpid {
 
             typedef std::vector<shared_ptr> vector;
 
-            QPID_BROKER_EXTERN Queue(const string& name,
-                                     bool autodelete = false, 
-                                     MessageStore* const store = 0, 
-                                     const OwnershipToken* const owner = 0,
-                                     management::Manageable* parent = 0);
-            QPID_BROKER_EXTERN ~Queue();
+            Queue(const string& name, bool autodelete = false, 
+                  MessageStore* const store = 0, 
+                  const OwnershipToken* const owner = 0,
+                  management::Manageable* parent = 0);
+            ~Queue();
 
-            QPID_BROKER_EXTERN bool dispatch(Consumer::shared_ptr);
+            bool dispatch(Consumer::shared_ptr);
             /**
              * Check whether there would be a message available for
              * dispatch to this consumer. If not, the consumer will be
@@ -173,28 +170,24 @@ namespace qpid {
             void create(const qpid::framing::FieldTable& settings);
 
             // "recovering" means we are doing a MessageStore recovery.
-            QPID_BROKER_EXTERN void configure(const qpid::framing::FieldTable& settings,
-                                              bool recovering = false);
+            void configure(const qpid::framing::FieldTable& settings, bool recovering = false);
             void destroy();
-            QPID_BROKER_EXTERN void bound(const string& exchange,
-                                          const string& key,
-                                          const qpid::framing::FieldTable& args);
-            QPID_BROKER_EXTERN void unbind(ExchangeRegistry& exchanges,
-                                           Queue::shared_ptr shared_ref);
+            void bound(const string& exchange, const string& key, const qpid::framing::FieldTable& args);
+            void unbind(ExchangeRegistry& exchanges, Queue::shared_ptr shared_ref);
 
-            QPID_BROKER_EXTERN bool acquire(const QueuedMessage& msg);
+            bool acquire(const QueuedMessage& msg);
             bool acquireMessageAt(const qpid::framing::SequenceNumber& position, QueuedMessage& message);
 
             /**
              * Delivers a message to the queue. Will record it as
              * enqueued if persistent then process it.
              */
-            QPID_BROKER_EXTERN void deliver(boost::intrusive_ptr<Message>& msg);
+            void deliver(boost::intrusive_ptr<Message>& msg);
             /**
              * Dispatches the messages immediately to a consumer if
              * one is available or stores it for later if not.
              */
-            QPID_BROKER_EXTERN void process(boost::intrusive_ptr<Message>& msg);
+            void process(boost::intrusive_ptr<Message>& msg);
             /**
              * Returns a message to the in-memory queue (due to lack
              * of acknowledegement from a receiver). If a consumer is
@@ -207,18 +200,17 @@ namespace qpid {
              */
             void recover(boost::intrusive_ptr<Message>& msg);
 
-            QPID_BROKER_EXTERN void consume(Consumer::shared_ptr c,
-                                            bool exclusive = false);
-            QPID_BROKER_EXTERN void cancel(Consumer::shared_ptr c);
+            void consume(Consumer::shared_ptr c, bool exclusive = false);
+            void cancel(Consumer::shared_ptr c);
 
             uint32_t purge(const uint32_t purge_request = 0); //defaults to all messages 
-            QPID_BROKER_EXTERN void purgeExpired();
+            void purgeExpired();
 
             //move qty # of messages to destination Queue destq
             uint32_t move(const Queue::shared_ptr destq, uint32_t qty); 
 
-            QPID_BROKER_EXTERN uint32_t getMessageCount() const;
-            QPID_BROKER_EXTERN uint32_t getConsumerCount() const;
+            uint32_t getMessageCount() const;
+            uint32_t getConsumerCount() const;
             inline const string& getName() const { return name; }
             bool isExclusiveOwner(const OwnershipToken* const o) const;
             void releaseExclusiveOwnership();
@@ -234,10 +226,11 @@ namespace qpid {
             /**
              * used to take messages from in memory and flush down to disk.
              */
-            QPID_BROKER_EXTERN void setLastNodeFailure();
-            QPID_BROKER_EXTERN void clearLastNodeFailure();
+            void setLastNodeFailure();
+            void clearLastNodeFailure();
 
-            bool enqueue(TransactionContext* ctxt, boost::intrusive_ptr<Message> msg);
+            bool enqueue(TransactionContext* ctxt, boost::intrusive_ptr<Message> msg, bool suppressPolicyCheck = false);
+            void enqueueAborted(boost::intrusive_ptr<Message> msg);
             /**
              * dequeue from store (only done once messages is acknowledged)
              */
@@ -248,10 +241,28 @@ namespace qpid {
              */
             void dequeueCommitted(const QueuedMessage& msg);
 
+             /**
+              * Inform queue of messages that were enqueued, have since
+              * been acquired but not yet accepted or released (and
+              * thus are still logically on the queue) - used in
+              * clustered broker.  
+              */ 
+            void enqueued(const QueuedMessage& msg);
+
+            /**
+             * Test whether the specified message (identified by its
+             * sequence/position), is still enqueued (note this
+             * doesn't mean it is available for delivery as it may
+             * have been delievered to a subscriber who has not yet
+             * accepted it).
+             */
+            bool isEnqueued(const QueuedMessage& msg);
+            
+
             /**
              * Gets the next available message 
              */
-            QPID_BROKER_EXTERN QueuedMessage get();
+            QueuedMessage get();
 
             /** Get the message at position pos */
             QueuedMessage find(framing::SequenceNumber pos) const;
@@ -280,17 +291,21 @@ namespace qpid {
                 ManagementMethod (uint32_t methodId, management::Args& args, std::string& text);
 
             /** Apply f to each Message on the queue. */
-            template <class F> void eachMessage(F f) const {
+            template <class F> void eachMessage(F f) {
                 sys::Mutex::ScopedLock l(messageLock);
-                std::for_each(messages.begin(), messages.end(), f);
+                if (lastValueQueue) {
+                    for (Messages::iterator i = messages.begin(); i != messages.end(); ++i) {
+                        f(checkLvqReplace(*i));
+                    }
+                } else {
+                    std::for_each(messages.begin(), messages.end(), f);
+                }
             }
 
             /** Apply f to each QueueBinding on the queue */
             template <class F> void eachBinding(F f) {
                 bindings.eachBinding(f);
             }
-
-            bool releaseMessageContent(const QueuedMessage&);
 
             void popMsg(QueuedMessage& qmsg);
 
@@ -299,6 +314,7 @@ namespace qpid {
              * Used by cluster to replicate queues.
              */
             void setPosition(framing::SequenceNumber pos);
+            framing::SequenceNumber getPosition();
             int getEventMode();
             void setQueueEventManager(QueueEvents&);
             void insertSequenceNumbers(const std::string& key);
@@ -306,6 +322,15 @@ namespace qpid {
              * Notify queue that recovery has completed.
              */
             void recoveryComplete();
+
+            // For cluster update
+            QueueListeners& getListeners();
+
+            /**
+             * Reserve space in policy for an enqueued message that
+             * has been recovered in the prepared state (dtx only)
+             */
+            void recoverPrepared(boost::intrusive_ptr<Message>& msg);
         };
     }
 }

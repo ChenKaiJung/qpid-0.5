@@ -16,10 +16,79 @@
  *
  */
 
+/** CLUSTER IMPLEMENTATION OVERVIEW
+ *
+ * The cluster works on the principle that if all members of the
+ * cluster receive identical input, they will all produce identical
+ * results. cluster::Connections intercept data received from clients
+ * and multicast it via CPG. The data is processed (passed to the
+ * broker::Connection) only when it is received from CPG in cluster
+ * order. Each cluster member has Connection objects for directly
+ * connected clients and "shadow" Connection objects for connections
+ * to other members.
+ *
+ * This assumes that all broker actions occur deterministically in
+ * response to data arriving on client connections. There are two
+ * situations where this assumption fails:
+ *  - sending data in response to polling local connections for writabiliy.
+ *  - taking actions based on a timer or timestamp comparison.
+ *
+ * IMPORTANT NOTE: any time code is added to the broker that uses timers,
+ * the cluster may need to be updated to take account of this.
+ * 
+ *
+ * USE OF TIMESTAMPS IN THE BROKER
+ *  
+ * The following are the current areas where broker uses timers or timestamps:
+ * 
+ * - Producer flow control: broker::SemanticState uses connection::getClusterOrderOutput.
+ *   a FrameHandler that sends frames to the client via the cluster. Used by broker::SessionState
+ *   
+ * - QueueCleaner, Message TTL: uses ExpiryPolicy, which is implemented by cluster::ExpiryPolicy.
+ * 
+ * - Connection heartbeat: sends connection controls, not part of session command counting so OK to ignore.
+ * 
+ * - LinkRegistry: only cluster elder is ever active for links.
+ * 
+ * - management::ManagementBroker: uses MessageHandler supplied by  cluster
+ *   to send messages to the broker via the cluster.
+ *   
+ * - Dtx: not yet supported with cluster.  
+ *
+ * cluster::ExpiryPolicy implements the strategy for message expiry.
+ *
+ * CLUSTER PROTOCOL OVERVIEW
+ * 
+ * Messages sent to/from CPG are called Events.
+ *
+ * An Event carries a ConnectionId, which includes a MemberId and a
+ * connection number.
+ * 
+ * Events are either
+ *  - Connection events: non-0 connection number and are associated with a connection.
+ *  - Cluster Events: 0 connection number, are not associated with a connection.
+ * 
+ * Events are further categorized as:
+ *  - Control: carries method frame(s) that affect cluster behavior.
+ *  - Data: carries raw data received from a client connection.
+ *
+ * The cluster defines extensions to the AMQP command set in ../../../xml/cluster.xml
+ * which defines two classes:
+ *  - cluster: cluster control information.
+ *  - cluster.connection: control information for a specific connection.
+ *
+ * The following combinations are legal:
+ *  - Data frames carrying connection data.
+ *  - Cluster control events carrying cluster commands.
+ *  - Connection control events carrying cluster.connection commands.
+ *  - Connection control events carrying non-cluster frames: frames sent to the client.
+ *    e.g. flow-control frames generated on a timer.
+ */
 #include "Cluster.h"
 #include "ClusterSettings.h"
 #include "Connection.h"
 #include "UpdateClient.h"
+#include "RetractClient.h"
 #include "FailoverExchange.h"
 #include "UpdateExchange.h"
 
@@ -35,20 +104,25 @@
 #include "qpid/framing/AllInvoker.h"
 #include "qpid/framing/ClusterConfigChangeBody.h"
 #include "qpid/framing/ClusterConnectionDeliverCloseBody.h"
+#include "qpid/framing/ClusterConnectionAbortBody.h"
+#include "qpid/framing/ClusterRetractOfferBody.h"
 #include "qpid/framing/ClusterConnectionDeliverDoOutputBody.h"
 #include "qpid/framing/ClusterReadyBody.h"
 #include "qpid/framing/ClusterShutdownBody.h"
 #include "qpid/framing/ClusterUpdateOfferBody.h"
 #include "qpid/framing/ClusterUpdateRequestBody.h"
+#include "qpid/framing/ClusterConnectionAnnounceBody.h"
+#include "qpid/framing/ClusterErrorCheckBody.h"
+#include "qpid/framing/MessageTransferBody.h"
 #include "qpid/log/Helpers.h"
 #include "qpid/log/Statement.h"
 #include "qpid/management/IdAllocator.h"
 #include "qpid/management/ManagementBroker.h"
 #include "qpid/memory.h"
-#include "qpid/shared_ptr.h"
-#include "qpid/sys/LatencyMetric.h"
 #include "qpid/sys/Thread.h"
+#include "qpid/sys/LatencyTracker.h"
 
+#include <boost/shared_ptr.hpp>
 #include <boost/bind.hpp>
 #include <boost/cast.hpp>
 #include <boost/current_function.hpp>
@@ -63,11 +137,19 @@ using namespace qpid::framing;
 using namespace qpid::sys;
 using namespace std;
 using namespace qpid::cluster;
+using namespace qpid::framing::cluster;
 using qpid::management::ManagementAgent;
 using qpid::management::ManagementObject;
 using qpid::management::Manageable;
 using qpid::management::Args;
 namespace _qmf = ::qmf::org::apache::qpid::cluster;
+
+/** NOTE: increment this number whenever any incompatible changes in
+ * cluster protocol/behavior are made. It allows early detection and
+ * sensible reporting of an attempt to mix different versions in a
+ * cluster.
+ */
+const uint32_t Cluster::CLUSTER_VERSION = 20090917;
 
 struct ClusterDispatcher : public framing::AMQP_AllOperations::ClusterHandler {
     qpid::cluster::Cluster& cluster;
@@ -77,9 +159,12 @@ struct ClusterDispatcher : public framing::AMQP_AllOperations::ClusterHandler {
 
     void updateRequest(const std::string& url) { cluster.updateRequest(member, url, l); }
     void ready(const std::string& url) { cluster.ready(member, url, l); }
-    void configChange(const std::string& addresses) { cluster.configChange(member, addresses, l); }
-    void updateOffer(uint64_t updatee, const Uuid& id) { cluster.updateOffer(member, updatee, id, l); }
+    void configChange(const std::string& current) { cluster.configChange(member, current, l); }
+    void updateOffer(uint64_t updatee, const Uuid& id, uint32_t version) { cluster.updateOffer(member, updatee, id, version, l); }
+    void retractOffer(uint64_t updatee) { cluster.retractOffer(member, updatee, l); }
     void messageExpired(uint64_t id) { cluster.messageExpired(member, id, l); }
+    void errorCheck(uint8_t type, const framing::SequenceNumber& frameSeq) { cluster.errorCheck(member, type, frameSeq, l); }
+
     void shutdown() { cluster.shutdown(member, l); }
 
     bool invoke(AMQBody& body) { return framing::invoke(*this, body).wasHandled(); }
@@ -94,8 +179,6 @@ Cluster::Cluster(const ClusterSettings& set, broker::Broker& b) :
     name(settings.name),
     myUrl(settings.url.empty() ? Url() : Url(settings.url)),
     self(cpg.self()),
-    readMax(settings.readMax),
-    writeEstimate(settings.writeEstimate),
     expiryPolicy(new ExpiryPolicy(mcast, self, broker.getTimer())),
     mcast(cpg, poller, boost::bind(&Cluster::leave, this)),
     dispatcher(cpg, poller, boost::bind(&Cluster::leave, this)),
@@ -107,12 +190,15 @@ Cluster::Cluster(const ClusterSettings& set, broker::Broker& b) :
                       boost::bind(&Cluster::leave, this),
                       "Error delivering frames",
                       poller),
+    quorum(boost::bind(&Cluster::leave, this)),
     initialized(false),
     decoder(boost::bind(&Cluster::deliverFrame, this, _1)),
     discarding(true),
     state(INIT),
     lastSize(0),
-    lastBroker(false)
+    lastBroker(false),
+    updateRetracted(false),
+    error(*this)
 {
     mAgent = ManagementAgent::Singleton::getInstance();
     if (mAgent != 0){
@@ -129,7 +215,6 @@ Cluster::Cluster(const ClusterSettings& set, broker::Broker& b) :
     // Update exchange is used during updates to replicate messages without modifying delivery-properties.exchange.
     broker.getExchanges().registerExchange(boost::shared_ptr<broker::Exchange>(new UpdateExchange(this)));
 
-    if (settings.quorum) quorum.init();
     cpg.join(name);
     // pump the CPG dispatch manually till we get initialized. 
     while (!initialized)
@@ -141,6 +226,7 @@ Cluster::~Cluster() {
 }
 
 void Cluster::initialize() {
+    if (settings.quorum) quorum.start(poller);
     if (myUrl.empty())
         myUrl = Url::getIpAddressesUrl(broker.getPort(broker::Broker::TCP_TRANSPORT));
     QPID_LOG(notice, *this << " joining cluster " << name << " with url=" << myUrl);
@@ -155,21 +241,36 @@ void Cluster::initialize() {
 
 // Called in connection thread to insert a client connection.
 void Cluster::addLocalConnection(const boost::intrusive_ptr<Connection>& c) {
+    QPID_LOG(debug, *this << " add local connection " << c->getId());
     localConnections.insert(c);
+    assert(c->getId().getMember() == self);
+    // Announce the connection to the cluster.
+    if (c->isLocalClient())
+        mcast.mcastControl((ClusterConnectionAnnounceBody()), c->getId());
 }
 
 // Called in connection thread to insert an updated shadow connection.
 void Cluster::addShadowConnection(const boost::intrusive_ptr<Connection>& c) {
+    QPID_LOG(debug, *this << " add shadow connection " << c->getId());
     // Safe to use connections here because we're pre-catchup, either
     // discarding or stalled, so deliveredFrame is not processing any
     // connection events.
     assert(discarding);         
-    connections.insert(ConnectionMap::value_type(c->getId(), c));
+    pair<ConnectionMap::iterator, bool> ib
+        = connections.insert(ConnectionMap::value_type(c->getId(), c));
+    assert(ib.second);
+}
+
+void Cluster::erase(const ConnectionId& id) {
+    Lock l(lock);    
+    erase(id,l);
 }
 
 // Called by Connection::deliverClose() in deliverFrameQueue thread.
-void Cluster::erase(const ConnectionId& id) {
+void Cluster::erase(const ConnectionId& id, Lock&) {
+    QPID_LOG(debug, *this << " erasing connection " << id);
     connections.erase(id);
+    decoder.erase(id);
 }
 
 std::vector<string> Cluster::getIds() const {
@@ -195,14 +296,19 @@ void Cluster::leave() {
     leave(l);
 }
 
+#define LEAVE_TRY(STMT) try { STMT; }                                   \
+    catch (const std::exception& e) {                                   \
+        QPID_LOG(warning, *this << " error leaving cluster: " << e.what()); \
+    } do {} while(0)
+
 void Cluster::leave(Lock&) { 
     if (state != LEFT) {
         state = LEFT;
         QPID_LOG(notice, *this << " leaving cluster " << name);
-        try { broker.shutdown(); }
-        catch (const std::exception& e) {
-            QPID_LOG(critical, *this << " error during broker shutdown: " << e.what());
-        }
+        // Finalize connections now now to avoid problems later in destructor.
+        LEAVE_TRY(localConnections.clear());
+        LEAVE_TRY(connections.clear());
+        LEAVE_TRY(broker.shutdown());
     }
 }
 
@@ -218,46 +324,109 @@ void Cluster::deliver(
     MemberId from(nodeid, pid);
     framing::Buffer buf(static_cast<char*>(msg), msg_len);
     Event e(Event::decodeCopy(from, buf));
-    if (from == self)  // Record self-deliveries for flow control.
-        mcast.selfDeliver(e);
+    LATENCY_TRACK(if (e.getConnectionId().getMember() == self) mcast.cpgLatency.finish());
     deliverEvent(e);
 }
 
+LATENCY_TRACK(sys::LatencyTracker<const char*> eventQueueLatencyTracker("EventQueue");)
+LATENCY_TRACK(sys::LatencyTracker<const AMQBody*> frameQueueLatencyTracker("FrameQueue");)
+
 void Cluster::deliverEvent(const Event& e) {
+    LATENCY_TRACK(eventQueueLatencyTracker.start(e.getData());)
     deliverEventQueue.push(e);
 }
 
 void Cluster::deliverFrame(const EventFrame& e) {
+    LATENCY_TRACK(frameQueueLatencyTracker.start(e.frame.getBody()));
     deliverFrameQueue.push(e);
 }
 
+const ClusterUpdateOfferBody* castUpdateOffer(const framing::AMQBody* body) {
+    return  (body && body->getMethod() &&
+             body->getMethod()->isA<ClusterUpdateOfferBody>()) ?
+        static_cast<const ClusterUpdateOfferBody*>(body) : 0;
+}
+ 
 // Handler for deliverEventQueue.
 // This thread decodes frames from events.
 void Cluster::deliveredEvent(const Event& e) {
-        QPID_LOG(trace, *this << " DLVR: " << e);
+    LATENCY_TRACK(eventQueueLatencyTracker.finish(e.getData()));
     if (e.isCluster()) {
+        QPID_LOG(trace, *this << " DLVR: " << e);
         EventFrame ef(e, e.getFrame());
         // Stop the deliverEventQueue on update offers.
         // This preserves the connection decoder fragments for an update.
-        ClusterUpdateOfferBody* offer = dynamic_cast<ClusterUpdateOfferBody*>(ef.frame.getBody());
-        if (offer)
+        const ClusterUpdateOfferBody* offer = castUpdateOffer(ef.frame.getBody());
+        if (offer) {
+            QPID_LOG(debug, *this << " stall for update offer from " << e.getMemberId()
+                     << " to " << MemberId(offer->getUpdatee()));
             deliverEventQueue.stop();
+        }
         deliverFrame(ef);
     }
     else if(!discarding) {    
+        QPID_LOG(trace, *this << " DLVR: " << e);
         if (e.isControl())
             deliverFrame(EventFrame(e, e.getFrame()));
-        else
-            decoder.decode(e, e.getData());
-}
+        else {
+            try { decoder.decode(e, e.getData()); }
+            catch (const Exception& ex) {
+                // Close a connection that is sending us invalid data.
+                QPID_LOG(error, *this << " aborting connection "
+                         << e.getConnectionId() << ": " << ex.what());
+                framing::AMQFrame abort((ClusterConnectionAbortBody()));
+                deliverFrame(EventFrame(EventHeader(CONTROL, e.getConnectionId()), abort));
+            }
+        }
+    }
     else // Discard connection events if discarding is set.
         QPID_LOG(trace, *this << " DROP: " << e);
 }
 
+void Cluster::flagError(
+    Connection& connection, ErrorCheck::ErrorType type, const std::string& msg)
+{
+    Mutex::ScopedLock l(lock);
+    if (connection.isCatchUp()) {
+        QPID_LOG(critical, *this << " error on update connection " << connection
+                 << ": " << msg);
+        leave(l);
+    }
+    else if (settings.checkErrors)
+        error.error(connection, type, map.getFrameSeq(), map.getMembers(), msg);
+}
+
+LATENCY_TRACK(sys::LatencyTracker<const AMQBody*> doOutputTracker("DoOutput");)
+
 // Handler for deliverFrameQueue.
 // This thread executes the main logic.
-void Cluster::deliveredFrame(const EventFrame& e) {
+    void Cluster::deliveredFrame(const EventFrame& efConst) {
+    LATENCY_TRACK(frameQueueLatencyTracker.finish(e.frame.getBody()));
+    LATENCY_TRACK(if (e.frame.getBody()->type() == CONTENT_BODY) doOutputTracker.start(e.frame.getBody()));
     Mutex::ScopedLock l(lock);
+    if (state == LEFT) return;
+    EventFrame e(efConst);
+    const ClusterUpdateOfferBody* offer = castUpdateOffer(e.frame.getBody());
+    if (offer && error.isUnresolved()) {
+        // We can't honour an update offer that is delivered while an
+        // error is in progress so replace it with a retractOffer and re-start
+        // the event queue.
+        e.frame = AMQFrame(
+            ClusterRetractOfferBody(ProtocolVersion(), offer->getUpdatee()));
+        deliverEventQueue.start(); 
+    }
+    // Process each frame through the error checker.
+    if (settings.checkErrors) {
+        error.delivered(e);
+        while (error.canProcess())  // There is a frame ready to process.
+            processFrame(error.getNext(), l);
+    }
+    else 
+        processFrame(e, l);
+}
+
+
+void Cluster::processFrame(const EventFrame& e, Lock& l) {
     if (e.isCluster()) {
         QPID_LOG(trace, *this << " DLVR: " << e);
         ClusterDispatcher dispatch(*this, e.connectionId.getMember(), l);
@@ -265,8 +434,10 @@ void Cluster::deliveredFrame(const EventFrame& e) {
             throw Exception(QPID_MSG("Invalid cluster control"));
     }
     else if (state >= CATCHUP) {
-        QPID_LOG(trace, *this << " DLVR:  " << e);
-        ConnectionPtr connection = getConnection(e.connectionId, l);
+        LATENCY_TRACK(LatencyScope ls(processLatency));
+        map.incrementFrameSeq();
+        QPID_LOG(trace, *this << " DLVR " << map.getFrameSeq() << ": " << e);
+        ConnectionPtr connection = getConnection(e, l);
         if (connection)
             connection->deliveredFrame(e);
     }
@@ -275,21 +446,24 @@ void Cluster::deliveredFrame(const EventFrame& e) {
 }
 
 // Called in deliverFrameQueue thread
-ConnectionPtr Cluster::getConnection(const ConnectionId& id, Lock&) {
-    ConnectionPtr cp;
+ConnectionPtr Cluster::getConnection(const EventFrame& e, Lock&) {
+    ConnectionId id = e.connectionId;
     ConnectionMap::iterator i = connections.find(id);
-    if (i != connections.end())
-        cp = i->second;
-    else {
-        if(id.getMember() == self) 
+    if (i != connections.end()) return i->second;
+    ConnectionPtr cp;
+    // If the frame is an announcement for a new connection, add it.
+    if (e.frame.getBody() && e.frame.getMethod() &&
+        e.frame.getMethod()->isA<ClusterConnectionAnnounceBody>())
+    {
+        if (id.getMember() == self)  { // Announces one of my own
             cp = localConnections.getErase(id);
-        else {
-            // New remote connection, create a shadow.
+            assert(cp); 
+        }
+        else {              // New remote connection, create a shadow.
             std::ostringstream mgmtId;
             mgmtId << id;
             cp = new Connection(*this, shadowOut, mgmtId.str(), id);
         }
-        if (cp)
             connections.insert(ConnectionMap::value_type(id, cp));
     }
     return cp;
@@ -316,11 +490,11 @@ ostream& operator<<(ostream& o, const AddrList& a) {
     for (const cpg_address* p = a.addrs; p < a.addrs+a.count; ++p) {
         const char* reasonString;
         switch (p->reason) {
-          case CPG_REASON_JOIN: reasonString =  " (joined) "; break;
-          case CPG_REASON_LEAVE: reasonString =  " (left) "; break;
-          case CPG_REASON_NODEDOWN: reasonString =  " (node-down) "; break;
-          case CPG_REASON_NODEUP: reasonString =  " (node-up) "; break;
-          case CPG_REASON_PROCDOWN: reasonString =  " (process-down) "; break;
+          case CPG_REASON_JOIN: reasonString =  "(joined) "; break;
+          case CPG_REASON_LEAVE: reasonString =  "(left) "; break;
+          case CPG_REASON_NODEDOWN: reasonString =  "(node-down) "; break;
+          case CPG_REASON_NODEUP: reasonString =  "(node-up) "; break;
+          case CPG_REASON_PROCDOWN: reasonString =  "(process-down) "; break;
           default: reasonString = " ";
         }
         qpid::cluster::MemberId member(*p);
@@ -334,7 +508,7 @@ void Cluster::configChange (
     cpg_name */*group*/,
     cpg_address *current, int nCurrent,
     cpg_address *left, int nLeft,
-    cpg_address */*joined*/, int /*nJoined*/)
+    cpg_address *joined, int nJoined)
 {
     Mutex::ScopedLock l(lock);
     if (state == INIT) {        // First config change.
@@ -342,8 +516,11 @@ void Cluster::configChange (
         broker.setRecovery(nCurrent == 1);
         initialized = true;
     }
-    QPID_LOG(debug, *this << " config change: " << AddrList(current, nCurrent) 
-             << AddrList(left, nLeft, "( ", ")"));
+    QPID_LOG(notice, *this << " membership change: "
+             << AddrList(current, nCurrent) << "("
+             << AddrList(joined, nJoined, "joined: ")
+             << AddrList(left, nLeft, "left: ")
+             << ")");
     std::string addresses;
     for (cpg_address* p = current; p < current+nCurrent; ++p) 
         addresses.append(MemberId(*p).str());
@@ -357,8 +534,9 @@ void Cluster::setReady(Lock&) {
     broker.getQueueEvents().enable();
 }
 
-void Cluster::configChange(const MemberId&, const std::string& addresses, Lock& l) {
-    bool memberChange = map.configChange(addresses);
+void Cluster::configChange(const MemberId&, const std::string& current, Lock& l) {
+    bool memberChange = map.configChange(current);
+    QPID_LOG(debug, *this << " applied config change: " << map);
     if (state == LEFT) return;
     
     if (!map.isAlive(self)) {  // Final config change.
@@ -399,7 +577,8 @@ void Cluster::makeOffer(const MemberId& id, Lock& ) {
     if (state == READY && map.isJoiner(id)) {
         state = OFFER;
         QPID_LOG(info, *this << " send update-offer to " << id);
-        mcast.mcastControl(ClusterUpdateOfferBody(ProtocolVersion(), id, clusterId), self);
+        mcast.mcastControl(
+            ClusterUpdateOfferBody(ProtocolVersion(), id, clusterId, CLUSTER_VERSION), self);
     }
 }
 
@@ -430,10 +609,17 @@ void Cluster::ready(const MemberId& id, const std::string& url, Lock& l) {
     }
 }
 
-void Cluster::updateOffer(const MemberId& updater, uint64_t updateeInt, const Uuid& uuid, Lock& l) {
+void Cluster::updateOffer(const MemberId& updater, uint64_t updateeInt, const Uuid& uuid,
+                          uint32_t version, Lock& l) {
     // NOTE: deliverEventQueue has been stopped at the update offer by
     // deliveredEvent in case an update is required.
     if (state == LEFT) return;
+    if (version != CLUSTER_VERSION) {
+        QPID_LOG(critical, *this << " incompatible cluster versions " <<
+                 version << " != " << CLUSTER_VERSION);
+        leave(l);
+        return;
+    }
     MemberId updatee(updateeInt);
     boost::optional<Url> url = map.updateOffer(updater, updatee);
     if (updater == self) {
@@ -441,10 +627,10 @@ void Cluster::updateOffer(const MemberId& updater, uint64_t updateeInt, const Uu
         if (url)               // My offer was first.
             updateStart(updatee, *url, l);
         else {                  // Another offer was first.
-            deliverEventQueue.start(); // Don't need to update
+            QPID_LOG(info, *this << " cancelled offer to " << updatee << " unstall");
             setReady(l);
-            QPID_LOG(info, *this << " cancelled update offer to " << updatee);
             makeOffer(map.firstJoiner(), l); // Maybe make another offer.
+            deliverEventQueue.start(); // Go back to normal processing
         }
     }
     else if (updatee == self && url) {
@@ -454,8 +640,40 @@ void Cluster::updateOffer(const MemberId& updater, uint64_t updateeInt, const Uu
         QPID_LOG(info, *this << " receiving update from " << updater);
         checkUpdateIn(l);
     }
-    else
-        deliverEventQueue.start(); // Don't need to update
+    else {
+        QPID_LOG(debug,*this << " unstall, ignore update " << updater
+                 << " to " << updatee);
+        deliverEventQueue.start(); // Not involved in update.
+    }
+}
+
+static client::ConnectionSettings connectionSettings(const ClusterSettings& settings) {
+    client::ConnectionSettings cs;
+    cs.username = settings.username;
+    cs.password = settings.password;
+    cs.mechanism = settings.mechanism;
+    return cs;
+}
+
+void Cluster::retractOffer(const MemberId& updater, uint64_t updateeInt, Lock& l) {
+    // An offer was received while handling an error, and converted to a retract.
+    // Behavior is very similar to updateOffer.
+    if (state == LEFT) return;
+    MemberId updatee(updateeInt);
+    boost::optional<Url> url = map.updateOffer(updater, updatee);
+    if (updater == self) {
+        assert(state == OFFER);
+        if (url)  {             // My offer was first.
+            QPID_LOG(info, *this << " retracting offer to " << updatee);
+            if (updateThread.id())
+                updateThread.join(); // Join the previous updateThread to avoid leaks.
+            updateThread = Thread(new RetractClient(*url, connectionSettings(settings)));
+        }
+        setReady(l);
+        makeOffer(map.firstJoiner(), l); // Maybe make another offer.
+        // Don't unstall the event queue, that was already done in deliveredFrame
+     }
+    QPID_LOG(debug,*this << " retracted offer " << updater << " to " << updatee);
 }
 
 void Cluster::updateStart(const MemberId& updatee, const Url& url, Lock& l) {
@@ -466,15 +684,12 @@ void Cluster::updateStart(const MemberId& updatee, const Url& url, Lock& l) {
     QPID_LOG(info, *this << " sending update to " << updatee << " at " << url);
     if (updateThread.id())
         updateThread.join(); // Join the previous updateThread to avoid leaks.
-    client::ConnectionSettings cs;
-    cs.username = settings.username;
-    cs.password = settings.password;
-    cs.mechanism = settings.mechanism;
     updateThread = Thread(
-        new UpdateClient(self, updatee, url, broker, map, *expiryPolicy, getConnections(l), decoder,
+        new UpdateClient(self, updatee, url, broker, map, *expiryPolicy,
+                         getConnections(l), decoder,
                          boost::bind(&Cluster::updateOutDone, this),
                          boost::bind(&Cluster::updateOutError, this, _1),
-                         cs));
+                         connectionSettings(settings)));
 }
 
 // Called in update thread.
@@ -484,13 +699,28 @@ void Cluster::updateInDone(const ClusterMap& m) {
     checkUpdateIn(l);
 }
 
+void Cluster::updateInRetracted() {
+    Lock l(lock);
+    updateRetracted = true;
+    map.clearStatus();
+    checkUpdateIn(l);
+}
+
 void Cluster::checkUpdateIn(Lock&) {
-    if (state == UPDATEE && updatedMap) {
+    if (state != UPDATEE) return; // Wait till we reach the stall point.
+    if (updatedMap) { // We're up to date
         map = *updatedMap;
         mcast.mcastControl(ClusterReadyBody(ProtocolVersion(), myUrl.str()), self);
         state = CATCHUP;
         discarding = false;     // ok to set, we're stalled for update.
         QPID_LOG(info, *this << " received update, starting catch-up");
+        deliverEventQueue.start();
+    }
+    else if (updateRetracted) { // Update was retracted, request another update
+        updateRetracted = false;
+        state = JOINER;
+        QPID_LOG(info, *this << " re-try joining after retracted update");
+        mcast.mcastControl(ClusterUpdateRequestBody(ProtocolVersion(), myUrl.str()), self);
         deliverEventQueue.start();
     }
 }
@@ -526,7 +756,7 @@ Manageable::status_t Cluster::ManagementMethod (uint32_t methodId, Args& args, s
     Lock l(lock);
     QPID_LOG(debug, *this << " managementMethod [id=" << methodId << "]");
     switch (methodId) {
-    case _qmf::Cluster::METHOD_STOPCLUSTERNODE :
+      case _qmf::Cluster::METHOD_STOPCLUSTERNODE :
         {
             _qmf::ArgsClusterStopClusterNode& iargs = (_qmf::ArgsClusterStopClusterNode&) args;
             stringstream stream;
@@ -535,10 +765,10 @@ Manageable::status_t Cluster::ManagementMethod (uint32_t methodId, Args& args, s
                 stopClusterNode(l);
         }
         break;
-    case _qmf::Cluster::METHOD_STOPFULLCLUSTER :
+      case _qmf::Cluster::METHOD_STOPFULLCLUSTER :
         stopFullCluster(l);
         break;
-    default:
+      default:
         return Manageable::STATUS_UNKNOWN_METHOD;
     }
     return Manageable::STATUS_OK;
@@ -589,19 +819,26 @@ void Cluster::memberUpdate(Lock& l) {
         mgmtObject->set_memberIDs(idstr);
     }
 
-    // Erase connections belonging to members that have left the cluster.
+    // Close connections belonging to members that have left the cluster.
     ConnectionMap::iterator i = connections.begin();
     while (i != connections.end()) {
         ConnectionMap::iterator j = i++;
         MemberId m = j->second->getId().getMember();
-        if (m != self && !map.isMember(m))
-            connections.erase(j);
+        if (m != self && !map.isMember(m)) {
+            j->second->getBrokerConnection().closed();
+            erase(j->second->getId(), l);
+        }
     }
 }
 
 std::ostream& operator<<(std::ostream& o, const Cluster& cluster) {
-    static const char* STATE[] = { "INIT", "JOINER", "UPDATEE", "CATCHUP", "READY", "OFFER", "UPDATER", "LEFT" };
-    return o << cluster.self << "(" << STATE[cluster.state] << ")";
+    static const char* STATE[] = {
+        "INIT", "JOINER", "UPDATEE", "CATCHUP", "READY", "OFFER", "UPDATER", "LEFT"
+    };
+    assert(sizeof(STATE)/sizeof(*STATE) == Cluster::LEFT+1);
+    o << cluster.self << "(" << STATE[cluster.state];
+    if (cluster.settings.checkErrors && cluster.error.isUnresolved()) o << "/error";
+    return o << ")";
 }
 
 MemberId Cluster::getId() const {
@@ -610,14 +847,6 @@ MemberId Cluster::getId() const {
 
 broker::Broker& Cluster::getBroker() const {
     return broker; // Immutable,  no need to lock.
-}
-
-void Cluster::checkQuorum() {
-    if (!quorum.isQuorate()) {
-        QPID_LOG(critical, *this << " disconnected from cluster quorum, shutting down");
-        leave();
-        throw Exception(QPID_MSG(*this << " disconnected from cluster quorum."));
-    }
 }
 
 void Cluster::setClusterId(const Uuid& uuid, Lock&) {
@@ -634,5 +863,14 @@ void Cluster::setClusterId(const Uuid& uuid, Lock&) {
 void Cluster::messageExpired(const MemberId&, uint64_t id, Lock&) {
     expiryPolicy->deliverExpire(id);
 }
+
+void Cluster::errorCheck(const MemberId& from, uint8_t type, framing::SequenceNumber frameSeq, Lock&) {
+    // If we see an errorCheck here (rather than in the ErrorCheck
+    // class) then we have processed succesfully past the point of the
+    // error.
+    if (state >= CATCHUP) // Don't respond pre catchup, we don't know what happened
+        error.respondNone(from, type, frameSeq);
+}
+
 
 }} // namespace qpid::cluster

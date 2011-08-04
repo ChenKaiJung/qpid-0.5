@@ -21,6 +21,7 @@
 #include "Connection.h"
 #include "UpdateClient.h"
 #include "Cluster.h"
+#include "UpdateReceiver.h"
 
 #include "qpid/broker/SessionState.h"
 #include "qpid/broker/SemanticState.h"
@@ -39,16 +40,13 @@
 #include "qpid/framing/ConnectionCloseBody.h"
 #include "qpid/framing/ConnectionCloseOkBody.h"
 #include "qpid/log/Statement.h"
-#include "qpid/sys/LatencyMetric.h"
-#include "qpid/sys/AtomicValue.h"
 
 #include <boost/current_function.hpp>
 
 // TODO aconway 2008-11-03:
 // 
-// Disproportionate amount of code here is dedicated to receiving an
-// update when joining a cluster and building initial
-// state. Should be separated out into its own classes.
+// Refactor code for receiving an update into a separate UpdateConnection
+// class.
 //
 
 
@@ -56,8 +54,16 @@ namespace qpid {
 namespace cluster {
 
 using namespace framing;
+using namespace framing::cluster;
 
-NoOpConnectionOutputHandler Connection::discardHandler;
+qpid::sys::AtomicValue<uint64_t> Connection::catchUpId(0x5000000000000000LL);
+
+Connection::NullFrameHandler Connection::nullFrameHandler;
+
+struct NullFrameHandler : public framing::FrameHandler {
+    void handle(framing::AMQFrame&) {}
+};
+
 
 namespace {
 sys::AtomicValue<uint64_t> idCounter;
@@ -67,7 +73,8 @@ sys::AtomicValue<uint64_t> idCounter;
 Connection::Connection(Cluster& c, sys::ConnectionOutputHandler& out, const std::string& logId, const ConnectionId& id)
     : cluster(c), self(id), catchUp(false), output(*this, out),
       connection(&output, cluster.getBroker(), logId), expectProtocolHeader(false),
-      mcastFrameHandler(cluster.getMulticast(), self)
+      mcastFrameHandler(cluster.getMulticast(), self),
+      consumerNumbering(c.getUpdateReceiver().consumerNumbering)
 { init(); }
 
 // Local connection
@@ -75,7 +82,8 @@ Connection::Connection(Cluster& c, sys::ConnectionOutputHandler& out,
                        const std::string& logId, MemberId member, bool isCatchUp, bool isLink)
     : cluster(c), self(member, ++idCounter), catchUp(isCatchUp), output(*this, out),
       connection(&output, cluster.getBroker(), logId, isLink, catchUp ? ++catchUpId : 0),
-      expectProtocolHeader(isLink), mcastFrameHandler(cluster.getMulticast(), self)
+      expectProtocolHeader(isLink), mcastFrameHandler(cluster.getMulticast(), self),
+      consumerNumbering(c.getUpdateReceiver().consumerNumbering)
 { init(); }
 
 void Connection::init() {
@@ -83,33 +91,29 @@ void Connection::init() {
     if (isLocalClient()) {  
         connection.setClusterOrderOutput(mcastFrameHandler); // Actively send cluster-order frames from local node
         cluster.addLocalConnection(this);
-        giveReadCredit(cluster.getReadMax());
+        giveReadCredit(cluster.getSettings().readMax);
     }
     else {                                                  // Shadow or catch-up connection
         connection.setClusterOrderOutput(nullFrameHandler); // Passive, discard cluster-order frames
         connection.setClientThrottling(false);              // Disable client throttling, done by active node.
+        connection.setShadow(); // Mark the broker connection as a shadow.
     }
+    if (!isCatchUp())
+        connection.setErrorListener(this);
 }
 
 void Connection::giveReadCredit(int credit) {
-    if (cluster.getReadMax() && credit) 
+    if (cluster.getSettings().readMax && credit) 
         output.giveReadCredit(credit);
 }
 
 Connection::~Connection() {
+    connection.setErrorListener(0);
     QPID_LOG(debug, cluster << " deleted connection: " << *this);
 }
 
 bool Connection::doOutput() {
     return output.doOutput();
-}
-
-// Delivery of doOutput allows us to run the real connection doOutput()
-// which stocks up the write buffers with data.
-//
-void Connection::deliverDoOutput(uint32_t requested) {
-    assert(!catchUp);
-    output.deliverDoOutput(requested);
 }
 
 // Received from a directly connected client.
@@ -126,7 +130,7 @@ void Connection::received(framing::AMQFrame& f) {
                 cluster.addShadowConnection(this);
             AMQFrame ok((ConnectionCloseOkBody()));
             connection.getOutput().send(ok);
-            output.closeOutput(discardHandler);
+            output.closeOutput();
             catchUp = false;
         }
         else
@@ -156,8 +160,8 @@ void Connection::deliveredFrame(const EventFrame& f) {
     {
         if (f.type == DATA) // incoming data frames to broker::Connection
             connection.received(const_cast<AMQFrame&>(f.frame)); 
-        else {                    // frame control, send frame via SessionState
-            broker::SessionState* ss = connection.getChannel(f.frame.getChannel()).getSession();
+        else {           // frame control, send frame via SessionState
+            broker::SessionState* ss = connection.getChannel(currentChannel).getSession();
             if (ss) ss->out(const_cast<AMQFrame&>(f.frame));
         }
     }
@@ -180,7 +184,7 @@ void Connection::closed() {
             // This was a local replicated connection. Multicast a deliver
             // closed and process any outstanding frames from the cluster
             // until self-delivery of deliver-close.
-            output.closeOutput(discardHandler);
+            output.closeOutput();
             cluster.getMulticast().mcastControl(ClusterConnectionDeliverCloseBody(), self);
         }
     }
@@ -193,6 +197,12 @@ void Connection::closed() {
 void Connection::deliverClose () {
     assert(!catchUp);
     connection.closed();
+    cluster.erase(self);
+}
+
+// The connection has been killed for misbehaving
+void Connection::abort() {
+    connection.abort();
     cluster.erase(self);
 }
 
@@ -243,11 +253,14 @@ broker::SemanticState& Connection::semanticState() {
     return sessionState().getSemanticState();
 }
 
-void Connection::consumerState(const string& name, bool blocked, bool notifyEnabled) {
+void Connection::consumerState(const string& name, bool blocked, bool notifyEnabled)
+{
     broker::SemanticState::ConsumerImpl& c = semanticState().find(name);
     c.setBlocked(blocked);
     if (notifyEnabled) c.enableNotify(); else c.disableNotify();
+    consumerNumbering.add(c.shared_from_this());
 }
+
 
 void Connection::sessionState(
     const SequenceNumber& replayStart,
@@ -270,18 +283,27 @@ void Connection::sessionState(
     QPID_LOG(debug, cluster << " received session state update for " << sessionState().getId());
 }
     
-void Connection::shadowReady(uint64_t memberId, uint64_t connectionId, const string& username, const string& fragment) {
+void Connection::shadowReady(uint64_t memberId, uint64_t connectionId, const string& username, const string& fragment, uint32_t sendMax) {
     ConnectionId shadowId = ConnectionId(memberId, connectionId);
     QPID_LOG(debug, cluster << " catch-up connection " << *this << " becomes shadow " << shadowId);
     self = shadowId;
     connection.setUserId(username);
-    // OK to use decoder here because we are stalled for update.
+    // OK to use decoder here because cluster is stalled for update.
     cluster.getDecoder().get(self).setFragment(fragment.data(), fragment.size());
+    connection.setErrorListener(this);
+    output.setSendMax(sendMax);
 }
 
-void Connection::membership(const FieldTable& joiners, const FieldTable& members) {
+void Connection::membership(const FieldTable& joiners, const FieldTable& members, const framing::SequenceNumber& frameSeq) {
     QPID_LOG(debug, cluster << " incoming update complete on connection " << *this);
-    cluster.updateInDone(ClusterMap(joiners, members));
+    cluster.updateInDone(ClusterMap(joiners, members, frameSeq));
+    consumerNumbering.clear();
+    self.second = 0;        // Mark this as completed update connection.
+}
+
+void Connection::retractOffer() {
+    QPID_LOG(debug, cluster << " incoming update retracted on connection " << *this);
+    cluster.updateInRetracted();
     self.second = 0;        // Mark this as completed update connection.
 }
 
@@ -298,14 +320,16 @@ bool Connection::isUpdated() const {
 }
 
 
-shared_ptr<broker::Queue> Connection::findQueue(const std::string& qname) {
-    shared_ptr<broker::Queue> queue = cluster.getBroker().getQueues().find(qname);
+boost::shared_ptr<broker::Queue> Connection::findQueue(const std::string& qname) {
+    boost::shared_ptr<broker::Queue> queue = cluster.getBroker().getQueues().find(qname);
     if (!queue) throw Exception(QPID_MSG(cluster << " can't find queue " << qname));
     return queue;
 }
 
 broker::QueuedMessage Connection::getUpdateMessage() {
-    broker::QueuedMessage m = findQueue(UpdateClient::UPDATE)->get();
+    boost::shared_ptr<broker::Queue> updateq = findQueue(UpdateClient::UPDATE);
+    assert(!updateq->isDurable());
+    broker::QueuedMessage m = updateq->get();
     if (!m.payload) throw Exception(QPID_MSG(cluster << " empty update queue"));
     return m;
 }
@@ -320,15 +344,20 @@ void Connection::deliveryRecord(const string& qname,
                                 bool completed,
                                 bool ended,
                                 bool windowing,
+                                bool enqueued,
                                 uint32_t credit)
 {
     broker::QueuedMessage m;
     broker::Queue::shared_ptr queue = findQueue(qname);
     if (!ended) {               // Has a message
-        if (acquired)           // Message is on the update queue
+        if (acquired) {         // Message is on the update queue
             m = getUpdateMessage();
-        else                    // Message at original position in original queue
+            m.queue = queue.get();
+            m.position = position;
+            if (enqueued) queue->enqueued(m); //inform queue of the message 
+        } else {                // Message at original position in original queue
             m = queue->find(position);
+        }
         if (!m.payload)
             throw Exception(QPID_MSG("deliveryRecord no update message"));
     }
@@ -339,17 +368,10 @@ void Connection::deliveryRecord(const string& qname,
     if (completed) dr.complete();
     if (ended) dr.setEnded();   // Exsitance of message
     semanticState().record(dr); // Part of the session's unacked list.
-
-    // If the message was unacked, the newbie broker must place
-    // it in its messageStore.
-    if ( m.payload && m.payload->isPersistent() && !completed && !ended && !accepted && !cancelled )
-        queue->enqueue ( 0, m.payload );
 }
 
 void Connection::queuePosition(const string& qname, const SequenceNumber& position) {
-    shared_ptr<broker::Queue> q = cluster.getBroker().getQueues().find(qname);
-    if (!q) throw InvalidArgumentException(QPID_MSG("Invalid queue name " << qname));
-    q->setPosition(position);
+    findQueue(qname)->setPosition(position);
 }
 
 void Connection::expiryId(uint64_t id) {
@@ -365,18 +387,21 @@ std::ostream& operator<<(std::ostream& o, const Connection& c) {
 }
 
 void Connection::txStart() {
-    txBuffer = make_shared_ptr(new broker::TxBuffer());
+    txBuffer.reset(new broker::TxBuffer());
 }
 void Connection::txAccept(const framing::SequenceSet& acked) {
-    txBuffer->enlist(make_shared_ptr(new broker::TxAccept(acked, semanticState().getUnacked())));
+    txBuffer->enlist(boost::shared_ptr<broker::TxAccept>(
+                         new broker::TxAccept(acked, semanticState().getUnacked())));
 }
 
 void Connection::txDequeue(const std::string& queue) {
-    txBuffer->enlist(make_shared_ptr(new broker::RecoveredDequeue(findQueue(queue), getUpdateMessage().payload)));
+    txBuffer->enlist(boost::shared_ptr<broker::RecoveredDequeue>(
+                         new broker::RecoveredDequeue(findQueue(queue), getUpdateMessage().payload)));
 }
 
 void Connection::txEnqueue(const std::string& queue) {
-    txBuffer->enlist(make_shared_ptr(new broker::RecoveredEnqueue(findQueue(queue), getUpdateMessage().payload)));
+    txBuffer->enlist(boost::shared_ptr<broker::RecoveredEnqueue>(
+                         new broker::RecoveredEnqueue(findQueue(queue), getUpdateMessage().payload)));
 }
 
 void Connection::txPublish(const framing::Array& queues, bool delivered) {
@@ -407,7 +432,20 @@ void Connection::queue(const std::string& encoded) {
     QPID_LOG(debug, cluster << " decoded queue " << q->getName());    
 }
 
-qpid::sys::AtomicValue<uint64_t> Connection::catchUpId(0x5000000000000000LL);
+void Connection::sessionError(uint16_t , const std::string& msg) {
+    cluster.flagError(*this, ERROR_TYPE_SESSION, msg);
+    
+}
 
-}} // namespace qpid::cluster
+void Connection::connectionError(const std::string& msg) {
+    cluster.flagError(*this, ERROR_TYPE_CONNECTION, msg);
+}
+
+void Connection::addQueueListener(const std::string& q, uint32_t listener) {
+    if (listener >= consumerNumbering.size())
+        throw Exception(QPID_MSG("Invalid listener ID: " << listener));
+    findQueue(q)->getListeners().addListener(consumerNumbering[listener]);
+}
+
+}} // Namespace qpid::cluster
 

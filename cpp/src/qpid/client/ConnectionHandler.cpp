@@ -160,6 +160,10 @@ void ConnectionHandler::heartbeat()
     // Do nothing - the purpose of heartbeats is just to make sure that there is some
     // traffic on the connection within the heart beat interval, we check for the
     // traffic and don't need to do anything in response to heartbeats
+
+    // Although the above is still true we're now using a received heartbeat as a trigger
+    // to send out our own heartbeat
+    proxy.heartbeat();
 }
 
 void ConnectionHandler::checkState(STATES s, const std::string& msg)

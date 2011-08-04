@@ -33,6 +33,8 @@
 #include "qmf/org/apache/qpid/broker/Agent.h"
 #include <qpid/framing/AMQFrame.h>
 #include <memory>
+#include <string>
+#include <map>
 
 namespace qpid {
 namespace management {
@@ -82,6 +84,11 @@ public:
 
     void setAllocator(std::auto_ptr<IdAllocator> allocator);
     uint64_t allocateId(Manageable* object);
+
+    /** Disallow a method. Attempts to call it will receive an exception with message. */
+    void disallow(const std::string& className, const std::string& methodName, const std::string& message);
+    void shutdown();
+                  
 private:
     friend class ManagementAgent;
 
@@ -185,6 +192,11 @@ private:
     const uint64_t               startTime;
 
     std::auto_ptr<IdAllocator> allocator;
+
+    typedef std::pair<std::string,std::string> MethodName;
+    typedef std::map<MethodName, std::string> DisallowedMethods;
+    DisallowedMethods disallowed;
+    bool shuttingDown;
 
 #   define MA_BUFFER_SIZE 65536
     char inputBuffer[MA_BUFFER_SIZE];

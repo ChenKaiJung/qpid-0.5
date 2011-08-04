@@ -48,6 +48,38 @@ namespace _qmf = qmf::org::apache::qpid::broker;
 namespace qpid {
 namespace broker {
 
+struct ConnectionTimeoutTask : public TimerTask {
+    Timer& timer;
+    Connection& connection;
+    AbsTime expires;
+
+    ConnectionTimeoutTask(uint16_t hb, Timer& t, Connection& c) :
+        TimerTask(Duration(hb*2*TIME_SEC)),
+        timer(t),
+        connection(c),
+        expires(AbsTime::now(), duration)
+    {}
+
+    void touch()
+    {
+        expires = AbsTime(AbsTime::now(), duration);
+    }
+
+    void fire() {
+        // This is the best we can currently do to avoid a destruction/fire race
+        if (isCancelled()) return;
+        if (expires < AbsTime::now()) {
+            // If we get here then we've not received any traffic in the timeout period
+            // Schedule closing the connection for the io thread
+            QPID_LOG(error, "Connection timed out: closing");
+            connection.abort();
+        } else {
+            reset();
+            timer.add(this);
+        }
+    }
+};
+
 Connection::Connection(ConnectionOutputHandler* out_, Broker& broker_, const std::string& mgmtId_, bool isLink_, uint64_t objectId) :
     ConnectionState(out_, broker_),
     adapter(*this, isLink_),
@@ -57,7 +89,9 @@ Connection::Connection(ConnectionOutputHandler* out_, Broker& broker_, const std
     mgmtObject(0),
     links(broker_.getLinks()),
     agent(0),
-    timer(broker_.getTimer())
+    timer(broker_.getTimer()),
+    errorListener(0),
+    shadow(false)
 {
     Manageable* parent = broker.GetVhostObject();
 
@@ -96,10 +130,15 @@ Connection::~Connection()
         links.notifyClosed(mgmtId);
         
     if (heartbeatTimer)
-        heartbeatTimer->cancel();
+        heartbeatTimer->cancelBlock();
+    if (timeoutTimer)
+        timeoutTimer->cancelBlock();
 }
 
 void Connection::received(framing::AMQFrame& frame) {
+    // Received frame on connection so delay timeout
+    restartTimeout();
+
     if (frame.getChannel() == 0 && frame.getMethod()) {
         adapter.handle(frame);
     } else {
@@ -180,7 +219,9 @@ void Connection::close(connection::CloseCode code, const string& text)
 {
     QPID_LOG_IF(error, code != connection::CLOSE_CODE_NORMAL, "Connection " << mgmtId << " closed by error: " << text << "(" << code << ")");
     if (heartbeatTimer)
-    	heartbeatTimer->cancel();
+    	heartbeatTimer->cancelBlock();
+    if (timeoutTimer)
+        timeoutTimer->cancel();
     adapter.close(code, text);
     //make sure we delete dangling pointers from outputTasks before deleting sessions
     outputTasks.removeAll();
@@ -191,7 +232,9 @@ void Connection::close(connection::CloseCode code, const string& text)
 // Send a close to the client but keep the channels. Used by cluster.
 void Connection::sendClose() {
     if (heartbeatTimer)
-    	heartbeatTimer->cancel();
+    	heartbeatTimer->cancelBlock();
+    if (timeoutTimer)
+        timeoutTimer->cancel();
     adapter.close(connection::CLOSE_CODE_NORMAL, "OK");
     getOutput().close();
 }
@@ -201,6 +244,10 @@ void Connection::idleOut(){}
 void Connection::idleIn(){}
 
 void Connection::closed(){ // Physically closed, suspend open sessions.
+    if (heartbeatTimer)
+        heartbeatTimer->cancelBlock();
+    if (timeoutTimer)
+        timeoutTimer->cancelBlock();
     try {
         while (!channels.empty()) 
             ptr_map_ptr(channels.begin())->handleDetach();
@@ -229,11 +276,13 @@ bool Connection::doOutput() {
             ioCallbacks.pop();
         }
         }
-        if (mgmtClosing)
+        if (mgmtClosing) {
+            closed();
             close(connection::CLOSE_CODE_CONNECTION_FORCED, "Closed by Management Request");
-        else
+        } else {
             //then do other output as needed:
             return outputTasks.doOutput();
+	}
     }catch(ConnectionException& e){
         close(e.code, e.getMessage());
     }catch(std::exception& e){
@@ -310,13 +359,32 @@ struct ConnectionHeartbeatTask : public TimerTask {
     }
 };
 
+void Connection::abort()
+{
+    // Make sure that we don't try to send a heartbeat as we're
+    // aborting the connection
+    if (heartbeatTimer)
+        heartbeatTimer->cancelBlock();
+
+    out.abort();
+}
+
 void Connection::setHeartbeatInterval(uint16_t heartbeat)
 {
     setHeartbeat(heartbeat);
-    if (heartbeat > 0) {
+    if (heartbeat > 0 && !isShadow()) {
     	heartbeatTimer = new ConnectionHeartbeatTask(heartbeat, timer, *this);
     	timer.add(heartbeatTimer);
+        timeoutTimer = new ConnectionTimeoutTask(heartbeat, timer, *this);
+        timer.add(timeoutTimer);
     }
+}
+
+
+void Connection::restartTimeout()
+{     
+    if (timeoutTimer)
+        timeoutTimer->touch();
 }
 
 }}

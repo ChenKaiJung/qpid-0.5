@@ -77,4 +77,6 @@ SessionId SessionBase_0_10::getId() const { return impl->getId(); }
 framing::FrameSet::shared_ptr SessionBase_0_10::get() { return impl->get(); }
 
 
+bool SessionBase_0_10::isValid() const { return impl; }
+
 }} // namespace qpid::client

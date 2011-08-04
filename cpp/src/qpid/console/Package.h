@@ -23,7 +23,6 @@
 
 #include <string>
 #include <map>
-#include "ConsoleImportExport.h"
 #include "qpid/sys/IntegerTypes.h"
 
 namespace qpid {

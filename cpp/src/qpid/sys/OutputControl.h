@@ -31,6 +31,7 @@ namespace sys {
     {
     public:
         virtual ~OutputControl() {}
+        virtual void abort() = 0;
         virtual void activateOutput() = 0;
         virtual void giveReadCredit(int32_t credit) = 0;
     };

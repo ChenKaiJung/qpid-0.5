@@ -22,7 +22,7 @@
  */
 
 #include "qpid/sys/IntegerTypes.h"
-#include "qpid/CommonImportExport.h"
+
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -45,9 +45,9 @@ private:
     AsynchAcceptorPrivate* impl;
 
 public:
-    QPID_COMMON_EXTERN AsynchAcceptor(const Socket& s, Callback callback);
-    QPID_COMMON_EXTERN ~AsynchAcceptor();
-    QPID_COMMON_EXTERN void start(boost::shared_ptr<Poller> poller);
+    AsynchAcceptor(const Socket& s, Callback callback);
+    ~AsynchAcceptor();
+    void start(boost::shared_ptr<Poller> poller);
 };
 
 /*
@@ -57,7 +57,7 @@ public:
 class AsynchConnector {
 public:
     typedef boost::function1<void, const Socket&> ConnectedCallback;
-    typedef boost::function2<void, int, std::string> FailedCallback;
+    typedef boost::function3<void, const Socket&, int, const std::string&> FailedCallback;
 
     // Call create() to allocate a new AsynchConnector object with the
     // specified poller, addressing, and callbacks.
@@ -65,12 +65,12 @@ public:
     // create a correctly typed object. The platform code also manages
     // deletes. To correctly manage heaps when needed, the allocate and
     // delete should both be done from the same class/library.
-    QPID_COMMON_EXTERN static AsynchConnector* create(const Socket& s,
+    static AsynchConnector* create(const Socket& s,
                                    boost::shared_ptr<Poller> poller,
                                    std::string hostname,
                                    uint16_t port,
                                    ConnectedCallback connCb,
-                                   FailedCallback failCb = 0);
+                                   FailedCallback failCb);
 
 protected:
     AsynchConnector() {}
@@ -121,7 +121,7 @@ public:
     // create a correctly typed object. The platform code also manages
     // deletes. To correctly manage heaps when needed, the allocate and
     // delete should both be done from the same class/library.
-    QPID_COMMON_EXTERN static AsynchIO* create(const Socket& s,
+    static AsynchIO* create(const Socket& s,
                             ReadCallback rCb,
                             EofCallback eofCb,
                             DisconnectCallback disCb,

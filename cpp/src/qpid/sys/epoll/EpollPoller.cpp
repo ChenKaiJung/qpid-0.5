@@ -131,6 +131,7 @@ PollerHandle::~PollerHandle() {
     if (impl->isDeleted()) {
     	return;
     }
+    impl->pollerHandle = 0;
     if (impl->isInterrupted()) {
         impl->setDeleted();
         return;
@@ -249,7 +250,7 @@ class PollerPrivate {
         // Add always readable fd into our set (but not listening to it yet)
         ::epoll_event epe;
         epe.events = 0;
-        epe.data.u64 = 0;
+        epe.data.u64 = 1;
         QPID_POSIX_CHECK(::epoll_ctl(epollFd, EPOLL_CTL_ADD, alwaysReadableFd, &epe));   
     }
 
@@ -271,7 +272,7 @@ class PollerPrivate {
         ::epoll_event epe;
         // Not EPOLLONESHOT, so we eventually get all threads
         epe.events = ::EPOLLIN;
-        epe.data.u64 = 0; // Keep valgrind happy
+        epe.data.u64 = 2; // Keep valgrind happy
         QPID_POSIX_CHECK(::epoll_ctl(epollFd, EPOLL_CTL_MOD, alwaysReadableFd, &epe));  
     }
 };
@@ -320,6 +321,11 @@ void Poller::delFd(PollerHandle& handle) {
 void Poller::modFd(PollerHandle& handle, Direction dir) {
     PollerHandlePrivate& eh = *handle.impl;
     ScopedLock<Mutex> l(eh.lock);
+
+    // If we are interrupting the handle don't allow us to monitor it
+    if (eh.isInterrupted())
+        return;
+
     assert(!eh.isIdle());
 
     ::epoll_event epe;
@@ -374,6 +380,7 @@ bool Poller::interrupt(PollerHandle& handle) {
 	    ::epoll_event epe;
 	    epe.events = 0;
 	    epe.data.u64 = 0; // Keep valgrind happy
+        epe.data.ptr = &eh;
 	    QPID_POSIX_CHECK(::epoll_ctl(impl->epollFd, EPOLL_CTL_MOD, eh.fd, &epe));
 	    eh.setInterrupted();
 	}
@@ -482,6 +489,7 @@ Poller::Event Poller::wait(Duration timeout) {
             // the handle could have gone inactive since we left the epoll_wait
             if (eh.isActive()) {
                 PollerHandle* handle = eh.pollerHandle;
+                assert(handle);
 
                 // If the connection has been hungup we could still be readable
                 // (just not writable), allow us to readable until we get here again

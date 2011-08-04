@@ -77,7 +77,7 @@ void MessageBuilder::handle(AMQFrame& frame)
             && message->getFrames().getContentSize() >= stagingThreshold
             && !NullMessageStore::isNullStore(store)) 
         {
-            message->releaseContent(store); 
+            message->releaseContent();
             staging = true;
         }
     }
@@ -93,6 +93,7 @@ void MessageBuilder::end()
 void MessageBuilder::start(const SequenceNumber& id)
 {
     message = intrusive_ptr<Message>(new Message(id));
+    message->setStore(store);
     state = METHOD;
     staging = false;
 }

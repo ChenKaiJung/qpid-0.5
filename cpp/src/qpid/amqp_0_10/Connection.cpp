@@ -103,6 +103,7 @@ size_t  Connection::encode(const char* buffer, size_t size) {
     return out.getPosition();
 }
 
+void Connection::abort() { output.abort(); }
 void  Connection::activateOutput() { output.activateOutput(); }
 void Connection::giveReadCredit(int32_t credit) { output.giveReadCredit(credit); }
 

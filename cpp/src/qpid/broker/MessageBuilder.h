@@ -21,7 +21,6 @@
 #ifndef _MessageBuilder_
 #define _MessageBuilder_
 
-#include "BrokerImportExport.h"
 #include "qpid/framing/FrameHandler.h"
 #include "qpid/framing/SequenceNumber.h"
 #include "qpid/RefCounted.h"
@@ -35,11 +34,10 @@ namespace qpid {
 
         class MessageBuilder : public framing::FrameHandler{
         public:
-            QPID_BROKER_EXTERN MessageBuilder(MessageStore* const store,
-                                              uint64_t stagingThreshold);
-            QPID_BROKER_EXTERN void handle(framing::AMQFrame& frame);
+            MessageBuilder(MessageStore* const store, uint64_t stagingThreshold);
+            void handle(framing::AMQFrame& frame);
             boost::intrusive_ptr<Message> getMessage() { return message; }
-            QPID_BROKER_EXTERN void start(const framing::SequenceNumber& id);
+            void start(const framing::SequenceNumber& id);
             void end();
         private:
             enum State {DORMANT, METHOD, HEADER, CONTENT};

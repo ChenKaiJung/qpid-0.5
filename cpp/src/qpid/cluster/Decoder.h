@@ -24,6 +24,7 @@
 
 #include "types.h"
 #include "qpid/framing/FrameDecoder.h"
+#include "qpid/sys/Mutex.h"
 #include <boost/function.hpp>
 #include <map>
 
@@ -44,10 +45,11 @@ class Decoder
     Decoder(FrameHandler fh) : callback(fh) {}
     void decode(const EventHeader& eh, const char* data);
     void erase(const ConnectionId&);
-    framing::FrameDecoder& get(const ConnectionId& c) { return map[c]; }
+    framing::FrameDecoder& get(const ConnectionId& c);
 
   private:
     typedef std::map<ConnectionId, framing::FrameDecoder> Map;
+    sys::Mutex lock;
     Map map;
     void process(const EventFrame&);
     FrameHandler callback;

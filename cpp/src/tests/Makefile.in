@@ -51,6 +51,25 @@
 # specific language governing permissions and limitations
 # under the License.
 #
+
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
 VPATH = @srcdir@
@@ -96,11 +115,14 @@ DIST_COMMON = README $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 
 # ais_check checks pre-requisites for cluster tests and runs them if ok.
 @HAVE_LIBCPG_TRUE@am__append_2 = ais_check federated_cluster_test clustered_replication_test
-@HAVE_LIBCPG_TRUE@am__append_3 = cluster_test
-@HAVE_LIBCPG_TRUE@am__append_4 = ../cluster.la
-@HAVE_LIBCPG_TRUE@am__append_5 = start_cluster cluster_python_tests stop_cluster
-@SSL_TRUE@am__append_6 = ssl_test
+@HAVE_LIBCPG_TRUE@am__append_3 = ais_check start_cluster stop_cluster restart_cluster cluster_python_tests cluster_python_tests_failing.txt \
+@HAVE_LIBCPG_TRUE@  federated_cluster_test clustered_replication_test
+
+@HAVE_LIBCPG_TRUE@am__append_4 = cluster_test
+@HAVE_LIBCPG_TRUE@am__append_5 = ../cluster.la
+@HAVE_LIBCPG_TRUE@am__append_6 = start_cluster cluster_python_tests stop_cluster
 @SSL_TRUE@am__append_7 = ssl_test
+@SSL_TRUE@am__append_8 = ssl_test
 subdir = src/tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/clock_time.m4 \
@@ -118,84 +140,88 @@ libdlclose_noop_la_OBJECTS = $(am_libdlclose_noop_la_OBJECTS)
 libshlibtest_la_LIBADD =
 am_libshlibtest_la_OBJECTS = shlibtest.lo
 libshlibtest_la_OBJECTS = $(am_libshlibtest_la_OBJECTS)
+am__DEPENDENCIES_1 = $(abs_builddir)/../libqpidbroker.la
+test_store_la_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am_test_store_la_OBJECTS = test_store.lo
+test_store_la_OBJECTS = $(am_test_store_la_OBJECTS)
 @HAVE_LIBCPG_TRUE@am__EXEEXT_1 = cluster_test$(EXEEXT)
 am_DispatcherTest_OBJECTS = DispatcherTest.$(OBJEXT)
 DispatcherTest_OBJECTS = $(am_DispatcherTest_OBJECTS)
-am__DEPENDENCIES_1 = $(abs_builddir)/../libqpidcommon.la
-am__DEPENDENCIES_2 =
-DispatcherTest_DEPENDENCIES = $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_2)
+am__DEPENDENCIES_2 = $(abs_builddir)/../libqpidcommon.la
+am__DEPENDENCIES_3 =
+DispatcherTest_DEPENDENCIES = $(am__DEPENDENCIES_2) \
+	$(am__DEPENDENCIES_3)
 am_PollerTest_OBJECTS = PollerTest.$(OBJEXT)
 PollerTest_OBJECTS = $(am_PollerTest_OBJECTS)
-PollerTest_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2)
+PollerTest_DEPENDENCIES = $(am__DEPENDENCIES_2) $(am__DEPENDENCIES_3)
 am_client_test_OBJECTS = client_test.$(OBJEXT)
 client_test_OBJECTS = $(am_client_test_OBJECTS)
-am__DEPENDENCIES_3 = $(abs_builddir)/../libqpidclient.la
-client_test_DEPENDENCIES = $(am__DEPENDENCIES_3)
-am__cluster_test_SOURCES_DIST = unit_test.cpp cluster_test.cpp \
-	ClusterFixture.cpp ClusterFixture.h ForkedBroker.h \
-	ForkedBroker.cpp
+am__DEPENDENCIES_4 = $(abs_builddir)/../libqpidclient.la
+client_test_DEPENDENCIES = $(am__DEPENDENCIES_4)
+am__cluster_test_SOURCES_DIST = unit_test.cpp ClusterFixture.cpp \
+	ClusterFixture.h ForkedBroker.h ForkedBroker.cpp \
+	cluster_test.cpp PartialFailure.cpp
 @HAVE_LIBCPG_TRUE@am_cluster_test_OBJECTS = unit_test.$(OBJEXT) \
-@HAVE_LIBCPG_TRUE@	cluster_test.$(OBJEXT) \
 @HAVE_LIBCPG_TRUE@	ClusterFixture.$(OBJEXT) \
-@HAVE_LIBCPG_TRUE@	ForkedBroker.$(OBJEXT)
+@HAVE_LIBCPG_TRUE@	ForkedBroker.$(OBJEXT) \
+@HAVE_LIBCPG_TRUE@	cluster_test.$(OBJEXT) \
+@HAVE_LIBCPG_TRUE@	PartialFailure.$(OBJEXT)
 cluster_test_OBJECTS = $(am_cluster_test_OBJECTS)
-@HAVE_LIBCPG_TRUE@cluster_test_DEPENDENCIES = $(am__DEPENDENCIES_3) \
-@HAVE_LIBCPG_TRUE@	../cluster.la
+@HAVE_LIBCPG_TRUE@cluster_test_DEPENDENCIES = $(am__DEPENDENCIES_4) \
+@HAVE_LIBCPG_TRUE@	../cluster.la test_store.la
 am_consume_OBJECTS = consume.$(OBJEXT)
 consume_OBJECTS = $(am_consume_OBJECTS)
-consume_DEPENDENCIES = $(am__DEPENDENCIES_3)
+consume_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am_declare_queues_OBJECTS = declare_queues.$(OBJEXT)
 declare_queues_OBJECTS = $(am_declare_queues_OBJECTS)
-declare_queues_DEPENDENCIES = $(am__DEPENDENCIES_3)
+declare_queues_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am_echotest_OBJECTS = echotest.$(OBJEXT)
 echotest_OBJECTS = $(am_echotest_OBJECTS)
-echotest_DEPENDENCIES = $(am__DEPENDENCIES_3)
+echotest_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am_failover_soak_OBJECTS = failover_soak.$(OBJEXT) \
 	ForkedBroker.$(OBJEXT)
 failover_soak_OBJECTS = $(am_failover_soak_OBJECTS)
-am__DEPENDENCIES_4 = $(abs_builddir)/../libqpidbroker.la
-failover_soak_DEPENDENCIES = $(am__DEPENDENCIES_3) \
-	$(am__DEPENDENCIES_4)
+failover_soak_DEPENDENCIES = $(am__DEPENDENCIES_4) \
+	$(am__DEPENDENCIES_1)
 am_header_test_OBJECTS = header_test.$(OBJEXT)
 header_test_OBJECTS = $(am_header_test_OBJECTS)
-header_test_DEPENDENCIES = $(am__DEPENDENCIES_3)
+header_test_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am_latencytest_OBJECTS = latencytest.$(OBJEXT)
 latencytest_OBJECTS = $(am_latencytest_OBJECTS)
-latencytest_DEPENDENCIES = $(am__DEPENDENCIES_3)
+latencytest_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am_perftest_OBJECTS = perftest.$(OBJEXT)
 perftest_OBJECTS = $(am_perftest_OBJECTS)
-perftest_DEPENDENCIES = $(am__DEPENDENCIES_3)
+perftest_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am_publish_OBJECTS = publish.$(OBJEXT)
 publish_OBJECTS = $(am_publish_OBJECTS)
-publish_DEPENDENCIES = $(am__DEPENDENCIES_3)
+publish_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am_receiver_OBJECTS = receiver.$(OBJEXT)
 receiver_OBJECTS = $(am_receiver_OBJECTS)
-receiver_DEPENDENCIES = $(am__DEPENDENCIES_3)
+receiver_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am_replaying_sender_OBJECTS = replaying_sender.$(OBJEXT)
 replaying_sender_OBJECTS = $(am_replaying_sender_OBJECTS)
-replaying_sender_DEPENDENCIES = $(am__DEPENDENCIES_3)
+replaying_sender_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am_resuming_receiver_OBJECTS = resuming_receiver.$(OBJEXT)
 resuming_receiver_OBJECTS = $(am_resuming_receiver_OBJECTS)
-resuming_receiver_DEPENDENCIES = $(am__DEPENDENCIES_3)
+resuming_receiver_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am_sender_OBJECTS = sender.$(OBJEXT)
 sender_OBJECTS = $(am_sender_OBJECTS)
-sender_DEPENDENCIES = $(am__DEPENDENCIES_3)
+sender_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am_topic_listener_OBJECTS = topic_listener.$(OBJEXT)
 topic_listener_OBJECTS = $(am_topic_listener_OBJECTS)
-topic_listener_DEPENDENCIES = $(am__DEPENDENCIES_3)
+topic_listener_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am_topic_publisher_OBJECTS = topic_publisher.$(OBJEXT)
 topic_publisher_OBJECTS = $(am_topic_publisher_OBJECTS)
-topic_publisher_DEPENDENCIES = $(am__DEPENDENCIES_3)
+topic_publisher_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am_txjob_OBJECTS = txjob.$(OBJEXT)
 txjob_OBJECTS = $(am_txjob_OBJECTS)
-txjob_DEPENDENCIES = $(am__DEPENDENCIES_3)
+txjob_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am_txshift_OBJECTS = txshift.$(OBJEXT)
 txshift_OBJECTS = $(am_txshift_OBJECTS)
-txshift_DEPENDENCIES = $(am__DEPENDENCIES_3)
+txshift_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am_txtest_OBJECTS = txtest.$(OBJEXT)
 txtest_OBJECTS = $(am_txtest_OBJECTS)
-txtest_DEPENDENCIES = $(am__DEPENDENCIES_3)
+txtest_DEPENDENCIES = $(am__DEPENDENCIES_4)
 am__unit_test_SOURCES_DIST = unit_test.cpp unit_test.h BrokerFixture.h \
 	SocketProxy.h exception_test.cpp RefCounted.cpp \
 	SessionState.cpp logging.cpp AsyncCompletion.cpp Url.cpp \
@@ -240,7 +266,7 @@ am_unit_test_OBJECTS = unit_test.$(OBJEXT) exception_test.$(OBJEXT) \
 unit_test_OBJECTS = $(am_unit_test_OBJECTS)
 am__DEPENDENCIES_5 = $(abs_builddir)/../libqmfconsole.la
 @HAVE_LIBCPG_TRUE@am__DEPENDENCIES_6 = ../cluster.la
-unit_test_DEPENDENCIES = $(am__DEPENDENCIES_3) $(am__DEPENDENCIES_4) \
+unit_test_DEPENDENCIES = $(am__DEPENDENCIES_4) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_5) $(am__DEPENDENCIES_6)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)/src
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
@@ -262,20 +288,9 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libdlclose_noop_la_SOURCES) $(libshlibtest_la_SOURCES) \
-	$(DispatcherTest_SOURCES) $(PollerTest_SOURCES) \
-	$(client_test_SOURCES) $(cluster_test_SOURCES) \
-	$(consume_SOURCES) $(declare_queues_SOURCES) \
-	$(echotest_SOURCES) $(failover_soak_SOURCES) \
-	$(header_test_SOURCES) $(latencytest_SOURCES) \
-	$(perftest_SOURCES) $(publish_SOURCES) $(receiver_SOURCES) \
-	$(replaying_sender_SOURCES) $(resuming_receiver_SOURCES) \
-	$(sender_SOURCES) $(topic_listener_SOURCES) \
-	$(topic_publisher_SOURCES) $(txjob_SOURCES) $(txshift_SOURCES) \
-	$(txtest_SOURCES) $(unit_test_SOURCES)
-DIST_SOURCES = $(libdlclose_noop_la_SOURCES) \
-	$(libshlibtest_la_SOURCES) $(DispatcherTest_SOURCES) \
+	$(test_store_la_SOURCES) $(DispatcherTest_SOURCES) \
 	$(PollerTest_SOURCES) $(client_test_SOURCES) \
-	$(am__cluster_test_SOURCES_DIST) $(consume_SOURCES) \
+	$(cluster_test_SOURCES) $(consume_SOURCES) \
 	$(declare_queues_SOURCES) $(echotest_SOURCES) \
 	$(failover_soak_SOURCES) $(header_test_SOURCES) \
 	$(latencytest_SOURCES) $(perftest_SOURCES) $(publish_SOURCES) \
@@ -283,7 +298,19 @@ DIST_SOURCES = $(libdlclose_noop_la_SOURCES) \
 	$(resuming_receiver_SOURCES) $(sender_SOURCES) \
 	$(topic_listener_SOURCES) $(topic_publisher_SOURCES) \
 	$(txjob_SOURCES) $(txshift_SOURCES) $(txtest_SOURCES) \
-	$(am__unit_test_SOURCES_DIST)
+	$(unit_test_SOURCES)
+DIST_SOURCES = $(libdlclose_noop_la_SOURCES) \
+	$(libshlibtest_la_SOURCES) $(test_store_la_SOURCES) \
+	$(DispatcherTest_SOURCES) $(PollerTest_SOURCES) \
+	$(client_test_SOURCES) $(am__cluster_test_SOURCES_DIST) \
+	$(consume_SOURCES) $(declare_queues_SOURCES) \
+	$(echotest_SOURCES) $(failover_soak_SOURCES) \
+	$(header_test_SOURCES) $(latencytest_SOURCES) \
+	$(perftest_SOURCES) $(publish_SOURCES) $(receiver_SOURCES) \
+	$(replaying_sender_SOURCES) $(resuming_receiver_SOURCES) \
+	$(sender_SOURCES) $(topic_listener_SOURCES) \
+	$(topic_publisher_SOURCES) $(txjob_SOURCES) $(txshift_SOURCES) \
+	$(txtest_SOURCES) $(am__unit_test_SOURCES_DIST)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -448,14 +475,7 @@ lib_client = $(abs_builddir)/../libqpidclient.la
 lib_common = $(abs_builddir)/../libqpidcommon.la
 lib_broker = $(abs_builddir)/../libqpidbroker.la
 lib_console = $(abs_builddir)/../libqmfconsole.la
-
-# Disabled till we move to amqp_0_10 codec.
-# 	amqp_0_10/serialize.cpp allSegmentTypes.h \
-# 	amqp_0_10/ProxyTemplate.cpp \
-# 	amqp_0_10/apply.cpp \
-# 	amqp_0_10/Map.cpp \
-# 	amqp_0_10/handlers.cpp 
-check_LTLIBRARIES = libshlibtest.la libdlclose_noop.la
+check_LTLIBRARIES = libshlibtest.la test_store.la libdlclose_noop.la
 
 #
 # Unit test program
@@ -464,45 +484,20 @@ check_LTLIBRARIES = libshlibtest.la libdlclose_noop.la
 # when running the tests. If you want to build a subset of the tests do 
 #   rm -f unit_test; make unit_test unit_test_OBJECTS="unit_test.o SelectedTest.o"
 # 
-TESTS = unit_test $(am__append_2) $(am__append_6) start_broker \
+TESTS = unit_test $(am__append_2) $(am__append_7) start_broker \
 	$(system_tests) python_tests stop_broker run_federation_tests \
 	run_acl_tests run_cli_tests replication_test
-
-#
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
-#
-EXTRA_DIST = ais_check start_cluster stop_cluster restart_cluster \
-	cluster_python_tests cluster_python_tests_failing.txt \
-	federated_cluster_test clustered_replication_test \
-	$(am__append_7) run_test vg_check run-unit-tests start_broker \
-	python_tests stop_broker quick_topictest quick_perftest \
-	quick_txtest topictest run_header_test header_test.py ssl_test \
-	config.null ais_check run_federation_tests run_cli_tests \
-	run_acl_tests .valgrind.supp MessageUtils.h TestMessageStore.h \
-	TxMocks.h replication_test run_perftest fanout_perftest \
-	shared_perftest multiq_perftest topic_perftest \
-	run_failover_soak reliable_replication_test \
-	federated_cluster_test_with_node_failure tests.sln \
-	client_test.vcproj consume.vcproj echotest.vcproj \
-	header_test.vcproj latencytest.vcproj perftest.vcproj \
-	publish.vcproj receiver.vcproj sender.vcproj shlibtest.vcproj \
-	topic_listener.vcproj topic_publisher.vcproj txjob.vcproj \
-	txshift.vcproj txtest.vcproj unit_test.vcproj
+# TODO: renable the temporarily disabled the failing reliable_replication_test when QPID-1984 is resolved.
+EXTRA_DIST = $(am__append_3) $(am__append_8) run_test vg_check \
+	run-unit-tests start_broker python_tests stop_broker \
+	quick_topictest quick_perftest quick_txtest topictest \
+	run_header_test header_test.py ssl_test config.null ais_check \
+	run_federation_tests run_cli_tests run_acl_tests \
+	.valgrind.supp MessageUtils.h TestMessageStore.h TxMocks.h \
+	replication_test run_perftest fanout_perftest shared_perftest \
+	multiq_perftest topic_perftest run_failover_soak \
+	reliable_replication_test \
+	federated_cluster_test_with_node_failure
 CLEANFILES = valgrind.out *.log *.vglog* dummy_test $(unit_wrappers)
 
 # FIXME aconway 2008-05-23: Disabled interop_runner because it uses
@@ -524,12 +519,12 @@ CLEANFILES = valgrind.out *.log *.vglog* dummy_test $(unit_wrappers)
 
 # Longer running stability tests, not run by default check: target.
 # Not run under valgrind, too slow
-LONG_TESTS = $(am__append_5) start_broker fanout_perftest \
+LONG_TESTS = $(am__append_6) start_broker fanout_perftest \
 	shared_perftest multiq_perftest topic_perftest \
-	run_failover_soak stop_broker reliable_replication_test \
+	run_ring_queue_test stop_broker run_failover_soak \
 	federated_cluster_test_with_node_failure
 unit_test_LDADD = -lboost_unit_test_framework -lboost_regex \
-	$(lib_client) $(lib_broker) $(lib_console) $(am__append_4)
+	$(lib_client) $(lib_broker) $(lib_console) $(am__append_5)
 unit_test_SOURCES = unit_test.cpp unit_test.h BrokerFixture.h \
 	SocketProxy.h exception_test.cpp RefCounted.cpp \
 	SessionState.cpp logging.cpp AsyncCompletion.cpp Url.cpp \
@@ -548,10 +543,23 @@ unit_test_SOURCES = unit_test.cpp unit_test.h BrokerFixture.h \
 	QueueEvents.cpp ProxyTest.cpp RetryList.cpp \
 	RateFlowcontrolTest.cpp FrameDecoder.cpp ReplicationTest.cpp \
 	$(am__append_1)
-libshlibtest_la_LDFLAGS = -module -rpath $(abs_builddir)
+
+# Disabled till we move to amqp_0_10 codec.
+# 	amqp_0_10/serialize.cpp allSegmentTypes.h \
+# 	amqp_0_10/ProxyTemplate.cpp \
+# 	amqp_0_10/apply.cpp \
+# 	amqp_0_10/Map.cpp \
+# 	amqp_0_10/handlers.cpp 
+TESTLIBFLAGS = -module -rpath $(abs_builddir)
+libshlibtest_la_LDFLAGS = $(TESTLIBFLAGS)
 libshlibtest_la_SOURCES = shlibtest.cpp
-@HAVE_LIBCPG_TRUE@cluster_test_SOURCES = unit_test.cpp cluster_test.cpp ClusterFixture.cpp ClusterFixture.h ForkedBroker.h ForkedBroker.cpp
-@HAVE_LIBCPG_TRUE@cluster_test_LDADD = $(lib_client) ../cluster.la -lboost_unit_test_framework 
+test_store_la_SOURCES = test_store.cpp
+test_store_la_LIBADD = $(lib_broker)
+test_store_la_LDFLAGS = $(TESTLIBFLAGS)
+@HAVE_LIBCPG_TRUE@cluster_test_SOURCES = unit_test.cpp ClusterFixture.cpp ClusterFixture.h ForkedBroker.h ForkedBroker.cpp \
+@HAVE_LIBCPG_TRUE@	cluster_test.cpp PartialFailure.cpp
+
+@HAVE_LIBCPG_TRUE@cluster_test_LDADD = $(lib_client) ../cluster.la test_store.la -lboost_unit_test_framework 
 perftest_SOURCES = perftest.cpp test_tools.h TestOptions.h ConnectionOptions.h
 perftest_LDADD = $(lib_client) 
 txtest_SOURCES = txtest.cpp  TestOptions.h ConnectionOptions.h
@@ -642,6 +650,8 @@ libdlclose_noop.la: $(libdlclose_noop_la_OBJECTS) $(libdlclose_noop_la_DEPENDENC
 	$(LINK)  $(libdlclose_noop_la_LDFLAGS) $(libdlclose_noop_la_OBJECTS) $(libdlclose_noop_la_LIBADD) $(LIBS)
 libshlibtest.la: $(libshlibtest_la_OBJECTS) $(libshlibtest_la_DEPENDENCIES) 
 	$(CXXLINK)  $(libshlibtest_la_LDFLAGS) $(libshlibtest_la_OBJECTS) $(libshlibtest_la_LIBADD) $(LIBS)
+test_store.la: $(test_store_la_OBJECTS) $(test_store_la_DEPENDENCIES) 
+	$(CXXLINK)  $(test_store_la_LDFLAGS) $(test_store_la_OBJECTS) $(test_store_la_LIBADD) $(LIBS)
 
 clean-checkPROGRAMS:
 	@list='$(check_PROGRAMS)'; for p in $$list; do \
@@ -747,6 +757,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MessageBuilderTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MessageReplayTracker.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MessageTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PartialFailure.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PollerTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProxyTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/QueueEvents.Po@am__quote@
@@ -789,6 +800,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/resuming_receiver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sender.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/shlibtest.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_store.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/topic_listener.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/topic_publisher.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/txjob.Po@am__quote@

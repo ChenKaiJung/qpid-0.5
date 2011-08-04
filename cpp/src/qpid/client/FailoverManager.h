@@ -27,7 +27,6 @@
 #include "qpid/Exception.h"
 #include "qpid/client/AsyncSession.h"
 #include "qpid/sys/Monitor.h"
-#include "qpid/client/ClientImportExport.h"
 #include <vector>
 
 namespace qpid {
@@ -85,7 +84,7 @@ class FailoverManager
      * to edit or reorder the list of urls to which reconnection is
      * attempted
      */
-    QPID_CLIENT_EXTERN FailoverManager(const ConnectionSettings& settings, ReconnectionStrategy* strategy = 0);
+    FailoverManager(const ConnectionSettings& settings, ReconnectionStrategy* strategy = 0);
     /**
      * Return the current connection if open or attept to reconnect to
      * the specified list of urls. If no list is specified the list of
@@ -96,15 +95,15 @@ class FailoverManager
      * If the full list is tried and all attempts fail,
      * CannotConnectException is thrown.
      */
-    QPID_CLIENT_EXTERN Connection& connect(std::vector<Url> brokers = std::vector<Url>());
+    Connection& connect(std::vector<Url> brokers = std::vector<Url>());
     /**
      * Return the current connection whether open or not
      */
-    QPID_CLIENT_EXTERN Connection& getConnection();
+    Connection& getConnection();
     /**
      * Close the current connection
      */
-    QPID_CLIENT_EXTERN void close();
+    void close();
     /**
      * Reliably execute the specified command. This involves creating
      * a session on which to carry out the work of the command,
@@ -117,7 +116,7 @@ class FailoverManager
      * on failover to ensure they continue to use the same logical
      * connection.
      */
-    QPID_CLIENT_EXTERN void execute(Command&);
+    void execute(Command&);
   private:
     enum State {IDLE, CONNECTING, CANT_CONNECT};
 

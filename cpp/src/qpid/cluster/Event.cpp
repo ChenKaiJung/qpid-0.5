@@ -87,7 +87,7 @@ Event Event::control(const framing::AMQBody& body, const ConnectionId& cid) {
     return control(framing::AMQFrame(body), cid);
 }
 
-iovec Event::toIovec() {
+iovec Event::toIovec() const {
     encodeHeader();
     iovec iov = { const_cast<char*>(getStore()), getStoreSize() };
     return iov;
@@ -103,8 +103,8 @@ void EventHeader::encode(Buffer& b) const {
 }
 
 // Encode my header in my buffer.
-void Event::encodeHeader () {
-    Buffer b(getStore(), HEADER_SIZE);
+void Event::encodeHeader () const {
+    Buffer b(const_cast<char*>(getStore()), HEADER_SIZE);
     encode(b);
     assert(b.getPosition() == HEADER_SIZE);
 }
@@ -113,11 +113,12 @@ Event::operator Buffer() const  {
     return Buffer(const_cast<char*>(getData()), getSize());
 }
 
-AMQFrame Event::getFrame() const {
+const AMQFrame& Event::getFrame() const {
     assert(type == CONTROL);
-    Buffer buf(*this);
-    AMQFrame frame;
-    QPID_ASSERT(frame.decode(buf));
+    if (!frame.getBody()) {
+        Buffer buf(*this);
+        QPID_ASSERT(frame.decode(buf));
+    }
     return frame;
 }
 
@@ -128,8 +129,17 @@ std::ostream& operator << (std::ostream& o, EventType t) {
 }
 
 std::ostream& operator << (std::ostream& o, const EventHeader& e) {
-    o << "Event[" << e.getConnectionId() << " " << e.getType() << " " << e.getSize() << " bytes]";
-    return o;
+    return o << "Event[" << e.getConnectionId() << " " << e.getType()
+             << " " << e.getSize() << " bytes]";
+}
+
+std::ostream& operator << (std::ostream& o, const Event& e) {
+    o << "Event[" << e.getConnectionId() << " ";
+    if (e.getType() == CONTROL)
+        o << e.getFrame();
+    else
+        o << " data " << e.getSize() << " bytes";
+    return o << "]";
 }
 
 }} // namespace qpid::cluster

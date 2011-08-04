@@ -257,6 +257,7 @@ SemanticState::ConsumerImpl::ConsumerImpl(SemanticState* _parent,
     msgCredit(0), 
     byteCredit(0),
     notifyEnabled(true),
+    queueHasMessages(1),
     syncFrequency(_arguments.getAsInt("qpid.sync_frequency")),
     deliveryCount(0) {}
 
@@ -346,6 +347,9 @@ void SemanticState::handle(intrusive_ptr<Message> msg) {
     } else {
         DeliverableMessage deliverable(msg);
         route(msg, deliverable);
+        if (msg->checkContentReleasable()) {
+            msg->releaseContent();
+        }
     }
 }
 
@@ -408,12 +412,13 @@ void SemanticState::requestDispatch(ConsumerImpl& c)
         outputTasks.activateOutput();
 }
 
-void SemanticState::complete(DeliveryRecord& delivery)
+bool SemanticState::complete(DeliveryRecord& delivery)
 {    
     ConsumerImplMap::iterator i = consumers.find(delivery.getTag());
     if (i != consumers.end()) {
         i->second->complete(delivery);
     }
+    return delivery.isRedundant();
 }
 
 void SemanticState::ConsumerImpl::complete(DeliveryRecord& delivery)
@@ -440,7 +445,7 @@ void SemanticState::recover(bool requeue)
         //unconfirmed messages re redelivered and therefore have their
         //id adjusted, confirmed messages are not and so the ordering
         //w.r.t id is lost
-        unacked.sort();
+        sort(unacked.begin(), unacked.end());
     }
 }
 
@@ -523,7 +528,7 @@ void SemanticState::ConsumerImpl::addMessageCredit(uint32_t value)
 
 bool SemanticState::ConsumerImpl::haveCredit()
 {
-    if (msgCredit) {
+    if (msgCredit && byteCredit) {
         return true;
     } else {
         blocked = true;
@@ -591,7 +596,11 @@ bool SemanticState::ConsumerImpl::hasOutput() {
 
 bool SemanticState::ConsumerImpl::doOutput()
 {
-    return haveCredit() && queue->dispatch(shared_from_this());
+    if (!haveCredit() || !queueHasMessages.boolCompareAndSwap(1, 0))
+        return false;
+    if (queue->dispatch(shared_from_this()))
+        queueHasMessages.boolCompareAndSwap(0, 1);
+    return queueHasMessages.get();
 }
 
 void SemanticState::ConsumerImpl::enableNotify()
@@ -613,6 +622,8 @@ bool SemanticState::ConsumerImpl::isNotifyEnabled() const {
 
 void SemanticState::ConsumerImpl::notify()
 {
+    queueHasMessages.boolCompareAndSwap(0, 1);
+
     //TODO: alter this, don't want to hold locks across external
     //calls; for now its is required to protect the notify() from
     //having part of the object chain of the invocation being
@@ -638,24 +649,23 @@ void SemanticState::accepted(DeliveryId first, DeliveryId last)
             dtxBuffer->enlist(txAck);    
 
             //mark the relevant messages as 'ended' in unacked
-            for_each(range.start, range.end, mem_fun_ref(&DeliveryRecord::setEnded));
-
             //if the messages are already completed, they can be
             //removed from the record
-            unacked.remove_if(mem_fun_ref(&DeliveryRecord::isRedundant));
-
+            DeliveryRecords::iterator removed = remove_if(range.start, range.end, mem_fun_ref(&DeliveryRecord::setEnded));
+            unacked.erase(removed, range.end);
         }
     } else {
-        for_each(range.start, range.end, boost::bind(&DeliveryRecord::accept, _1, (TransactionContext*) 0));
-        unacked.remove_if(mem_fun_ref(&DeliveryRecord::isRedundant));
+        DeliveryRecords::iterator removed = remove_if(range.start, range.end, boost::bind(&DeliveryRecord::accept, _1, (TransactionContext*) 0));
+        unacked.erase(removed, range.end);
     }
 }
 
 void SemanticState::completed(DeliveryId first, DeliveryId last)
 {
     AckRange range = findRange(first, last);
-    for_each(range.start, range.end, boost::bind(&SemanticState::complete, this, _1));
-    unacked.remove_if(mem_fun_ref(&DeliveryRecord::isRedundant));
+    
+    DeliveryRecords::iterator removed = remove_if(range.start, range.end, boost::bind(&SemanticState::complete, this, _1));
+    unacked.erase(removed, range.end);
     requestDispatch();
 }
 

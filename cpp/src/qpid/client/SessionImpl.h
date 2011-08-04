@@ -120,6 +120,9 @@ public:
      */
     shared_ptr<ConnectionImpl> getConnection();
 
+    /** Suppress sending detach in destructor. Used by cluster to build session state */
+    void disableAutoDetach();
+
 private:
     enum State {
         INACTIVE,
@@ -233,6 +236,8 @@ private:
     // Only keep track of message credit 
     sys::Semaphore* sendMsgCredit;
 
+    bool autoDetach;
+    
   friend class client::SessionHandler;
 };
 

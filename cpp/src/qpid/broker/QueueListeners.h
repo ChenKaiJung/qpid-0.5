@@ -55,6 +55,13 @@ class QueueListeners
     void addListener(Consumer::shared_ptr);    
     void removeListener(Consumer::shared_ptr);    
     void populate(NotificationSet&);
+    bool contains(Consumer::shared_ptr c) const;
+
+    template <class F> void eachListener(F f) {
+        std::for_each(browsers.begin(), browsers.end(), f);
+        std::for_each(consumers.begin(), consumers.end(), f);
+    }
+
   private:
     Listeners consumers;
     Listeners browsers;

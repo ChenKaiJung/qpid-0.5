@@ -23,12 +23,11 @@
 #include "ManagementObject.h"
 #include "Args.h"
 #include <string>
-#include "qpid/CommonImportExport.h"
 
 namespace qpid { 
 namespace management {
 
-class QPID_COMMON_EXTERN Manageable
+class Manageable
 {
   public:
 

@@ -25,7 +25,6 @@
 #include "qpid/client/Session.h"
 #include "qpid/framing/MessageTransferBody.h"
 #include "qpid/framing/TransferContent.h"
-#include "qpid/client/ClientImportExport.h"
 
 namespace qpid {
 namespace client {
@@ -112,7 +111,7 @@ public:
      *@param data Data for the message body.
      *@param routingKey Passed to the exchange that routes the message.
      */
-    QPID_CLIENT_EXTERN Message(const std::string& data=std::string(),
+    Message(const std::string& data=std::string(),
             const std::string& routingKey=std::string());
 
     /** The destination of messages sent to the broker is the exchange
@@ -120,26 +119,26 @@ public:
      * the delivery tag identifyig the local subscription (often this
      * is the name of the subscribed queue.)
      */
-    QPID_CLIENT_EXTERN std::string getDestination() const;
+    std::string getDestination() const;
 
     /** Check the redelivered flag. */
-    QPID_CLIENT_EXTERN bool isRedelivered() const;
+    bool isRedelivered() const;
     /** Set the redelivered flag. */
-    QPID_CLIENT_EXTERN void setRedelivered(bool redelivered);
+    void setRedelivered(bool redelivered);
 
     /** Get a modifyable reference to the message headers. */
-    QPID_CLIENT_EXTERN framing::FieldTable& getHeaders();
+    framing::FieldTable& getHeaders();
 
     /** Get a non-modifyable reference to the message headers. */
-    QPID_CLIENT_EXTERN const framing::FieldTable& getHeaders() const;
+    const framing::FieldTable& getHeaders() const;
 
     ///@internal
-    QPID_CLIENT_EXTERN const framing::MessageTransferBody& getMethod() const;
+    const framing::MessageTransferBody& getMethod() const;
     ///@internal
-    QPID_CLIENT_EXTERN const framing::SequenceNumber& getId() const;
+    const framing::SequenceNumber& getId() const;
 
     /**@internal for incoming messages */
-    QPID_CLIENT_EXTERN Message(const framing::FrameSet& frameset);
+    Message(const framing::FrameSet& frameset);
     
 private:
     //method and id are only set for received messages:

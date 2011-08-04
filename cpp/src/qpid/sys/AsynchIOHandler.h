@@ -25,7 +25,6 @@
 #include "ConnectionCodec.h"
 #include "AtomicValue.h"
 #include "Mutex.h"
-#include "qpid/CommonImportExport.h"
 
 namespace qpid {
 
@@ -53,26 +52,26 @@ class AsynchIOHandler : public OutputControl {
     void write(const framing::ProtocolInitiation&);
 
   public:
-    QPID_COMMON_EXTERN AsynchIOHandler(std::string id, ConnectionCodec::Factory* f);
-    QPID_COMMON_EXTERN ~AsynchIOHandler();
-    QPID_COMMON_EXTERN void init(AsynchIO* a, int numBuffs);
+    AsynchIOHandler(std::string id, ConnectionCodec::Factory* f);
+    ~AsynchIOHandler();
+    void init(AsynchIO* a, int numBuffs);
 
-    QPID_COMMON_EXTERN void setClient() { isClient = true; }
+    void setClient() { isClient = true; }
 
     // Output side
-    QPID_COMMON_EXTERN void close();
-    QPID_COMMON_EXTERN void activateOutput();
-    QPID_COMMON_EXTERN void giveReadCredit(int32_t credit);
+    void abort();
+    void activateOutput();
+    void giveReadCredit(int32_t credit);
 
     // Input side
-    QPID_COMMON_EXTERN bool readbuff(AsynchIO& aio, AsynchIOBufferBase* buff);
-    QPID_COMMON_EXTERN void eof(AsynchIO& aio);
-    QPID_COMMON_EXTERN void disconnect(AsynchIO& aio);
+    bool readbuff(AsynchIO& aio, AsynchIOBufferBase* buff);
+    void eof(AsynchIO& aio);
+    void disconnect(AsynchIO& aio);
 	
     // Notifications
-    QPID_COMMON_EXTERN void nobuffs(AsynchIO& aio);
-    QPID_COMMON_EXTERN void idle(AsynchIO& aio);
-    QPID_COMMON_EXTERN void closedSocket(AsynchIO& aio, const Socket& s);
+    void nobuffs(AsynchIO& aio);
+    void idle(AsynchIO& aio);
+    void closedSocket(AsynchIO& aio, const Socket& s);
 };
 
 }} // namespace qpid::sys

@@ -28,17 +28,18 @@
 #include "qpid/broker/Broker.h"
 #include "qpid/Plugin.h"
 #include "qpid/Options.h"
-#include "qpid/shared_ptr.h"
 #include "qpid/sys/AtomicValue.h"
 #include "qpid/log/Statement.h"
 
 #include "qpid/management/ManagementBroker.h"
 #include "qpid/management/IdAllocator.h"
 #include "qpid/broker/Exchange.h"
+#include "qpid/broker/Message.h"
 #include "qpid/broker/Queue.h"
 #include "qpid/broker/SessionState.h"
 #include "qpid/client/ConnectionSettings.h"
 
+#include <boost/shared_ptr.hpp>
 #include <boost/utility/in_place_factory.hpp>
 #include <boost/scoped_ptr.hpp>
 
@@ -71,10 +72,9 @@ struct ClusterOptions : public Options {
 #if HAVE_LIBCMAN_H
             ("cluster-cman", optValue(settings.quorum), "Integrate with Cluster Manager (CMAN) cluster.")
 #endif
-            ("cluster-read-max", optValue(settings.readMax,"N"),
-             "Experimental: Limit per-client-connection queue of read buffers. 0=no limit.")
-            ("cluster-write-estimate", optValue(settings.writeEstimate, "Kb"),
-             "Experimental: initial estimate for connection write rate per multicast cycle")
+            ("cluster-read-max", optValue(settings.readMax,"N"), "Experimental: flow-control limit  reads per connection. 0=no limit.")
+            // TODO aconway 2009-05-20: temporary, remove
+            ("cluster-check-errors", optValue(settings.checkErrors, "yes|no"), "Enable/disable cluster error checks. Normally should be enabled.")
             ;
     }
 };
@@ -134,15 +134,11 @@ struct ClusterPlugin : public Plugin {
         if (settings.name.empty()) return; // Only if --cluster-name option was specified.
         Broker* broker = dynamic_cast<Broker*>(&target);
         if (!broker) return;
-        if (settings.readMax < 3) {
-            QPID_LOG(notice, "invalid value for cluster-read-max: " << settings.readMax << ", setting to 3");            
-            settings.readMax = 3;//prevent lower values being used as they are unsafe
-        }
-
         cluster = new Cluster(settings, *broker);
         broker->setConnectionFactory(
             boost::shared_ptr<sys::ConnectionCodec::Factory>(
                 new ConnectionCodec::Factory(broker->getConnectionFactory(), *cluster)));
+        broker::Message::setUpdateDestination(UpdateClient::UPDATE);
         ManagementBroker* mgmt = dynamic_cast<ManagementBroker*>(ManagementAgent::Singleton::getInstance());
         if (mgmt) {
             std::auto_ptr<IdAllocator> allocator(new UpdateClientIdAllocator());
@@ -150,10 +146,25 @@ struct ClusterPlugin : public Plugin {
         }
     }
 
+    void disallow(ManagementBroker* agent, const string& className, const string& methodName) {
+        string message = "Management method " + className + ":" + methodName + " is not allowed on a clustered broker.";
+        agent->disallow(className, methodName, message);
+    }
+    void disallowManagementMethods(ManagementBroker* agent) {
+        if (!agent) return;
+        disallow(agent, "queue", "purge");
+        disallow(agent, "session", "detach");
+        disallow(agent, "session", "close");
+        disallow(agent, "connection", "close");
+    }
+
     void initialize(Plugin::Target& target) {
         Broker* broker = dynamic_cast<Broker*>(&target);
-        if (broker && cluster)
+        ManagementBroker* mgmt = dynamic_cast<ManagementBroker*>(ManagementAgent::Singleton::getInstance());
+        if (broker && cluster) {
+            disallowManagementMethods(mgmt);
             cluster->initialize();
+        }
     }
 };
 

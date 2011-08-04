@@ -22,7 +22,6 @@
 #define _StructHelper_
 
 #include "qpid/Exception.h"
-#include "qpid/CommonImportExport.h"
 #include "Buffer.h"
 
 #include <stdlib.h> // For alloca

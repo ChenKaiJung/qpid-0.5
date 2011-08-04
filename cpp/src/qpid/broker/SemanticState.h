@@ -37,6 +37,7 @@
 #include "qpid/sys/AggregateOutput.h"
 #include "qpid/sys/Mutex.h"
 #include "qpid/shared_ptr.h"
+ #include "qpid/sys/AtomicValue.h"
 #include "AclModule.h"
 
 #include <list>
@@ -77,6 +78,9 @@ class SemanticState : public sys::OutputTask,
         uint32_t msgCredit;
         uint32_t byteCredit;
         bool notifyEnabled;
+        // queueHasMessages is boolean but valgrind has trouble with
+        // AtomicValue<bool> so use an int with 1 or 0.
+        sys:: AtomicValue<int> queueHasMessages; 
         const int syncFrequency;
         int deliveryCount;
 
@@ -152,7 +156,7 @@ class SemanticState : public sys::OutputTask,
     void route(boost::intrusive_ptr<Message> msg, Deliverable& strategy);
     void checkDtxTimeout();
 
-    void complete(DeliveryRecord&);
+    bool complete(DeliveryRecord&);
     AckRange findRange(DeliveryId first, DeliveryId last);
     void requestDispatch();
     void requestDispatch(ConsumerImpl&);
@@ -215,10 +219,11 @@ class SemanticState : public sys::OutputTask,
     void attached();
     void detached();
 
-    // Used by cluster to re-create replica sessions
-    static ConsumerImpl* castToConsumerImpl(OutputTask* p) { return boost::polymorphic_downcast<ConsumerImpl*>(p); }
-
-    template <class F> void eachConsumer(F f) { outputTasks.eachOutput(boost::bind(f, boost::bind(castToConsumerImpl, _1))); }
+    // Used by cluster to re-create sessions
+    template <class F> void eachConsumer(F f) {
+        for(ConsumerImplMap::iterator i = consumers.begin(); i != consumers.end(); ++i)
+            f(i->second);
+    }
     DeliveryRecords& getUnacked() { return unacked; }
     framing::SequenceSet getAccumulatedAck() const { return accumulatedAck; }
     TxBuffer::shared_ptr getTxBuffer() const { return txBuffer; }

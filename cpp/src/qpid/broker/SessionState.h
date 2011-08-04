@@ -56,7 +56,7 @@ class Message;
 class SessionHandler;
 class SessionManager;
 class RateFlowcontrol;
-struct TimerTask;
+class TimerTask;
 
 /**
  * Broker-side session state includes session's handler chains, which
@@ -87,6 +87,7 @@ class SessionState : public qpid::SessionState,
     Broker& getBroker();
 
     /** OutputControl **/
+    void abort();
     void activateOutput();
     void giveReadCredit(int32_t);
 
@@ -107,6 +108,7 @@ class SessionState : public qpid::SessionState,
     // Used by cluster to create replica sessions.
     SemanticState& getSemanticState() { return semanticState; }
     boost::intrusive_ptr<Message> getMessageInProgress() { return msgBuilder.getMessage(); }
+    SessionAdapter& getSessionAdapter() { return adapter; }
 
     bool processSendCredit(uint32_t msgs);
 

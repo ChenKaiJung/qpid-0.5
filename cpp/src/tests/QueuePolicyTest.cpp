@@ -45,56 +45,56 @@ QueuedMessage createMessage(uint32_t size)
 
 QPID_AUTO_TEST_CASE(testCount)
 {
-    std::auto_ptr<QueuePolicy> policy(QueuePolicy::createQueuePolicy(5, 0));
+    std::auto_ptr<QueuePolicy> policy(QueuePolicy::createQueuePolicy("test", 5, 0));
     BOOST_CHECK_EQUAL((uint64_t) 0, policy->getMaxSize());
     BOOST_CHECK_EQUAL((uint32_t) 5, policy->getMaxCount());
 
     QueuedMessage msg = createMessage(10);
-    for (size_t i = 0; i < 5; i++) { 
-        policy->tryEnqueue(msg);
+    for (size_t i = 0; i < 5; i++) {
+        policy->tryEnqueue(msg.payload);
     }
     try {
-        policy->tryEnqueue(msg);        
+        policy->tryEnqueue(msg.payload);
         BOOST_FAIL("Policy did not fail on enqueuing sixth message");
     } catch (const ResourceLimitExceededException&) {}
 
     policy->dequeued(msg);
-    policy->tryEnqueue(msg);
+    policy->tryEnqueue(msg.payload);
 
     try {
-        policy->tryEnqueue(msg);        
+        policy->tryEnqueue(msg.payload);
         BOOST_FAIL("Policy did not fail on enqueuing sixth message (after dequeue)");
     } catch (const ResourceLimitExceededException&) {}
 }
 
 QPID_AUTO_TEST_CASE(testSize)
 {
-    std::auto_ptr<QueuePolicy> policy(QueuePolicy::createQueuePolicy(0, 50));
+    std::auto_ptr<QueuePolicy> policy(QueuePolicy::createQueuePolicy("test", 0, 50));
     QueuedMessage msg = createMessage(10);
-    
-    for (size_t i = 0; i < 5; i++) { 
-        policy->tryEnqueue(msg);
+
+    for (size_t i = 0; i < 5; i++) {
+        policy->tryEnqueue(msg.payload);
     }
     try {
-        policy->tryEnqueue(msg);        
+        policy->tryEnqueue(msg.payload);
         BOOST_FAIL("Policy did not fail on aggregate size exceeding 50. " << *policy);
     } catch (const ResourceLimitExceededException&) {}
 
     policy->dequeued(msg);
-    policy->tryEnqueue(msg);
+    policy->tryEnqueue(msg.payload);
 
     try {
-        policy->tryEnqueue(msg);        
+        policy->tryEnqueue(msg.payload);
         BOOST_FAIL("Policy did not fail on aggregate size exceeding 50 (after dequeue). " << *policy);
     } catch (const ResourceLimitExceededException&) {}
 }
 
 QPID_AUTO_TEST_CASE(testBoth)
 {
-    std::auto_ptr<QueuePolicy> policy(QueuePolicy::createQueuePolicy(5, 50));
+    std::auto_ptr<QueuePolicy> policy(QueuePolicy::createQueuePolicy("test", 5, 50));
     try {
         QueuedMessage msg = createMessage(51);
-        policy->tryEnqueue(msg);
+        policy->tryEnqueue(msg.payload);
         BOOST_FAIL("Policy did not fail on single message exceeding 50. " << *policy);
     } catch (const ResourceLimitExceededException&) {}
 
@@ -104,18 +104,18 @@ QPID_AUTO_TEST_CASE(testBoth)
     messages.push_back(createMessage(11));
     messages.push_back(createMessage(2));
     messages.push_back(createMessage(7));
-    for (size_t i = 0; i < messages.size(); i++) { 
-        policy->tryEnqueue(messages[i]);
+    for (size_t i = 0; i < messages.size(); i++) {
+        policy->tryEnqueue(messages[i].payload);
     }
     //size = 45 at this point, count = 5
     try {
         QueuedMessage msg = createMessage(5);
-        policy->tryEnqueue(msg);
+        policy->tryEnqueue(msg.payload);
         BOOST_FAIL("Policy did not fail on count exceeding 6. " << *policy);
     } catch (const ResourceLimitExceededException&) {}
     try {
         QueuedMessage msg = createMessage(10);
-        policy->tryEnqueue(msg);
+        policy->tryEnqueue(msg.payload);
         BOOST_FAIL("Policy did not fail on aggregate size exceeding 50. " << *policy);
     } catch (const ResourceLimitExceededException&) {}
 
@@ -123,7 +123,7 @@ QPID_AUTO_TEST_CASE(testBoth)
     policy->dequeued(messages[0]);
     try {
         QueuedMessage msg = createMessage(20);
-        policy->tryEnqueue(msg);
+        policy->tryEnqueue(msg.payload);
     } catch (const ResourceLimitExceededException&) {
         BOOST_FAIL("Policy failed incorrectly after dequeue. " << *policy);
     }
@@ -132,10 +132,10 @@ QPID_AUTO_TEST_CASE(testBoth)
 QPID_AUTO_TEST_CASE(testSettings)
 {
     //test reading and writing the policy from/to field table
-    std::auto_ptr<QueuePolicy> a(QueuePolicy::createQueuePolicy(101, 303));
+    std::auto_ptr<QueuePolicy> a(QueuePolicy::createQueuePolicy("test", 101, 303));
     FieldTable settings;
     a->update(settings);
-    std::auto_ptr<QueuePolicy> b(QueuePolicy::createQueuePolicy(settings));
+    std::auto_ptr<QueuePolicy> b(QueuePolicy::createQueuePolicy("test", settings));
     BOOST_CHECK_EQUAL(a->getMaxCount(), b->getMaxCount());
     BOOST_CHECK_EQUAL(a->getMaxSize(), b->getMaxSize());
 }
@@ -143,7 +143,7 @@ QPID_AUTO_TEST_CASE(testSettings)
 QPID_AUTO_TEST_CASE(testRingPolicy) 
 {
     FieldTable args;
-    std::auto_ptr<QueuePolicy> policy = QueuePolicy::createQueuePolicy(5, 0, QueuePolicy::RING);
+    std::auto_ptr<QueuePolicy> policy = QueuePolicy::createQueuePolicy("test", 5, 0, QueuePolicy::RING);
     policy->update(args);
 
     ProxySessionFixture f;
@@ -172,7 +172,7 @@ QPID_AUTO_TEST_CASE(testRingPolicy)
 QPID_AUTO_TEST_CASE(testStrictRingPolicy) 
 {
     FieldTable args;
-    std::auto_ptr<QueuePolicy> policy = QueuePolicy::createQueuePolicy(5, 0, QueuePolicy::RING_STRICT);
+    std::auto_ptr<QueuePolicy> policy = QueuePolicy::createQueuePolicy("test", 5, 0, QueuePolicy::RING_STRICT);
     policy->update(args);
 
     ProxySessionFixture f;
@@ -198,7 +198,7 @@ QPID_AUTO_TEST_CASE(testStrictRingPolicy)
 QPID_AUTO_TEST_CASE(testPolicyWithDtx) 
 {
     FieldTable args;
-    std::auto_ptr<QueuePolicy> policy = QueuePolicy::createQueuePolicy(5, 0, QueuePolicy::REJECT);
+    std::auto_ptr<QueuePolicy> policy = QueuePolicy::createQueuePolicy("test", 5, 0, QueuePolicy::REJECT);
     policy->update(args);
 
     ProxySessionFixture f;
@@ -279,5 +279,21 @@ QPID_AUTO_TEST_CASE(testFlowToDiskWithNoStore)
     } catch (const ResourceLimitExceededException&) {}    
 }
 
+QPID_AUTO_TEST_CASE(testPolicyFailureOnCommit)
+{
+    FieldTable args;
+    std::auto_ptr<QueuePolicy> policy = QueuePolicy::createQueuePolicy("test", 5, 0, QueuePolicy::REJECT);
+    policy->update(args);
+
+    ProxySessionFixture f;
+    std::string q("q");
+    f.session.queueDeclare(arg::queue=q, arg::exclusive=true, arg::autoDelete=true, arg::arguments=args);
+    f.session.txSelect();
+    for (int i = 0; i < 10; i++) {
+        f.session.messageTransfer(arg::content=client::Message((boost::format("%1%_%2%") % "Message" % (i+1)).str(), q));
+    }
+    ScopedSuppressLogging sl; // Suppress messages for expected errors.
+    BOOST_CHECK_THROW(f.session.txCommit(), InternalErrorException);
+}
 
 QPID_AUTO_TEST_SUITE_END()

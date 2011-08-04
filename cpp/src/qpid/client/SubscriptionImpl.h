@@ -30,7 +30,6 @@
 #include "qpid/framing/SequenceSet.h"
 #include "qpid/sys/Mutex.h"
 #include "qpid/RefCounted.h"
-#include "qpid/client/ClientImportExport.h"
 #include <memory>
 
 namespace qpid {
@@ -40,62 +39,62 @@ class SubscriptionManager;
 
 class SubscriptionImpl : public RefCounted, public MessageListener {
   public:
-    QPID_CLIENT_EXTERN SubscriptionImpl(SubscriptionManager&, const std::string& queue,
+    SubscriptionImpl(SubscriptionManager&, const std::string& queue,
                      const SubscriptionSettings&, const std::string& name, MessageListener* =0);
     
     /** The name of the subsctription, used as the "destination" for messages from the broker.
      * Usually the same as the queue name but can be set differently.
      */
-    QPID_CLIENT_EXTERN std::string getName() const;
+    std::string getName() const;
 
     /** Name of the queue this subscription subscribes to */
-    QPID_CLIENT_EXTERN std::string getQueue() const;
+    std::string getQueue() const;
 
     /** Get the flow control and acknowledgement settings for this subscription */
-    QPID_CLIENT_EXTERN const SubscriptionSettings& getSettings() const;
+    const SubscriptionSettings& getSettings() const;
 
     /** Set the flow control parameters */
-    QPID_CLIENT_EXTERN void setFlowControl(const FlowControl&);
+    void setFlowControl(const FlowControl&);
 
     /** Automatically acknowledge (acquire and accept) batches of n messages.
      * You can disable auto-acknowledgement by setting n=0, and use acquire() and accept()
      * to manually acquire and accept messages.
      */
-    QPID_CLIENT_EXTERN void setAutoAck(size_t n);
+    void setAutoAck(size_t n);
 
     /** Get the set of ID's for messages received by this subscription but not yet acquired.
      * This will always be empty if  acquireMode=ACQUIRE_MODE_PRE_ACQUIRED
      */
-    QPID_CLIENT_EXTERN SequenceSet getUnacquired() const;
+    SequenceSet getUnacquired() const;
 
     /** Get the set of ID's for messages acquired by this subscription but not yet accepted. */
-    QPID_CLIENT_EXTERN SequenceSet getUnaccepted() const;
+    SequenceSet getUnaccepted() const;
 
     /** Acquire messageIds and remove them from the un-acquired set for the session. */
-    QPID_CLIENT_EXTERN void acquire(const SequenceSet& messageIds);
+    void acquire(const SequenceSet& messageIds);
 
     /** Accept messageIds and remove them from the un-accepted set for the session. */
-    QPID_CLIENT_EXTERN void accept(const SequenceSet& messageIds);
+    void accept(const SequenceSet& messageIds);
 
     /** Release messageIds and remove them from the un-accepted set for the session. */
-    QPID_CLIENT_EXTERN void release(const SequenceSet& messageIds);
+    void release(const SequenceSet& messageIds);
 
     /** Get the session associated with this subscription */
-    QPID_CLIENT_EXTERN Session getSession() const;
+    Session getSession() const;
 
     /** Get the subscription manager associated with this subscription */
-    QPID_CLIENT_EXTERN SubscriptionManager& getSubscriptionManager() const;
+    SubscriptionManager& getSubscriptionManager() const;
 
     /** Send subscription request and issue appropriate flow control commands. */
-    QPID_CLIENT_EXTERN void subscribe();
+    void subscribe();
 
     /** Cancel the subscription. */
-    QPID_CLIENT_EXTERN void cancel();
+    void cancel();
 
     /** Grant specified credit for this subscription **/
-    QPID_CLIENT_EXTERN void grantCredit(framing::message::CreditUnit unit, uint32_t value);
+    void grantCredit(framing::message::CreditUnit unit, uint32_t value);
 
-    QPID_CLIENT_EXTERN void received(Message&);
+    void received(Message&);
 
     /**
      * Set up demux diversion for messages sent to this subscription
@@ -105,7 +104,7 @@ class SubscriptionImpl : public RefCounted, public MessageListener {
      * Cancel any demux diversion that may have been setup for this
      * subscription
      */
-    QPID_CLIENT_EXTERN void cancelDiversion();
+    void cancelDiversion();
 
   private:
 

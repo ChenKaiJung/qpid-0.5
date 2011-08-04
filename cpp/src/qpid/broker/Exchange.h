@@ -23,7 +23,6 @@
  */
 
 #include <boost/shared_ptr.hpp>
-#include "BrokerImportExport.h"
 #include "Deliverable.h"
 #include "Queue.h"
 #include "MessageStore.h"
@@ -79,6 +78,9 @@ protected:
         Exchange* parent;
     };
            
+    typedef boost::shared_ptr<const std::vector<boost::shared_ptr<qpid::broker::Exchange::Binding> > > ConstBindingList;
+    typedef boost::shared_ptr<      std::vector<boost::shared_ptr<qpid::broker::Exchange::Binding> > > BindingList;
+    void doRoute(Deliverable& msg, ConstBindingList b);
     void routeIVE();
            
 
@@ -124,7 +126,7 @@ public:
     explicit Exchange(const std::string& name, management::Manageable* parent = 0);
     Exchange(const std::string& _name, bool _durable, const qpid::framing::FieldTable& _args,
              management::Manageable* parent = 0);
-    QPID_BROKER_EXTERN virtual ~Exchange();
+    virtual ~Exchange();
 
     const std::string& getName() const { return name; }
     bool isDurable() { return durable; }
@@ -147,9 +149,9 @@ public:
     void setPersistenceId(uint64_t id) const;
     uint64_t getPersistenceId() const { return persistenceId; }
     uint32_t encodedSize() const;
-    QPID_BROKER_EXTERN virtual void encode(framing::Buffer& buffer) const;
+    virtual void encode(framing::Buffer& buffer) const; 
 
-    static QPID_BROKER_EXTERN Exchange::shared_ptr decode(ExchangeRegistry& exchanges, framing::Buffer& buffer);
+    static Exchange::shared_ptr decode(ExchangeRegistry& exchanges, framing::Buffer& buffer);
 
     // Manageable entry points
     management::ManagementObject* GetManagementObject(void) const;

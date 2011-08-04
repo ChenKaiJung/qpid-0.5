@@ -329,6 +329,10 @@ void DispatchHandle::call(Callback iCb) {
     ScopedLock<Mutex> lock(stateLock);
     switch (state) {
     case IDLE:
+    case DELAYED_DELETE:
+        // These can actually happen with some unfortunate execution
+        // sequences, just do nothing
+        return;
     case ACTIVE_DELETE:
         assert(false);
         return;
@@ -444,28 +448,30 @@ void DispatchHandle::processEvent(Poller::EventType type) {
         }
         break;
     case Poller::INTERRUPTED:
-        {
-        // We could only be interrupted if we also had a callback to do
-        assert(callbacks.size() > 0);
-        // We'll actually do the interrupt below
+        // If we have any callbacks do them now -
+        // (because we use a copy from before the previous callbacks we won't
+        //  do anything yet that was just added)
+        while (callbacks.size() > 0) {
+            Callback cb = callbacks.front();
+            assert(cb);
+            cb(*this);
+            callbacks.pop();
         }
         break;
     default:
         assert(false);
     }
 
-    // If we have any callbacks do them now -
-    // (because we use a copy from before the previous callbacks we won't
-    //  do anything yet that was just added) 
+    {
+    ScopedLock<Mutex> lock(stateLock);
+
+    // If we got any new callbacks add them to any existing remaining callbacks
+    std::swap(callbacks, interruptedCallbacks);
     while (callbacks.size() > 0) {
-        Callback cb = callbacks.front();
-        assert(cb);
-        cb(*this);
+        interruptedCallbacks.push(callbacks.front());
         callbacks.pop();
     }
 
-    {
-    ScopedLock<Mutex> lock(stateLock);
     // If any of the callbacks re-enabled reading/writing then actually
     // do it now
     switch (state) {

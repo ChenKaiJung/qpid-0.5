@@ -22,10 +22,10 @@
  *
  */
 
-#include "WriteEstimate.h"
+#include "NoOpConnectionOutputHandler.h"
 #include "qpid/sys/ConnectionOutputHandler.h"
+#include "qpid/sys/Mutex.h"
 #include "qpid/broker/ConnectionFactory.h"
-#include "qpid/sys/LatencyMetric.h"
 #include <boost/function.hpp>
 
 namespace qpid {
@@ -37,39 +37,41 @@ class Connection;
 /**
  * Interceptor for connection OutputHandler, manages outgoing message replication.
  */
-class OutputInterceptor : public sys::ConnectionOutputHandler, sys::LatencyMetricTimestamp {
+class OutputInterceptor : public sys::ConnectionOutputHandler {
   public:
     OutputInterceptor(cluster::Connection& p, sys::ConnectionOutputHandler& h);
 
     // sys::ConnectionOutputHandler functions
     void send(framing::AMQFrame& f);
+    void abort();
     void activateOutput();
     void giveReadCredit(int32_t);
     void close();
     size_t getBuffered() const;
 
     // Delivery point for doOutput requests.
-    void deliverDoOutput(size_t requested);
+    void deliverDoOutput(uint32_t limit);
     // Intercept doOutput requests on Connection.
     bool doOutput();
 
-    void closeOutput(sys::ConnectionOutputHandler& h);
+    void closeOutput();
 
+    uint32_t getSendMax() const { return sendMax; }
+    void setSendMax(uint32_t sendMax_) { sendMax=sendMax_; }
+    
     cluster::Connection& parent;
     
   private:
     typedef sys::Mutex::ScopedLock Locker;
 
-    void sendDoOutput();
+    void sendDoOutput(size_t newLimit);
 
     mutable sys::Mutex lock;
     bool closing;
     sys::ConnectionOutputHandler* next;
-    size_t sent;
-    size_t lastDoOutput;
-    WriteEstimate writeEstimate;
-    bool moreOutput;
-    bool doingOutput;
+    static NoOpConnectionOutputHandler discardHandler;
+    uint32_t sendMax, sent;
+    bool sentDoOutput;
 };
 
 }} // namespace qpid::cluster

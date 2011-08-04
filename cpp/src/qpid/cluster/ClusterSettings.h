@@ -32,10 +32,13 @@ struct ClusterSettings {
     std::string name;
     std::string url;
     bool quorum;
-    size_t readMax, writeEstimate;
+    size_t readMax;
     std::string username, password, mechanism;
+    bool checkErrors;
 
-    ClusterSettings() : quorum(false), readMax(10), writeEstimate(64) {}
+    ClusterSettings() : quorum(false), readMax(10),
+                        checkErrors(true) // TODO aconway 2009-05-20: remove this option.
+    {}
   
     Url getUrl(uint16_t port) const {
         if (url.empty()) return Url::getIpAddressesUrl(port);

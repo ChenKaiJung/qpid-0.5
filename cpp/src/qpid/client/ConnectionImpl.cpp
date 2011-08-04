@@ -32,6 +32,7 @@
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
 
+#include <limits>
 
 namespace qpid {
 namespace client {
@@ -81,6 +82,8 @@ ConnectionImpl::ConnectionImpl(framing::ProtocolVersion v, const ConnectionSetti
     handler.onError = boost::bind(&ConnectionImpl::closed, this, _1, _2);
 }
 
+const uint16_t ConnectionImpl::NEXT_CHANNEL = std::numeric_limits<uint16_t>::max();
+
 ConnectionImpl::~ConnectionImpl() {
     // Important to close the connector first, to ensure the
     // connector thread does not call on us while the destructor
@@ -92,11 +95,21 @@ ConnectionImpl::~ConnectionImpl() {
 void ConnectionImpl::addSession(const boost::shared_ptr<SessionImpl>& session, uint16_t channel)
 {
     Mutex::ScopedLock l(lock);
-    session->setChannel(channel ? channel : nextChannel++);
-    boost::weak_ptr<SessionImpl>& s = sessions[session->getChannel()];
-    boost::shared_ptr<SessionImpl> ss = s.lock();
-    if (ss) throw SessionBusyException(QPID_MSG("Channel " << ss->getChannel() << " attached to " << ss->getId()));
-    s = session;
+    for (uint16_t i = 0; i < NEXT_CHANNEL; i++) { //will at most search through channels once
+        uint16_t c = channel == NEXT_CHANNEL ? nextChannel++ : channel;
+        boost::weak_ptr<SessionImpl>& s = sessions[c];
+        boost::shared_ptr<SessionImpl> ss = s.lock();
+        if (!ss) {
+            //channel is free, we can assign it to this session
+            session->setChannel(c);
+            s = session;
+            return;
+        } else if (channel != NEXT_CHANNEL) {
+            //channel is taken and was requested explicitly so don't look for another
+            throw SessionBusyException(QPID_MSG("Channel " << ss->getChannel() << " attached to " << ss->getId()));
+        } //else channel is busy, but we can keep looking for a free one
+    }
+
 }
 
 void ConnectionImpl::handle(framing::AMQFrame& frame)
@@ -136,7 +149,6 @@ void ConnectionImpl::open()
     connector->setShutdownHandler(this);
     connector->connect(host, port);
     connector->init();
-    handler.waitForOpen();
  
     // Enable heartbeat if requested
     uint16_t heartbeat = static_cast<ConnectionSettings&>(handler).heartbeat;
@@ -147,6 +159,8 @@ void ConnectionImpl::open()
         theTimer().add(heartbeatTask);
     }
  
+    handler.waitForOpen();
+
     //enable security layer if one has been negotiated:
     std::auto_ptr<SecurityLayer> securityLayer = handler.getSecurityLayer();
     if (securityLayer.get()) {
@@ -155,7 +169,6 @@ void ConnectionImpl::open()
     } else {
         QPID_LOG(debug, "No security layer in place");
     }
-
     failover.reset(new FailoverListener(shared_from_this(), handler.knownBrokersUrls));
 }
 
@@ -172,10 +185,11 @@ void ConnectionImpl::idleOut()
 
 void ConnectionImpl::close()
 {
-    if (!handler.isOpen()) return;
     if (heartbeatTask) {
         heartbeatTask->cancel();
     }
+
+    if (!handler.isOpen()) return;
     handler.close();
     closed(CLOSE_CODE_NORMAL, "Closed by client");
 }
@@ -235,7 +249,7 @@ const ConnectionSettings& ConnectionImpl::getNegotiatedSettings()
 {
     return handler;
 }
-    
+
 std::vector<qpid::Url> ConnectionImpl::getKnownBrokers() {
     return failover ? failover->getKnownBrokers() : handler.knownBrokersUrls;
 }

@@ -61,14 +61,7 @@
     namespace { struct test_name { void test_method(); };  }            \
     void test_name::test_method()
 
-#endif  // Workaround for BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES
-
-// Correct syntax for boost > 1.36
-#if (BOOST_VERSION > 103500)
-# define QPID_AUTO_TEST_CASE_EXPECTED_FAILURES(name,n) \
-    BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES(name,n) \
-    BOOST_AUTO_TEST_CASE(name)
-#endif  // Correct syntax for boost > 1.36
+#endif  // Workaround for BOOST_AUTO_TEST_SUITE_EXPECTED_FAILURES
 
 //
 // Default definitions for latest version of boost.

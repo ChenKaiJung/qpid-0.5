@@ -24,7 +24,6 @@
 
 #include <boost/operators.hpp>
 #include <string>
-#include <qpid/CommonImportExport.h>
 
 namespace qpid {
 
@@ -43,16 +42,16 @@ class SessionId : boost::totally_ordered1<SessionId> {
     std::string userId;
     std::string name;
   public:
-    QPID_COMMON_EXTERN SessionId(const std::string& userId=std::string(), const std::string& name=std::string());
+    SessionId(const std::string& userId=std::string(), const std::string& name=std::string());
     std::string getUserId() const { return userId; }
     std::string getName() const { return name; }
-    QPID_COMMON_EXTERN bool operator<(const SessionId&) const ;
-    QPID_COMMON_EXTERN bool operator==(const SessionId& id) const;
+    bool operator<(const SessionId&) const ;
+    bool operator==(const SessionId& id) const;
     // Convert to a string
-    QPID_COMMON_EXTERN std::string str() const;
+    std::string str() const;
 };
 
-QPID_COMMON_EXTERN std::ostream& operator<<(std::ostream&, const SessionId&);
+std::ostream& operator<<(std::ostream&, const SessionId&);
 
 
 } // namespace qpid

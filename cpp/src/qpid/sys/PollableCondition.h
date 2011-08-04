@@ -23,7 +23,6 @@
  */
 
 #include "qpid/sys/Poller.h"
-#include "qpid/CommonImportExport.h"
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -37,35 +36,35 @@ class PollableCondition {
 public:
     typedef boost::function1<void, PollableCondition&> Callback;
 
-    QPID_COMMON_EXTERN PollableCondition(const Callback& cb,
+    PollableCondition(const Callback& cb,
                       const boost::shared_ptr<sys::Poller>& poller);
 
-    QPID_COMMON_EXTERN ~PollableCondition();
+    ~PollableCondition();
 
     /**
      * Set the condition. Triggers callback to Callback from Poller.
      * When callback is made, condition is suspended. Call rearm() to
      * resume reacting to the condition.
      */
-    QPID_COMMON_EXTERN void set();
+    void set();
 
     /**
      * Get the current state of the condition, then clear it.
      *
      * @return The state of the condition before it was cleared.
      */
-    QPID_COMMON_EXTERN bool clear();
+    bool clear();
 
     /**
      * Temporarily suspend the ability for the poller to react to the
      * condition. It can be rearm()ed later.
      */
-    QPID_COMMON_EXTERN void disarm();
+    void disarm();
 
     /**
      * Reset the ability for the poller to react to the condition.
      */
-    QPID_COMMON_EXTERN void rearm();
+    void rearm();
 
  private:
     PollableConditionPrivate *impl;

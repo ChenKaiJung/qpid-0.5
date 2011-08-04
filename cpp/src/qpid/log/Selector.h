@@ -20,7 +20,6 @@
  */
 
 #include "Statement.h"
-#include "qpid/CommonImportExport.h"
 #include <vector>
 
 namespace qpid {
@@ -38,7 +37,7 @@ class Selector {
     Selector() {}
 
     /** Set selector from Options */
-    QPID_COMMON_EXTERN Selector(const Options&);
+    Selector(const Options&);
     
     /** Equavlient to: Selector s; s.enable(l, s) */
     Selector(Level l, const std::string& s=std::string()) {
@@ -55,10 +54,10 @@ class Selector {
     }
 
     /** Enable based on a 'level[+]:file' string */
-    QPID_COMMON_EXTERN void enable(const std::string& enableStr);
+    void enable(const std::string& enableStr);
 
     /** True if level is enabled for file. */
-    QPID_COMMON_EXTERN bool isEnabled(Level level, const char* function);
+    bool isEnabled(Level level, const char* function);
 
   private:
     std::vector<std::string> substrings[LevelTraits::COUNT];

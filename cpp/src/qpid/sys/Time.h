@@ -33,8 +33,6 @@
 #  include "posix/Time.h"
 #endif
 
-#include "qpid/CommonImportExport.h"
-
 #include <limits>
 #include <iosfwd>
 
@@ -88,23 +86,23 @@ class AbsTime {
     TimePrivate timepoint;
 	
 public:
-    QPID_COMMON_EXTERN inline AbsTime() {}
-    QPID_COMMON_EXTERN AbsTime(const AbsTime& time0, const Duration& duration);
+    inline AbsTime() {}
+    AbsTime(const AbsTime& time0, const Duration& duration);
     // Default assignment operation fine
     // Default copy constructor fine
 	 
-    QPID_COMMON_EXTERN static AbsTime now();
-    QPID_COMMON_EXTERN static AbsTime FarFuture();
+    static AbsTime now();
+    static AbsTime FarFuture();
     const TimePrivate& getPrivate(void) const { return timepoint; }
     bool operator==(const AbsTime& t) const { return t.timepoint == timepoint; }
     template <class S> void serialize(S& s) { s(timepoint); }
 
     friend bool operator<(const AbsTime& a, const AbsTime& b);
     friend bool operator>(const AbsTime& a, const AbsTime& b);
-    QPID_COMMON_EXTERN friend std::ostream& operator << (std::ostream&, const AbsTime&);
+    friend std::ostream& operator << (std::ostream&, const AbsTime&);
 };
 
-QPID_COMMON_EXTERN std::ostream& operator << (std::ostream&, const AbsTime&);
+std::ostream& operator << (std::ostream&, const AbsTime&);
 
 /**
  * @class Duration
@@ -122,9 +120,9 @@ class Duration {
     friend class AbsTime;
 
 public:
-    QPID_COMMON_EXTERN inline Duration(int64_t time0);
-    QPID_COMMON_EXTERN explicit Duration(const AbsTime& time0);
-    QPID_COMMON_EXTERN explicit Duration(const AbsTime& start, const AbsTime& finish);
+    inline Duration(int64_t time0);
+    explicit Duration(const AbsTime& time0);
+    explicit Duration(const AbsTime& start, const AbsTime& finish);
     inline operator int64_t() const;
 };
 
@@ -160,10 +158,10 @@ const Duration TIME_INFINITE = std::numeric_limits<int64_t>::max();
 const AbsTime FAR_FUTURE = AbsTime::FarFuture();
  
 /** Portable sleep for a number of seconds */
-QPID_COMMON_EXTERN void sleep(int secs);
+void sleep(int secs);
 
 /** Portable sleep for a number of microseconds */
-QPID_COMMON_EXTERN void usleep(uint64_t usecs);
+void usleep(uint64_t usecs);
 
 }}
 

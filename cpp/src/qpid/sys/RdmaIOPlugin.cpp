@@ -58,6 +58,7 @@ class RdmaIOHandler : public OutputControl {
 
     // Output side
     void close();
+    void abort();
     void activateOutput();
     void giveReadCredit(int32_t credit);
     void initProtocolOut();
@@ -105,6 +106,10 @@ void RdmaIOHandler::write(const framing::ProtocolInitiation& data)
 
 void RdmaIOHandler::close() {
     aio->queueWriteClose();
+}
+
+// TODO: Dummy implementation, need to fill this in for heartbeat timeout to work
+void RdmaIOHandler::abort() {
 }
 
 void RdmaIOHandler::activateOutput() {

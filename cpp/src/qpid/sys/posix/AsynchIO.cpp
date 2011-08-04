@@ -131,6 +131,7 @@ void AsynchAcceptorPrivate::readable(DispatchHandle& h) {
             }
         } catch (const std::exception& e) {
             QPID_LOG(error, "Could not accept socket: " << e.what());
+            break;
         }
     } while (true);
 
@@ -155,11 +156,12 @@ class AsynchConnector : public qpid::sys::AsynchConnector,
 
 private:
     void connComplete(DispatchHandle& handle);
-    void failure(int, std::string);
+    void failure(int, const std::string&);
 
 private:
     ConnectedCallback connCallback;
     FailedCallback failCallback;
+    std::string errMsg;
     const Socket& socket;
 
 public:
@@ -168,7 +170,7 @@ public:
                     std::string hostname,
                     uint16_t port,
                     ConnectedCallback connCb,
-                    FailedCallback failCb = 0);
+                    FailedCallback failCb);
 };
 
 AsynchConnector::AsynchConnector(const Socket& s,
@@ -188,10 +190,14 @@ AsynchConnector::AsynchConnector(const Socket& s,
     socket.setNonblocking();
     try {
         socket.connect(hostname, port);
-        startWatch(poller);
     } catch(std::exception& e) {
-        failure(-1, std::string(e.what()));
+        // Defer reporting failure
+        startWatch(poller);
+        errMsg = e.what();
+        DispatchHandle::call(boost::bind(&AsynchConnector::failure, this, -1, errMsg));
+        return;
     }
+    startWatch(poller);
 }
 
 void AsynchConnector::connComplete(DispatchHandle& h)
@@ -203,17 +209,13 @@ void AsynchConnector::connComplete(DispatchHandle& h)
         connCallback(socket);
         DispatchHandle::doDelete();
     } else {
-        failure(errCode, std::string(strError(errCode)));
+        failure(errCode, strError(errCode));
     }
 }
 
-void AsynchConnector::failure(int errCode, std::string message)
+void AsynchConnector::failure(int errCode, const std::string& message)
 {
-    if (failCallback)
-        failCallback(errCode, message);
-
-    socket.close();
-    delete &socket;
+    failCallback(socket, errCode, message);
 
     DispatchHandle::doDelete();
 }

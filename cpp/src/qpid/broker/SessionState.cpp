@@ -136,6 +136,11 @@ void SessionState::attach(SessionHandler& h) {
     }
 }
 
+void SessionState::abort() {
+    if (isAttached())
+        getConnection().outputTasks.abort();
+}
+
 void SessionState::activateOutput() {
     if (isAttached())
         getConnection().outputTasks.activateOutput();

@@ -18,7 +18,6 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/noncopyable.hpp>
 #include <set>
-#include "qpid/CommonImportExport.h"
 
 namespace qpid {
 namespace log {
@@ -49,48 +48,48 @@ class Logger : private boost::noncopyable {
      */
     class Output {
       public:
-        QPID_COMMON_EXTERN Output();
-        QPID_COMMON_EXTERN virtual ~Output();
+        Output();
+        virtual ~Output();
         /** Receives the statemnt of origin and formatted message to log. */
         virtual void log(const Statement&, const std::string&) =0;
     };
 
-    QPID_COMMON_EXTERN static Logger& instance();
+    static Logger& instance();
 
-    QPID_COMMON_EXTERN Logger();
-    QPID_COMMON_EXTERN ~Logger();
+    Logger();
+    ~Logger();
     
     /** Select the messages to be logged. */
-    QPID_COMMON_EXTERN void select(const Selector& s);
+    void select(const Selector& s);
 
     /** Set the formatting flags, bitwise OR of FormatFlag values. */
-    QPID_COMMON_EXTERN void format(int formatFlags);
+    void format(int formatFlags);
 
     /** Set format flags from options object.
      *@returns computed flags.
      */
-    QPID_COMMON_EXTERN int format(const Options&);
+    int format(const Options&);
 
     /** Configure logger from Options */
-    QPID_COMMON_EXTERN void configure(const Options& o);
+    void configure(const Options& o);
 
     /** Add a statement. */
-    QPID_COMMON_EXTERN void add(Statement& s);
+    void add(Statement& s);
 
     /** Log a message. */
-    QPID_COMMON_EXTERN void log(const Statement&, const std::string&);
+    void log(const Statement&, const std::string&);
 
     /** Add an output destination for messages */
-    QPID_COMMON_EXTERN void output(std::auto_ptr<Output> out);
+    void output(std::auto_ptr<Output> out);
 
     /** Set a prefix for all messages */
-    QPID_COMMON_EXTERN void setPrefix(const std::string& prefix);
+    void setPrefix(const std::string& prefix);
     
     /** Reset the logger. */
-    QPID_COMMON_EXTERN void clear();
+    void clear();
 
     /** Get the options used to configure the logger. */
-    QPID_COMMON_EXTERN const Options& getOptions() const { return options; }
+    const Options& getOptions() const { return options; }
     
     
   private:

@@ -38,6 +38,7 @@
 #include <sstream>
 #include <numeric>
 #include <algorithm>
+#include <unistd.h>
 #include <math.h>
 
 
@@ -237,10 +238,8 @@ struct Client : public Runnable {
 
     ~Client() {
         try {
-            if (connection->isOpen()) {
-                session.close();
-                connection->close();
-            }
+            session.close();
+            connection->close();
         } catch (const std::exception& e) {
             std::cerr << "Error in shutdown: " << e.what() << std::endl;
         }
@@ -524,8 +523,7 @@ struct PublishThread : public Client {
                             sync(session).txCommit();
                         }
                     }
-                    if (opts.intervalPub)
-                        qpid::sys::usleep(opts.intervalPub*1000);
+                    if (opts.intervalPub) ::usleep(opts.intervalPub*1000);
                 }
                 if (opts.confirm) session.sync();
                 AbsTime end=now();
@@ -615,8 +613,7 @@ struct SubscribeThread : public Client {
                         if (opts.commitAsync) session.txCommit();
                         else sync(session).txCommit();
                     }
-                    if (opts.intervalSub)
-                        qpid::sys::usleep(opts.intervalSub*1000);
+                    if (opts.intervalSub) ::usleep(opts.intervalSub*1000);
                     // TODO aconway 2007-11-23: check message order for. 
                     // multiple publishers. Need an array of counters,
                     // one per publisher and a publisher ID in the
@@ -655,7 +652,10 @@ struct SubscribeThread : public Client {
 };
 
 int main(int argc, char** argv) {
-    
+    int exitCode = 0;
+    boost::ptr_vector<Client> subs(opts.subs);
+    boost::ptr_vector<Client> pubs(opts.pubs);
+
     try {
         opts.parse(argc, argv);
 
@@ -665,16 +665,13 @@ int main(int argc, char** argv) {
             case TOPIC: exchange="amq.topic"; break;
             case SHARED: break;
         }
-        
+
         bool singleProcess=
             (!opts.setup && !opts.control && !opts.publish && !opts.subscribe);
         if (singleProcess)
             opts.setup = opts.control = opts.publish = opts.subscribe = true;
 
         if (opts.setup) Setup().run();          // Set up queues
-
-        boost::ptr_vector<Client> subs(opts.subs);
-        boost::ptr_vector<Client> pubs(opts.pubs);
 
         // Start pubs/subs for each queue/topic.
         for (size_t i = 0; i < opts.qt; ++i) {
@@ -700,29 +697,25 @@ int main(int argc, char** argv) {
         }
 
         if (opts.control) Controller().run();
-
-
-        // Wait for started threads.
-        if (opts.publish) {
-            for (boost::ptr_vector<Client>::iterator i=pubs.begin();
-                 i != pubs.end();
-                 ++i) 
-                i->thread.join();
-        }
-            
-
-        if (opts.subscribe) {
-            for (boost::ptr_vector<Client>::iterator i=subs.begin();
-                 i != subs.end();
-                 ++i) 
-                i->thread.join();
-        }
-        return 0;
     }
     catch (const std::exception& e) {
-        cout << endl << e.what() << endl; 
+        cout << endl << e.what() << endl;
+        exitCode = 1;
     }
-    return 1;
-}
 
-                                            
+    // Wait for started threads.
+    if (opts.publish) {
+        for (boost::ptr_vector<Client>::iterator i=pubs.begin();
+             i != pubs.end();
+             ++i)
+            i->thread.join();
+    }
+
+    if (opts.subscribe) {
+        for (boost::ptr_vector<Client>::iterator i=subs.begin();
+             i != subs.end();
+             ++i)
+            i->thread.join();
+    }
+    return exitCode;
+}

@@ -30,14 +30,14 @@ namespace framing { class AMQFrame; }
 namespace cluster {
 
 /**
- * Output handler for frames sent to noop connections.
- * Simply discards frames.
+ * Output handler shadow connections, simply discards frames.
  */
 class NoOpConnectionOutputHandler : public sys::ConnectionOutputHandler
 {
   public:
     virtual void send(framing::AMQFrame&) {}
     virtual void close() {}
+    virtual void abort() {}
     virtual void activateOutput() {}
     virtual void giveReadCredit(int32_t) {}
 };

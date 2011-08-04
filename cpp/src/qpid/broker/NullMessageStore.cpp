@@ -54,22 +54,21 @@ NullMessageStore::NullMessageStore() : nextPersistenceId(1) {
 
 bool NullMessageStore::init(const Options* /*options*/) {return true;}
 
+void NullMessageStore::discardInit(const bool /*pushDownStoreFiles*/) {}
+
 void NullMessageStore::create(PersistableQueue& queue, const framing::FieldTable& /*args*/)
 {
     queue.setPersistenceId(nextPersistenceId++);
 }
 
-void NullMessageStore::destroy(PersistableQueue&)
-{
-}
+void NullMessageStore::destroy(PersistableQueue&) {}
 
 void NullMessageStore::create(const PersistableExchange& exchange, const framing::FieldTable& /*args*/)
 {
     exchange.setPersistenceId(nextPersistenceId++);
 }
 
-void NullMessageStore::destroy(const PersistableExchange& )
-{}
+void NullMessageStore::destroy(const PersistableExchange&) {}
 
 void NullMessageStore::bind(const PersistableExchange&, const PersistableQueue&, const std::string&, const framing::FieldTable&){}
 

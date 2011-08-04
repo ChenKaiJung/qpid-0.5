@@ -37,6 +37,7 @@ class SignalHandler
   public:
     /** Set the broker to be shutdown on signals */
     static void setBroker(const boost::intrusive_ptr<Broker>& broker);
+    static void cancel();
 
   private:
     static void shutdownHandler(int);

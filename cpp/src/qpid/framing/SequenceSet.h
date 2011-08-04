@@ -23,7 +23,6 @@
 
 #include "SequenceNumber.h"
 #include "qpid/RangeSet.h"
-#include "qpid/CommonImportExport.h"
 
 namespace qpid {
 namespace framing {
@@ -42,13 +41,13 @@ class SequenceSet : public RangeSet<SequenceNumber> {
     void decode(Buffer& buffer);
     uint32_t encodedSize() const;   
 
-    QPID_COMMON_EXTERN bool contains(const SequenceNumber& s) const;
-    QPID_COMMON_EXTERN void add(const SequenceNumber& s);
-    QPID_COMMON_EXTERN void add(const SequenceNumber& start, const SequenceNumber& finish); // Closed range
-    QPID_COMMON_EXTERN void add(const SequenceSet& set);
-    QPID_COMMON_EXTERN void remove(const SequenceNumber& s);
-    QPID_COMMON_EXTERN void remove(const SequenceNumber& start, const SequenceNumber& finish); // Closed range
-    QPID_COMMON_EXTERN void remove(const SequenceSet& set);
+    bool contains(const SequenceNumber& s) const;
+    void add(const SequenceNumber& s);
+    void add(const SequenceNumber& start, const SequenceNumber& finish); // Closed range
+    void add(const SequenceSet& set);
+    void remove(const SequenceNumber& s);
+    void remove(const SequenceNumber& start, const SequenceNumber& finish); // Closed range
+    void remove(const SequenceSet& set);
 
     template <class T> void for_each(T& t) const {
         for (RangeIterator i = rangesBegin(); i != rangesEnd(); i++) 
@@ -60,7 +59,7 @@ class SequenceSet : public RangeSet<SequenceNumber> {
             t(i->first(), i->last());
     }
 
-  friend QPID_COMMON_EXTERN std::ostream& operator<<(std::ostream&, const SequenceSet&);
+  friend std::ostream& operator<<(std::ostream&, const SequenceSet&);
 };    
 
 }} // namespace qpid::framing

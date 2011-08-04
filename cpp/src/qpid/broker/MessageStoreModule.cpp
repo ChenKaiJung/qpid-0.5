@@ -41,6 +41,11 @@ MessageStoreModule::~MessageStoreModule()
 
 bool MessageStoreModule::init(const Options*) { return true; }
 
+void MessageStoreModule::discardInit(const bool pushDownStoreFiles)
+{
+    TRANSFER_EXCEPTION(store->discardInit(pushDownStoreFiles));
+}
+
 void MessageStoreModule::create(PersistableQueue& queue, const FieldTable& args)
 {
     TRANSFER_EXCEPTION(store->create(queue, args));

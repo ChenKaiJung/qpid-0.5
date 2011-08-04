@@ -22,7 +22,6 @@
 #include "Multicaster.h"
 #include "Cpg.h"
 #include "qpid/log/Statement.h"
-#include "qpid/sys/LatencyMetric.h"
 #include "qpid/framing/AMQBody.h"
 #include "qpid/framing/AMQFrame.h"
 
@@ -32,6 +31,9 @@ namespace cluster {
 Multicaster::Multicaster(Cpg& cpg_, 
                          const boost::shared_ptr<sys::Poller>& poller,
                          boost::function<void()> onError_) :
+#if defined (QPID_LATENCY_TRACKER)
+    cpgLatency("CPG"),
+#endif
     onError(onError_), cpg(cpg_), 
     queue(boost::bind(&Multicaster::sendMcast, this, _1), poller),
     holding(true)
@@ -59,21 +61,20 @@ void Multicaster::mcastBuffer(const char* data, size_t size, const ConnectionId&
 void Multicaster::mcast(const Event& e) {
     {
         sys::Mutex::ScopedLock l(lock);
-        if (e.getType() == DATA && e.isConnection() && holding) {
+        LATENCY_TRACK(cpgLatency.start());
+        if (e.isConnection() && holding) {
             holdingQueue.push_back(e); 
             return;
         }
     }
-    QPID_LATENCY_INIT(e);
     queue.push(e);
 }
 
 
-void Multicaster::sendMcast(PollableEventQueue::Queue& values) {
+Multicaster::PollableEventQueue::Batch::const_iterator Multicaster::sendMcast(const PollableEventQueue::Batch& values) {
     try {
-        PollableEventQueue::Queue::iterator i = values.begin();
+        PollableEventQueue::Batch::const_iterator i = values.begin();
         while( i != values.end()) {
-            QPID_LATENCY_RECORD("mcast send queue", *i);
             iovec iov = i->toIovec();
             if (!cpg.mcast(&iov, 1)) {
                 // cpg didn't send because of CPG flow control.
@@ -81,12 +82,13 @@ void Multicaster::sendMcast(PollableEventQueue::Queue& values) {
             }
             ++i;
         }
-        values.erase(values.begin(), i); // Erase sent events.
+        return i;
     }
     catch (const std::exception& e) {
         QPID_LOG(critical, "Multicast error: " << e.what());
         queue.stop();
         onError();
+        return values.end();
     }
 }
 
@@ -95,11 +97,6 @@ void Multicaster::release() {
     holding = false;
     std::for_each(holdingQueue.begin(), holdingQueue.end(), boost::bind(&Multicaster::mcast, this, _1));
     holdingQueue.clear();
-}
-
-void Multicaster::selfDeliver(const Event& e) {
-    sys::Mutex::ScopedLock l(lock);
-    QPID_LATENCY_RECORD("cpg self deliver", e);
 }
 
 }} // namespace qpid::cluster

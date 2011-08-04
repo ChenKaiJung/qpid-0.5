@@ -20,7 +20,6 @@
  */
 
 #include "Broker.h"
-#include "BrokerImportExport.h"
 
 namespace qpid {
 namespace broker {
@@ -37,7 +36,7 @@ namespace broker {
  *
  * THREAD UNSAFE.
  */
-class QPID_BROKER_EXTERN BrokerSingleton : public boost::intrusive_ptr<Broker>
+class BrokerSingleton : public boost::intrusive_ptr<Broker>
 {
   public:
     BrokerSingleton();

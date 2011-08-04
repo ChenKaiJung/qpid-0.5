@@ -24,7 +24,6 @@
 #include <boost/shared_ptr.hpp>
 #include <iostream>
 #include <vector>
-#include "qpid/CommonImportExport.h"
 
 #ifndef _Array_
 #define _Array_
@@ -42,38 +41,38 @@ class Array
     typedef ValueVector::const_iterator const_iterator;
     typedef ValueVector::iterator iterator;
 
-    QPID_COMMON_EXTERN uint32_t encodedSize() const;
-    QPID_COMMON_EXTERN void encode(Buffer& buffer) const;
-    QPID_COMMON_EXTERN void decode(Buffer& buffer);
+    uint32_t encodedSize() const;
+    void encode(Buffer& buffer) const;
+    void decode(Buffer& buffer);
 
-    QPID_COMMON_EXTERN int count() const;
-    QPID_COMMON_EXTERN bool operator==(const Array& other) const;
+    int count() const;
+    bool operator==(const Array& other) const;
 
-    QPID_COMMON_EXTERN Array();
-    QPID_COMMON_EXTERN Array(TypeCode type);
-    QPID_COMMON_EXTERN Array(uint8_t type);
+    Array();
+    Array(TypeCode type);
+    Array(uint8_t type);
     //creates a longstr array
-    QPID_COMMON_EXTERN Array(const std::vector<std::string>& in);
+    Array(const std::vector<std::string>& in);
 
-    QPID_COMMON_EXTERN TypeCode getType() const { return type; }
+    TypeCode getType() const { return type; }
     
     // std collection interface.
-    QPID_COMMON_EXTERN const_iterator begin() const { return values.begin(); }
-    QPID_COMMON_EXTERN const_iterator end() const { return values.end(); }
-    QPID_COMMON_EXTERN iterator begin() { return values.begin(); }
-    QPID_COMMON_EXTERN iterator end(){ return values.end(); }
+    const_iterator begin() const { return values.begin(); }
+    const_iterator end() const { return values.end(); }
+    iterator begin() { return values.begin(); }
+    iterator end(){ return values.end(); }
 
-    QPID_COMMON_EXTERN ValuePtr front() const { return values.front(); }
-    QPID_COMMON_EXTERN ValuePtr back() const { return values.back(); }
-    QPID_COMMON_EXTERN size_t size() const { return values.size(); }
+    ValuePtr front() const { return values.front(); }
+    ValuePtr back() const { return values.back(); }
+    size_t size() const { return values.size(); }
 
-    QPID_COMMON_EXTERN void insert(iterator i, ValuePtr value);
-    QPID_COMMON_EXTERN void erase(iterator i) { values.erase(i); }
-    QPID_COMMON_EXTERN void push_back(ValuePtr value) { values.insert(end(), value); }
-    QPID_COMMON_EXTERN void pop_back() { values.pop_back(); }
+    void insert(iterator i, ValuePtr value);
+    void erase(iterator i) { values.erase(i); }
+    void push_back(ValuePtr value) { values.insert(end(), value); }
+    void pop_back() { values.pop_back(); }
     
     // Non-std interface
-    QPID_COMMON_EXTERN void add(ValuePtr value) { push_back(value); }
+    void add(ValuePtr value) { push_back(value); }
 
     template <class T>
     void collect(std::vector<T>& out) const
@@ -87,7 +86,7 @@ class Array
     TypeCode type;
     ValueVector values;
 
-    friend QPID_COMMON_EXTERN std::ostream& operator<<(std::ostream& out, const Array& body);
+    friend std::ostream& operator<<(std::ostream& out, const Array& body);
 };
 
 }

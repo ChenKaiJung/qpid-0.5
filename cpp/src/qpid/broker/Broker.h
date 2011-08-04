@@ -22,7 +22,6 @@
  *
  */
 
-#include "BrokerImportExport.h"
 #include "ConnectionFactory.h"
 #include "ConnectionToken.h"
 #include "DirectExchange.h"
@@ -81,16 +80,15 @@ struct NoSuchTransportException : qpid::Exception
  * A broker instance. 
  */
 class Broker : public sys::Runnable, public Plugin::Target,
-               public management::Manageable,
-               public RefCounted
+               public management::Manageable, public RefCounted
 {
-public:
+  public:
 
     struct Options : public qpid::Options {
         static const std::string DEFAULT_DATA_DIR_LOCATION;
         static const std::string DEFAULT_DATA_DIR_NAME;
 
-        QPID_BROKER_EXTERN Options(const std::string& name="Broker Options");
+        Options(const std::string& name="Broker Options");
 
         bool noDataDir;
         std::string dataDir;
@@ -111,6 +109,10 @@ public:
         bool requireEncrypted;
         std::string knownHosts;
         uint32_t maxSessionRate;
+        bool asyncQueueEvents;
+
+      private:
+        std::string getHome();
     };
  
   private:
@@ -150,9 +152,9 @@ public:
   
     virtual ~Broker();
 
-    QPID_BROKER_EXTERN Broker(const Options& configuration);
-    static QPID_BROKER_EXTERN boost::intrusive_ptr<Broker> create(const Options& configuration);
-    static QPID_BROKER_EXTERN boost::intrusive_ptr<Broker> create(int16_t port = DEFAULT_PORT);
+    Broker(const Options& configuration);
+    static boost::intrusive_ptr<Broker> create(const Options& configuration);
+    static boost::intrusive_ptr<Broker> create(int16_t port = DEFAULT_PORT);
 
     /**
      * Return listening port. If called before bind this is
@@ -171,7 +173,7 @@ public:
     /** Shut down the broker */
     virtual void shutdown();
 
-    QPID_BROKER_EXTERN void setStore (MessageStore*);
+    void setStore (MessageStore*);
     MessageStore& getStore() { return *store; }
     void setAcl (AclModule* _acl) {acl = _acl;}
     AclModule* getAcl() { return acl; }
@@ -231,10 +233,12 @@ public:
 
     boost::function<std::vector<Url> ()> getKnownBrokers;
 
-    static QPID_BROKER_EXTERN const std::string TCP_TRANSPORT;
+    static const std::string TCP_TRANSPORT;
 
     void setRecovery(bool set) { recovery = set; }
     bool getRecovery() const { return recovery; }
+
+    management::ManagementAgent* getManagementAgent() { return managementAgent; }
 };
 
 }}

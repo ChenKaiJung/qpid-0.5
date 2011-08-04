@@ -43,6 +43,13 @@ bool isControl(const AMQFrame& f) {
 bool isCommand(const AMQFrame& f) {
     return f.getMethod() && f.getMethod()->type() == framing::SEGMENT_TYPE_COMMAND;
 }
+
+const std::string QMF_PREFIX="qmf";
+bool isQmfSession(const SessionId& id)
+{
+    return id.getName().find(QMF_PREFIX) == 0;
+}
+
 } // namespace
 
 SessionPoint::SessionPoint(SequenceNumber c, uint64_t o) : command(c), offset(o) {}
@@ -147,8 +154,14 @@ void SessionState::senderRecordKnownCompleted() {
 }
 
 void SessionState::senderConfirmed(const SessionPoint& confirmed) {
-    if (confirmed > sender.sendPoint)
+    if (confirmed > sender.sendPoint) {
+        if (isQmfSession(id)) {
+            QPID_LOG(info, getId() << ": confirmed < " << confirmed << " but only sent < " << sender.sendPoint);
+            senderConfirmed(sender.sendPoint);
+            return;
+        }
         throw InvalidArgumentException(QPID_MSG(getId() << ": confirmed < " << confirmed << " but only sent < " << sender.sendPoint));
+    }
     QPID_LOG(debug, getId() << ": sender confirmed point moved to " << confirmed);
     ReplayList::iterator i = sender.replayList.begin();
     while (i != sender.replayList.end() && sender.replayPoint.command < confirmed.command) {
@@ -212,8 +225,13 @@ void SessionState::receiverCompleted(SequenceNumber command, bool cumulative) {
 }
 
 void SessionState::receiverKnownCompleted(const SequenceSet& commands) {
-    if (!commands.empty() && commands.back() > receiver.received.command)
-        throw InvalidArgumentException(QPID_MSG(getId() << ": Known-completed has invalid commands."));
+    if (!commands.empty() && commands.back() > receiver.received.command) {
+        if (isQmfSession(id)) {
+            QPID_LOG(info, getId() << ": Known-completed has invalid commands: " << commands);
+        } else {
+            throw InvalidArgumentException(QPID_MSG(getId() << ": Known-completed has invalid commands."));
+        }
+    }
     receiver.bytesSinceKnownCompleted=0;
     receiver.unknownCompleted -= commands;
     QPID_LOG(debug, getId() << ": receiver known completed: " << commands << " unknown: " << receiver.unknownCompleted);

@@ -22,7 +22,6 @@
 #define _ProtocolVersion_
 
 #include "amqp_types.h"
-#include "qpid/CommonImportExport.h"
 
 namespace qpid
 {
@@ -39,16 +38,16 @@ public:
     explicit ProtocolVersion(uint8_t _major=0, uint8_t _minor=0) 
         : major_(_major), minor_(_minor) {}
 
-    QPID_COMMON_EXTERN uint8_t getMajor() const { return major_; }
-    QPID_COMMON_EXTERN void setMajor(uint8_t major) { major_ = major; }
-    QPID_COMMON_EXTERN uint8_t getMinor() const { return minor_; }
-    QPID_COMMON_EXTERN void setMinor(uint8_t minor) { minor_ = minor; }
-    QPID_COMMON_EXTERN const std::string toString() const;
+    uint8_t getMajor() const { return major_; }
+    void setMajor(uint8_t major) { major_ = major; }
+    uint8_t getMinor() const { return minor_; }
+    void setMinor(uint8_t minor) { minor_ = minor; }
+    const std::string toString() const;
 
-    QPID_COMMON_EXTERN ProtocolVersion& operator=(ProtocolVersion p); 
+    ProtocolVersion& operator=(ProtocolVersion p); 
 
-    QPID_COMMON_EXTERN bool operator==(ProtocolVersion p) const;
-    QPID_COMMON_EXTERN bool operator!=(ProtocolVersion p) const { return ! (*this == p); }
+    bool operator==(ProtocolVersion p) const;
+    bool operator!=(ProtocolVersion p) const { return ! (*this == p); }
 };
 
 } // namespace framing

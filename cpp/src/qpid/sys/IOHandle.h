@@ -22,8 +22,6 @@
  *
  */
 
-#include "qpid/CommonImportExport.h"
-
 namespace qpid {
 namespace sys {
 
@@ -52,8 +50,8 @@ class IOHandle {
 protected:
     IOHandlePrivate* const impl;
 
-	IOHandle(IOHandlePrivate*);
-    QPID_COMMON_EXTERN virtual ~IOHandle();
+    IOHandle(IOHandlePrivate*);
+    virtual ~IOHandle();
 };
 
 }}

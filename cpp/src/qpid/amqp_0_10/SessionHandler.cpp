@@ -34,21 +34,21 @@ namespace amqp_0_10 {
 using namespace framing;
 using namespace std;
 
-#define CHECK_ATTACHED(MSG) if (!getState()) throw NotAttachedException(QPID_MSG(MSG << ": channel " << channel.get() << " is not attached"))
+void SessionHandler::checkAttached() {
+    if (!getState()) 
+        throw NotAttachedException(QPID_MSG("Channel " << channel.get() << " is not attached"));
+}
 
 SessionHandler::SessionHandler(FrameHandler* out, ChannelId ch)
-    : channel(ch, out), peer(channel), ignoring(false), sendReady(), receiveReady() {}
+    : channel(ch, out), peer(channel),
+      awaitingDetached(false),
+      sendReady(), receiveReady() {}
 
 SessionHandler::~SessionHandler() {}
 
 namespace {
 bool isSessionControl(AMQMethodBody* m) {
-    return m &&
-        m->amqpClassId() == SESSION_CLASS_ID;
-}
-bool isSessionDetachedControl(AMQMethodBody* m) {
-    return isSessionControl(m) &&
-        m->amqpMethodId() == SESSION_DETACHED_METHOD_ID;
+    return m && m->amqpClassId() == SESSION_CLASS_ID;
 }
 
 session::DetachCode convert(uint8_t code) {
@@ -71,12 +71,19 @@ void SessionHandler::handleIn(AMQFrame& f) {
     // Note on channel states: a channel is attached if session != 0
     AMQMethodBody* m = f.getBody()->getMethod();
     try {
-        if (ignoring && !isSessionDetachedControl(m))
-            return;
-        else if (isSessionControl(m))
+        // Ignore all but detach controls while awaiting detach
+        if (awaitingDetached) {
+            if (!isSessionControl(m)) return;
+            if (m->amqpMethodId() != SESSION_DETACH_METHOD_ID &&
+                m->amqpMethodId() != SESSION_DETACHED_METHOD_ID)
+                return;
+        }
+        if (isSessionControl(m)) {
             invoke(*m);
+        }
         else {
-            CHECK_ATTACHED("receiving " << f);
+            // Drop frames if we are detached.
+            if (!getState()) return;  
             if (!receiveReady)
                 throw IllegalStateException(QPID_MSG(getState()->getId() << ": Not ready to receive data"));
             if (!getState()->receiverRecord(f))
@@ -88,6 +95,7 @@ void SessionHandler::handleIn(AMQFrame& f) {
     }
     catch(const SessionException& e) {
         QPID_LOG(error, "Execution exception: " << e.what());
+        executionException(e.code, e.what()); // Let subclass handle this first.
         framing::AMQP_AllProxy::Execution  execution(channel);
         AMQMethodBody* m = f.getMethod();
         SequenceNumber commandId;
@@ -98,6 +106,7 @@ void SessionHandler::handleIn(AMQFrame& f) {
     }
     catch(const ChannelException& e){
         QPID_LOG(error, "Channel exception: " << e.what());
+        channelException(e.code, e.what()); // Let subclass handle this first.
         peer.detached(name, e.code);
     }
     catch(const ConnectionException& e) {
@@ -120,7 +129,7 @@ bool isCommand(const AMQFrame& f) {
 } // namespace
 
 void SessionHandler::handleOut(AMQFrame& f) {
-    CHECK_ATTACHED("sending " << f);
+    checkAttached();
     if (!sendReady)
         throw IllegalStateException(QPID_MSG(getState()->getId() << ": Not ready to send data"));
     getState()->senderRecord(f); 
@@ -135,11 +144,11 @@ void SessionHandler::attach(const std::string& name_, bool force) {
     // Save the name for possible session-busy exception. Session-busy
     // can be thrown before we have attached the handler to a valid
     // SessionState, and in that case we need the name to send peer.detached
-    name = name_;               
+    name = name_;
     if (getState() && name == getState()->getId().getName())
         return;                 // Idempotent
     if (getState())
-        throw TransportBusyException(
+            throw TransportBusyException(
             QPID_MSG("Channel " << channel.get() << " already attached to " << getState()->getId()));
     setState(name, force);
     QPID_LOG(debug, "Attached channel " << channel.get() << " to " << getState()->getId());
@@ -150,8 +159,8 @@ void SessionHandler::attach(const std::string& name_, bool force) {
         sendCommandPoint(getState()->senderGetCommandPoint());
 }
 
-#define CHECK_NAME(NAME, MSG) do {                                       \
-    CHECK_ATTACHED(MSG);                                                \
+#define CHECK_NAME(NAME, MSG) do {                                      \
+    checkAttached();                                                    \
     if (NAME != getState()->getId().getName())                          \
         throw InvalidArgumentException(                                 \
             QPID_MSG(MSG << ": incorrect session name: " << NAME        \
@@ -171,7 +180,7 @@ void SessionHandler::detach(const std::string& name) {
 
 void SessionHandler::detached(const std::string& name, uint8_t code) {
     CHECK_NAME(name, "session.detached");
-    ignoring = false;
+    awaitingDetached = false;
     if (code != session::DETACH_CODE_NORMAL)
         channelException(convert(code), "session.detached from peer.");
     else {
@@ -184,18 +193,18 @@ void SessionHandler::handleDetach() {
 }
 
 void SessionHandler::requestTimeout(uint32_t t) {
-    CHECK_ATTACHED("session.request-timeout");
+    checkAttached();
     getState()->setTimeout(t);
     peer.timeout(t);
 }
 
 void SessionHandler::timeout(uint32_t t) {
-    CHECK_ATTACHED("session.request-timeout");
+    checkAttached();
     getState()->setTimeout(t);
 }
 
 void SessionHandler::commandPoint(const SequenceNumber& id, uint64_t offset) {
-    CHECK_ATTACHED("session.command-point");
+    checkAttached();
     getState()->receiverSetCommandPoint(SessionPoint(id, offset));
     if (!receiveReady) {
         receiveReady = true;
@@ -204,7 +213,7 @@ void SessionHandler::commandPoint(const SequenceNumber& id, uint64_t offset) {
 }
 
 void SessionHandler::expected(const SequenceSet& commands, const Array& /*fragments*/) {
-    CHECK_ATTACHED("session.expected");
+    checkAttached();
     if (getState()->hasState()) { // Replay
         if (commands.empty()) throw IllegalStateException(
             QPID_MSG(getState()->getId() << ": has state but client is attaching as new session."));        
@@ -220,14 +229,14 @@ void SessionHandler::expected(const SequenceSet& commands, const Array& /*fragme
 }
 
 void SessionHandler::confirmed(const SequenceSet& commands, const Array& /*fragments*/) {
-    CHECK_ATTACHED("session.confirmed");
+    checkAttached();
     // Ignore non-contiguous confirmations.
     if (!commands.empty() && commands.front() >= getState()->senderGetReplayPoint()) 
         getState()->senderConfirmed(commands.rangesBegin()->last());
 }
 
 void SessionHandler::completed(const SequenceSet& commands, bool timelyReply) {
-    CHECK_ATTACHED("session.completed");
+    checkAttached();
     getState()->senderCompleted(commands);
     if (getState()->senderNeedKnownCompleted() || timelyReply) {
         peer.knownCompleted(commands);
@@ -236,12 +245,12 @@ void SessionHandler::completed(const SequenceSet& commands, bool timelyReply) {
 }
 
 void SessionHandler::knownCompleted(const SequenceSet& commands) {
-    CHECK_ATTACHED("session.known-completed");
+    checkAttached();
     getState()->receiverKnownCompleted(commands);
 }
 
 void SessionHandler::flush(bool expected, bool confirmed, bool completed) {
-    CHECK_ATTACHED("session.flush");
+    checkAttached();
     if (expected)  {
         SequenceSet expectSet;
         if (getState()->hasState())
@@ -265,13 +274,13 @@ void SessionHandler::gap(const SequenceSet& /*commands*/) {
 
 void SessionHandler::sendDetach()
 {
-    CHECK_ATTACHED("session.sendDetach");
-    ignoring = true;
+    checkAttached();
+    awaitingDetached = true;
     peer.detach(getState()->getId().getName());
 }
 
 void SessionHandler::sendCompletion() {
-    CHECK_ATTACHED("session.send-completion");
+    checkAttached();
     const SequenceSet& c = getState()->receiverGetUnknownComplete();
     peer.completed(c, getState()->receiverNeedKnownCompleted());
 }
@@ -300,7 +309,7 @@ void SessionHandler::markReadyToSend() {
 }
 
 void SessionHandler::sendTimeout(uint32_t t) {
-    CHECK_ATTACHED("session.send-timeout");
+    checkAttached();
     peer.requestTimeout(t);
 }
 

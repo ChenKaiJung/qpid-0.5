@@ -21,7 +21,6 @@
 #ifndef _QueueRegistry_
 #define _QueueRegistry_
 
-#include "BrokerImportExport.h"
 #include "Queue.h"
 #include "qpid/sys/Mutex.h"
 #include "qpid/management/Manageable.h"
@@ -41,10 +40,10 @@ class QueueEvents;
  * are deleted when and only when they are no longer in use.
  *
  */
-class QueueRegistry {
+class QueueRegistry{
   public:
-    QPID_BROKER_EXTERN QueueRegistry();
-    QPID_BROKER_EXTERN ~QueueRegistry();
+    QueueRegistry();
+    ~QueueRegistry();
 
     /**
      * Declare a queue.
@@ -52,11 +51,8 @@ class QueueRegistry {
      * @return The queue and a boolean flag which is true if the queue
      * was created by this declare call false if it already existed.
      */
-    QPID_BROKER_EXTERN std::pair<Queue::shared_ptr, bool> declare
-      (const string& name,
-       bool durable = false,
-       bool autodelete = false, 
-       const OwnershipToken* owner = 0);
+    std::pair<Queue::shared_ptr, bool> declare(const string& name, bool durable = false, bool autodelete = false, 
+                                               const OwnershipToken* owner = 0);
 
     /**
      * Destroy the named queue.
@@ -70,7 +66,7 @@ class QueueRegistry {
      * subsequent calls to find or declare with the same name.
      *
      */
-    QPID_BROKER_EXTERN void destroy(const string& name);
+    void destroy   (const string& name);
     template <class Test> bool destroyIf(const string& name, Test test)
     {
         qpid::sys::RWlock::ScopedWlock locker(lock);
@@ -85,7 +81,7 @@ class QueueRegistry {
     /**
      * Find the named queue. Return 0 if not found.
      */
-    QPID_BROKER_EXTERN Queue::shared_ptr find(const string& name);
+    Queue::shared_ptr find(const string& name);
 
     /**
      * Generate unique queue name.
@@ -111,7 +107,7 @@ class QueueRegistry {
 
     /** Call f for each queue in the registry. */
     template <class F> void eachQueue(F f) const {
-        qpid::sys::RWlock::ScopedWlock l(lock);
+        qpid::sys::RWlock::ScopedRlock l(lock);
         for (QueueMap::const_iterator i = queues.begin(); i != queues.end(); ++i)
             f(i->second);
     }

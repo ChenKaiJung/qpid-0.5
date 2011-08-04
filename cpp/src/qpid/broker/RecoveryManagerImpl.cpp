@@ -44,8 +44,7 @@ class RecoverableMessageImpl : public RecoverableMessage
     intrusive_ptr<Message> msg;
     const uint64_t stagingThreshold;
 public:
-    RecoverableMessageImpl(const intrusive_ptr<Message>& _msg, uint64_t _stagingThreshold) 
-        : msg(_msg), stagingThreshold(_stagingThreshold) {}
+    RecoverableMessageImpl(const intrusive_ptr<Message>& _msg, uint64_t _stagingThreshold); 
     ~RecoverableMessageImpl() {};
     void setPersistenceId(uint64_t id);
     bool loadContent(uint64_t available);
@@ -112,6 +111,7 @@ RecoverableQueue::shared_ptr RecoveryManagerImpl::recoverQueue(framing::Buffer& 
         Exchange::shared_ptr exchange = exchanges.getDefault();
         if (exchange) {
             exchange->bind(queue, queue->getName(), 0);
+            queue->bound(exchange->getName(), queue->getName(), framing::FieldTable());
         }
     } catch (const framing::NotFoundException& /*e*/) {
         //assume no default exchange has been declared
@@ -151,6 +151,13 @@ void RecoveryManagerImpl::recoveryComplete()
 {
     //notify all queues
     queues.eachQueue(boost::bind(&Queue::recoveryComplete, _1));
+}
+
+RecoverableMessageImpl:: RecoverableMessageImpl(const intrusive_ptr<Message>& _msg, uint64_t _stagingThreshold) : msg(_msg), stagingThreshold(_stagingThreshold) 
+{
+    if (!msg->isPersistent()) {
+        msg->forcePersistent(); // set so that message will get dequeued from store.
+    }
 }
 
 bool RecoverableMessageImpl::loadContent(uint64_t available)
@@ -220,6 +227,7 @@ void RecoverableExchangeImpl::bind(string& queueName, string& key, framing::Fiel
 {
     Queue::shared_ptr queue = queues.find(queueName);
     exchange->bind(queue, key, &args);
+    queue->bound(exchange->getName(), key, args);
 }
 
 void RecoverableMessageImpl::dequeue(DtxBuffer::shared_ptr buffer, Queue::shared_ptr queue)

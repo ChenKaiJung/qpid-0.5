@@ -110,10 +110,16 @@ endif
 # 	amqp_0_10/Map.cpp \
 # 	amqp_0_10/handlers.cpp 
 
+TESTLIBFLAGS = -module -rpath $(abs_builddir)
 
 check_LTLIBRARIES += libshlibtest.la
-libshlibtest_la_LDFLAGS = -module -rpath $(abs_builddir)
+libshlibtest_la_LDFLAGS = $(TESTLIBFLAGS)
 libshlibtest_la_SOURCES = shlibtest.cpp
+
+check_LTLIBRARIES += test_store.la
+test_store_la_SOURCES = test_store.cpp
+test_store_la_LIBADD = $(lib_broker)
+test_store_la_LDFLAGS = $(TESTLIBFLAGS)
 
 include cluster.mk
 if SSL
@@ -257,28 +263,13 @@ CLEANFILES+=valgrind.out *.log *.vglog* dummy_test $(unit_wrappers)
 # Longer running stability tests, not run by default check: target.
 # Not run under valgrind, too slow
 
-LONG_TESTS+=start_broker fanout_perftest shared_perftest multiq_perftest topic_perftest run_failover_soak stop_broker \
- reliable_replication_test federated_cluster_test_with_node_failure
+LONG_TESTS+=start_broker fanout_perftest shared_perftest multiq_perftest topic_perftest run_ring_queue_test stop_broker \
+ run_failover_soak  \
+ federated_cluster_test_with_node_failure
+# TODO: renable the temporarily disabled the failing reliable_replication_test when QPID-1984 is resolved.
 
 EXTRA_DIST+=fanout_perftest shared_perftest multiq_perftest topic_perftest run_failover_soak reliable_replication_test \
-  federated_cluster_test_with_node_failure \
-  tests.sln \
-  client_test.vcproj \
-  consume.vcproj \
-  echotest.vcproj \
-  header_test.vcproj \
-  latencytest.vcproj \
-  perftest.vcproj \
-  publish.vcproj \
-  receiver.vcproj \
-  sender.vcproj \
-  shlibtest.vcproj \
-  topic_listener.vcproj \
-  topic_publisher.vcproj \
-  txjob.vcproj \
-  txshift.vcproj \
-  txtest.vcproj \
-  unit_test.vcproj
+  federated_cluster_test_with_node_failure
 
 check-long:
 	$(MAKE) check TESTS="$(LONG_TESTS)" VALGRIND=

@@ -29,7 +29,6 @@
 #include "qpid/sys/LatencyMetric.h"
 #include <boost/intrusive_ptr.hpp>
 #include <boost/cast.hpp>
-#include "qpid/CommonImportExport.h"
 
 namespace qpid {
 namespace framing {
@@ -37,15 +36,15 @@ namespace framing {
 class AMQFrame : public AMQDataBlock, public sys::LatencyMetricTimestamp
 {
   public:
-    QPID_COMMON_EXTERN AMQFrame(const boost::intrusive_ptr<AMQBody>& b=0);
-    QPID_COMMON_EXTERN AMQFrame(const AMQBody& b);
-    QPID_COMMON_EXTERN ~AMQFrame();
+    AMQFrame(const boost::intrusive_ptr<AMQBody>& b=0);
+    AMQFrame(const AMQBody& b);
+    ~AMQFrame();
 
     ChannelId getChannel() const { return channel; }
     void setChannel(ChannelId c) { channel = c; }
 
-    QPID_COMMON_EXTERN AMQBody* getBody();
-    QPID_COMMON_EXTERN const AMQBody* getBody() const;
+    AMQBody* getBody();
+    const AMQBody* getBody() const;
 
     AMQMethodBody* getMethod() { return getBody()->getMethod(); }
     const AMQMethodBody* getMethod() const { return getBody()->getMethod(); }
@@ -60,9 +59,9 @@ class AMQFrame : public AMQDataBlock, public sys::LatencyMetricTimestamp
         return boost::polymorphic_downcast<const T*>(getBody());
     }
 
-    QPID_COMMON_EXTERN void encode(Buffer& buffer) const; 
-    QPID_COMMON_EXTERN bool decode(Buffer& buffer); 
-    QPID_COMMON_EXTERN uint32_t encodedSize() const;
+    void encode(Buffer& buffer) const; 
+    bool decode(Buffer& buffer); 
+    uint32_t encodedSize() const;
 
     // 0-10 terminology: first/last frame (in segment) first/last segment (in assembly)
 
@@ -89,7 +88,7 @@ class AMQFrame : public AMQDataBlock, public sys::LatencyMetricTimestamp
     void setEos(bool isEos) { eos = isEos; }
 
     static uint16_t DECODE_SIZE_MIN;
-    QPID_COMMON_EXTERN static uint32_t frameOverhead();
+    static uint32_t frameOverhead();
     /** Must point to at least DECODE_SIZE_MIN bytes of data */
     static uint16_t decodeSize(char* data);
 
@@ -106,7 +105,7 @@ class AMQFrame : public AMQDataBlock, public sys::LatencyMetricTimestamp
     mutable uint32_t encodedSizeCache;
 };
 
-QPID_COMMON_EXTERN std::ostream& operator<<(std::ostream&, const AMQFrame&);
+std::ostream& operator<<(std::ostream&, const AMQFrame&);
 
 }} // namespace qpid::framing
 

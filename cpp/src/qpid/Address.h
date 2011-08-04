@@ -20,7 +20,7 @@
  */
 
 #include "qpid/sys/IntegerTypes.h"
-#include "qpid/CommonImportExport.h"
+
 #include <boost/variant.hpp>
 #include <iosfwd>
 #include <string>
@@ -31,12 +31,12 @@ namespace qpid {
 /** TCP address of a broker - host:port */
 struct TcpAddress {
     static const uint16_t DEFAULT_PORT=5672;
-    QPID_COMMON_EXTERN explicit TcpAddress(const std::string& host_=std::string(),uint16_t port_=DEFAULT_PORT);
+    explicit TcpAddress(const std::string& host_=std::string(),uint16_t port_=DEFAULT_PORT);
     std::string host;
     uint16_t port;
 };
 bool operator==(const TcpAddress& x, const TcpAddress& y);
-QPID_COMMON_EXTERN std::ostream& operator<<(std::ostream& os, const TcpAddress& a);
+std::ostream& operator<<(std::ostream& os, const TcpAddress& a);
 
 /**@internal Not a real address type, this is a placeholder to
  * demonstrate and validate multi-protocol Urls for unit tests and

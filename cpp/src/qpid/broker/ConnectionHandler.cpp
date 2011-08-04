@@ -64,13 +64,16 @@ void ConnectionHandler::heartbeat()
 void ConnectionHandler::handle(framing::AMQFrame& frame)
 {
     AMQMethodBody* method=frame.getBody()->getMethod();
+    Connection::ErrorListener* errorListener = handler->connection.getErrorListener();
     try{
         if (!invoke(static_cast<AMQP_AllOperations::ConnectionHandler&>(*handler.get()), *method)) {
             handler->connection.getChannel(frame.getChannel()).in(frame);
         }
     }catch(ConnectionException& e){
+        if (errorListener) errorListener->connectionError(e.what());
         handler->proxy.close(e.code, e.what());
     }catch(std::exception& e){
+        if (errorListener) errorListener->connectionError(e.what());
         handler->proxy.close(541/*internal error*/, e.what());
     }
 }
@@ -213,9 +216,15 @@ void ConnectionHandler::Handler::closeOk(){
 } 
 
 void ConnectionHandler::Handler::heartbeat(){
-	// Do nothing - the purpose of heartbeats is just to make sure that there is some
-	// traffic on the connection within the heart beat interval, we check for the
-	// traffic and don't need to do anything in response to heartbeats
+     // For general case, do nothing - the purpose of heartbeats is
+     // just to make sure that there is some traffic on the connection
+     // within the heart beat interval, we check for the traffic and
+     // don't need to do anything in response to heartbeats.  The
+     // exception is when we are in fact the client to another broker
+     // (i.e. an inter-broker link), in which case we echo the
+     // heartbeat back to the peer
+
+     if (!serverMode) proxy.heartbeat();
 }
 
 void ConnectionHandler::Handler::start(const FieldTable& serverProperties,

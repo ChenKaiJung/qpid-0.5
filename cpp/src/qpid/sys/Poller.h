@@ -24,7 +24,7 @@
 
 #include "Time.h"
 #include "Runnable.h"
-#include "qpid/CommonImportExport.h"
+
 #include <boost/shared_ptr.hpp>
 
 namespace qpid {
@@ -74,10 +74,10 @@ public:
         void process();
     };
     
-    QPID_COMMON_EXTERN Poller();
-    QPID_COMMON_EXTERN ~Poller();
+    Poller();
+    ~Poller();
     /** Note: this function is async-signal safe */
-    QPID_COMMON_EXTERN void shutdown();
+    void shutdown();
     
     // Interrupt waiting for a specific poller handle
     // returns true if we could interrupt the handle
@@ -89,16 +89,16 @@ public:
     //   reported and has not been reenabled since.
     // - Because it was removed from the monitoring set
     // - Or because it is already being interrupted 
-    QPID_COMMON_EXTERN bool interrupt(PollerHandle& handle);
+    bool interrupt(PollerHandle& handle);
     
     // Poller run loop
-    QPID_COMMON_EXTERN void run();
+    void run();
 
-    QPID_COMMON_EXTERN void addFd(PollerHandle& handle, Direction dir);
-    QPID_COMMON_EXTERN void delFd(PollerHandle& handle);
-    QPID_COMMON_EXTERN void modFd(PollerHandle& handle, Direction dir);
-    QPID_COMMON_EXTERN void rearmFd(PollerHandle& handle);
-    QPID_COMMON_EXTERN Event wait(Duration timeout = TIME_INFINITE);
+    void addFd(PollerHandle& handle, Direction dir);
+    void delFd(PollerHandle& handle);
+    void modFd(PollerHandle& handle, Direction dir);
+    void rearmFd(PollerHandle& handle);
+    Event wait(Duration timeout = TIME_INFINITE);
 };
 
 /**
@@ -111,11 +111,11 @@ class PollerHandle {
     friend struct Poller::Event;
 
     PollerHandlePrivate* const impl;
-    QPID_COMMON_EXTERN virtual void processEvent(Poller::EventType) {};
+    virtual void processEvent(Poller::EventType) {};
 
 public:
-    QPID_COMMON_EXTERN PollerHandle(const IOHandle& h);
-    QPID_COMMON_EXTERN virtual ~PollerHandle();
+    PollerHandle(const IOHandle& h);
+    virtual ~PollerHandle();
 };
 
 inline void Poller::Event::process() {
