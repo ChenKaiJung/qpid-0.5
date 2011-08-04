@@ -148,8 +148,8 @@ protected:
     // static create() method. Deletes not allowed from outside.
     AsynchIO() {}
     virtual ~AsynchIO() {}
-    friend class std::auto_ptr<AsynchIO>;
-    static std::auto_ptr<AsynchIO> AIOInstance;  
+//    friend class std::auto_ptr<AsynchIO>;
+//    static std::auto_ptr<AsynchIO> AIOInstance;  
 };
 
 }}

@@ -26,7 +26,6 @@ module_hdr += \
   qpid/console/Agent.h \
   qpid/console/Broker.h \
   qpid/console/ClassKey.h \
-  qpid/console/ConsoleImportExport.h \
   qpid/console/ConsoleListener.h \
   qpid/console/Event.h \
   qpid/console/Object.h \
@@ -44,7 +43,6 @@ libqmfconsole_la_SOURCES = \
   qpid/console/Broker.cpp \
   qpid/console/ClassKey.h \
   qpid/console/ClassKey.cpp \
-  qpid/console/ConsoleImportExport.h \
   qpid/console/ConsoleListener.h \
   qpid/console/Event.h \
   qpid/console/Event.cpp \

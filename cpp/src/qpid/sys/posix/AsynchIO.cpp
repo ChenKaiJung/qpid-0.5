@@ -611,13 +611,15 @@ AsynchIO* qpid::sys::AsynchIO::create(const Socket& s,
                                       AsynchIO::BuffersEmptyCallback eCb,
                                       AsynchIO::IdleCallback iCb)
 {
-    //return new qpid::sys::posix::AsynchIO(s, rCb, eofCb, disCb, cCb, eCb, iCb);
+    return new qpid::sys::posix::AsynchIO(s, rCb, eofCb, disCb, cCb, eCb, iCb);
+    /*
     if(AIOInstance.get() == NULL)  {
       if(AIOInstance.get() == NULL) {
           AIOInstance.reset(new qpid::sys::posix::AsynchIO(s, rCb, eofCb, disCb, cCb, eCb, iCb));
       }
     }
     return AIOInstance.get();
+    */
 }
 
 }} // namespace qpid::sys
