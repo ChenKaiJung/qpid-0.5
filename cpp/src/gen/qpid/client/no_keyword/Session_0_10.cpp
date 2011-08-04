@@ -1,0 +1,275 @@
+/*
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+ */
+
+///
+/// This file was automatically generated from the AMQP specification.
+/// Do not edit.
+///
+
+
+#include "Session_0_10.h"
+#include "qpid/framing/all_method_bodies.h"
+
+namespace qpid {
+namespace client {
+namespace no_keyword {
+
+using namespace framing;
+
+void Session_0_10::executionSync(bool sync) {
+    ExecutionSyncBody body(ProtocolVersion(0,10));
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::executionResult(const SequenceNumber& commandId, const string& value, bool sync) {
+    ExecutionResultBody body(ProtocolVersion(0,10), commandId, value);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::executionException(uint16_t errorCode, const SequenceNumber& commandId, uint8_t classCode, uint8_t commandCode, uint8_t fieldIndex, const string& description, const FieldTable& errorInfo, bool sync) {
+    ExecutionExceptionBody body(ProtocolVersion(0,10), errorCode, commandId, classCode, commandCode, fieldIndex, description, errorInfo);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::messageTransfer(const string& destination, uint8_t acceptMode, uint8_t acquireMode, const MethodContent& content, bool sync) {
+    MessageTransferBody body(ProtocolVersion(0,10), destination, acceptMode, acquireMode);
+    body.setSync(sync);
+    Completion(impl->send(body, content), impl).wait();
+}
+
+void Session_0_10::messageAccept(const SequenceSet& transfers, bool sync) {
+    MessageAcceptBody body(ProtocolVersion(0,10), transfers);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::messageReject(const SequenceSet& transfers, uint16_t code, const string& text, bool sync) {
+    MessageRejectBody body(ProtocolVersion(0,10), transfers, code, text);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::messageRelease(const SequenceSet& transfers, bool setRedelivered, bool sync) {
+    MessageReleaseBody body(ProtocolVersion(0,10), transfers, setRedelivered);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+qpid::framing::MessageAcquireResult Session_0_10::messageAcquire(const SequenceSet& transfers, bool sync) {
+    MessageAcquireBody body(ProtocolVersion(0,10), transfers);
+    body.setSync(sync);
+    return TypedResult<qpid::framing::MessageAcquireResult>(impl->send(body), impl).get();
+}
+
+qpid::framing::MessageResumeResult Session_0_10::messageResume(const string& destination, const string& resumeId, bool sync) {
+    MessageResumeBody body(ProtocolVersion(0,10), destination, resumeId);
+    body.setSync(sync);
+    return TypedResult<qpid::framing::MessageResumeResult>(impl->send(body), impl).get();
+}
+
+void Session_0_10::messageSubscribe(const string& queue, const string& destination, uint8_t acceptMode, uint8_t acquireMode, bool exclusive, const string& resumeId, uint64_t resumeTtl, const FieldTable& arguments, bool sync) {
+    MessageSubscribeBody body(ProtocolVersion(0,10), queue, destination, acceptMode, acquireMode, exclusive, resumeId, resumeTtl, arguments);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::messageCancel(const string& destination, bool sync) {
+    MessageCancelBody body(ProtocolVersion(0,10), destination);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::messageSetFlowMode(const string& destination, uint8_t flowMode, bool sync) {
+    MessageSetFlowModeBody body(ProtocolVersion(0,10), destination, flowMode);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::messageFlow(const string& destination, uint8_t unit, uint32_t value, bool sync) {
+    MessageFlowBody body(ProtocolVersion(0,10), destination, unit, value);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::messageFlush(const string& destination, bool sync) {
+    MessageFlushBody body(ProtocolVersion(0,10), destination);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::messageStop(const string& destination, bool sync) {
+    MessageStopBody body(ProtocolVersion(0,10), destination);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::txSelect(bool sync) {
+    TxSelectBody body(ProtocolVersion(0,10));
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::txCommit(bool sync) {
+    TxCommitBody body(ProtocolVersion(0,10));
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::txRollback(bool sync) {
+    TxRollbackBody body(ProtocolVersion(0,10));
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::dtxSelect(bool sync) {
+    DtxSelectBody body(ProtocolVersion(0,10));
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+qpid::framing::XaResult Session_0_10::dtxStart(const Xid& xid, bool join, bool resume, bool sync) {
+    DtxStartBody body(ProtocolVersion(0,10), xid, join, resume);
+    body.setSync(sync);
+    return TypedResult<qpid::framing::XaResult>(impl->send(body), impl).get();
+}
+
+qpid::framing::XaResult Session_0_10::dtxEnd(const Xid& xid, bool fail, bool suspend, bool sync) {
+    DtxEndBody body(ProtocolVersion(0,10), xid, fail, suspend);
+    body.setSync(sync);
+    return TypedResult<qpid::framing::XaResult>(impl->send(body), impl).get();
+}
+
+qpid::framing::XaResult Session_0_10::dtxCommit(const Xid& xid, bool onePhase, bool sync) {
+    DtxCommitBody body(ProtocolVersion(0,10), xid, onePhase);
+    body.setSync(sync);
+    return TypedResult<qpid::framing::XaResult>(impl->send(body), impl).get();
+}
+
+void Session_0_10::dtxForget(const Xid& xid, bool sync) {
+    DtxForgetBody body(ProtocolVersion(0,10), xid);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+qpid::framing::DtxGetTimeoutResult Session_0_10::dtxGetTimeout(const Xid& xid, bool sync) {
+    DtxGetTimeoutBody body(ProtocolVersion(0,10), xid);
+    body.setSync(sync);
+    return TypedResult<qpid::framing::DtxGetTimeoutResult>(impl->send(body), impl).get();
+}
+
+qpid::framing::XaResult Session_0_10::dtxPrepare(const Xid& xid, bool sync) {
+    DtxPrepareBody body(ProtocolVersion(0,10), xid);
+    body.setSync(sync);
+    return TypedResult<qpid::framing::XaResult>(impl->send(body), impl).get();
+}
+
+qpid::framing::DtxRecoverResult Session_0_10::dtxRecover(bool sync) {
+    DtxRecoverBody body(ProtocolVersion(0,10));
+    body.setSync(sync);
+    return TypedResult<qpid::framing::DtxRecoverResult>(impl->send(body), impl).get();
+}
+
+qpid::framing::XaResult Session_0_10::dtxRollback(const Xid& xid, bool sync) {
+    DtxRollbackBody body(ProtocolVersion(0,10), xid);
+    body.setSync(sync);
+    return TypedResult<qpid::framing::XaResult>(impl->send(body), impl).get();
+}
+
+void Session_0_10::dtxSetTimeout(const Xid& xid, uint32_t timeout, bool sync) {
+    DtxSetTimeoutBody body(ProtocolVersion(0,10), xid, timeout);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::exchangeDeclare(const string& exchange, const string& type, const string& alternateExchange, bool passive, bool durable, bool autoDelete, const FieldTable& arguments, bool sync) {
+    ExchangeDeclareBody body(ProtocolVersion(0,10), exchange, type, alternateExchange, passive, durable, autoDelete, arguments);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::exchangeDelete(const string& exchange, bool ifUnused, bool sync) {
+    ExchangeDeleteBody body(ProtocolVersion(0,10), exchange, ifUnused);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+qpid::framing::ExchangeQueryResult Session_0_10::exchangeQuery(const string& name, bool sync) {
+    ExchangeQueryBody body(ProtocolVersion(0,10), name);
+    body.setSync(sync);
+    return TypedResult<qpid::framing::ExchangeQueryResult>(impl->send(body), impl).get();
+}
+
+void Session_0_10::exchangeBind(const string& queue, const string& exchange, const string& bindingKey, const FieldTable& arguments, bool sync) {
+    ExchangeBindBody body(ProtocolVersion(0,10), queue, exchange, bindingKey, arguments);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::exchangeUnbind(const string& queue, const string& exchange, const string& bindingKey, bool sync) {
+    ExchangeUnbindBody body(ProtocolVersion(0,10), queue, exchange, bindingKey);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+qpid::framing::ExchangeBoundResult Session_0_10::exchangeBound(const string& exchange, const string& queue, const string& bindingKey, const FieldTable& arguments, bool sync) {
+    ExchangeBoundBody body(ProtocolVersion(0,10), exchange, queue, bindingKey, arguments);
+    body.setSync(sync);
+    return TypedResult<qpid::framing::ExchangeBoundResult>(impl->send(body), impl).get();
+}
+
+void Session_0_10::queueDeclare(const string& queue, const string& alternateExchange, bool passive, bool durable, bool exclusive, bool autoDelete, const FieldTable& arguments, bool sync) {
+    QueueDeclareBody body(ProtocolVersion(0,10), queue, alternateExchange, passive, durable, exclusive, autoDelete, arguments);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::queueDelete(const string& queue, bool ifUnused, bool ifEmpty, bool sync) {
+    QueueDeleteBody body(ProtocolVersion(0,10), queue, ifUnused, ifEmpty);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+void Session_0_10::queuePurge(const string& queue, bool sync) {
+    QueuePurgeBody body(ProtocolVersion(0,10), queue);
+    body.setSync(sync);
+    Completion(impl->send(body), impl).wait();
+}
+
+qpid::framing::QueueQueryResult Session_0_10::queueQuery(const string& queue, bool sync) {
+    QueueQueryBody body(ProtocolVersion(0,10), queue);
+    body.setSync(sync);
+    return TypedResult<qpid::framing::QueueQueryResult>(impl->send(body), impl).get();
+}
+
+ Session_0_10::Session_0_10() {}
+ Session_0_10::Session_0_10(const SessionBase_0_10& other) {
+    *this = other;
+}
+ Session_0_10& Session_0_10::operator=(const SessionBase_0_10& other) {
+    impl = static_cast<const Session_0_10&>(other).impl;
+    return *this;
+}
+
+}}} // namespace qpid::client::no_keyword
+
