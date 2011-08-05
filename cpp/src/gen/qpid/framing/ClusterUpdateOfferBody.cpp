@@ -47,6 +47,14 @@ const Uuid& ClusterUpdateOfferBody::getClusterId() const { return clusterId; }
 bool ClusterUpdateOfferBody::hasClusterId() const { return flags & (1 << 9); }
 void ClusterUpdateOfferBody::clearClusterIdFlag() { flags &= ~(1 << 9); }
 
+void ClusterUpdateOfferBody::setVersion(uint32_t _version) {
+    version = _version;
+    flags |= (1 << 10);
+}
+uint32_t ClusterUpdateOfferBody::getVersion() const { return version; }
+bool ClusterUpdateOfferBody::hasVersion() const { return flags & (1 << 10); }
+void ClusterUpdateOfferBody::clearVersionFlag() { flags &= ~(1 << 10); }
+
 void ClusterUpdateOfferBody::encodeStructBody(Buffer& buffer) const
 {
 encodeHeader(buffer);
@@ -55,6 +63,8 @@ encodeHeader(buffer);
         buffer.putLongLong(updatee);
     if (flags & (1 << 9))
         clusterId.encode(buffer);
+    if (flags & (1 << 10))
+        buffer.putLong(version);
 }
 
 void ClusterUpdateOfferBody::encode(Buffer& buffer) const
@@ -70,6 +80,8 @@ decodeHeader(buffer);
         updatee = buffer.getLongLong();
     if (flags & (1 << 9))
         clusterId.decode(buffer);
+    if (flags & (1 << 10))
+        version = buffer.getLong();
 }
 
 void ClusterUpdateOfferBody::decode(Buffer& buffer, uint32_t /*size*/)
@@ -86,6 +98,8 @@ total += headerSize();
         total += 8;//updatee
     if (flags & (1 << 9))
         total += clusterId.encodedSize();
+    if (flags & (1 << 10))
+        total += 4;//version
     return total;
 }
 
@@ -101,5 +115,7 @@ void ClusterUpdateOfferBody::print(std::ostream& out) const
         out << "updatee=" << updatee << "; ";
     if (flags & (1 << 9))
         out << "cluster-id=" << clusterId << "; ";
+    if (flags & (1 << 10))
+        out << "version=" << version << "; ";
     out << "}";
 }

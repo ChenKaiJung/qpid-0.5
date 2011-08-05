@@ -2609,10 +2609,12 @@ const char* UpdateOffer::CLASS_NAME=cluster::NAME;
 
 UpdateOffer::UpdateOffer(
     Uint64 updatee_,
-    const Uuid& clusterId_
+    const Uuid& clusterId_,
+    Uint32 version_
 ) :
     updatee(updatee_),
-    clusterId(clusterId_){
+    clusterId(clusterId_),
+    version(version_){
 }
 void UpdateOffer::accept(Visitor& v) {  v.visit(*this); }
 void UpdateOffer::accept(ConstVisitor& v) const { v.visit(*this); }
@@ -2621,16 +2623,41 @@ std::ostream& operator << (std::ostream& o, const UpdateOffer&x) {
     o << "cluster.update-offer[";
     o << " updatee=" << x.updatee;
     o << " cluster-id=" << x.clusterId;
+    o << " version=" << x.version;
     o << "]";
     return o;
 }
 void UpdateOffer::Handler::clusterUpdateOffer(
     Uint64 /*updatee_*/,
-    const Uuid& /*clusterId_*/
+    const Uuid& /*clusterId_*/,
+    Uint32 /*version_*/
 )
 {
     assert(0);
     throw NotImplementedException(QPID_MSG("cluster.update-offer not implemented."));
+}
+
+const char* RetractOffer::NAME="cluster.retract-offer";
+const char* RetractOffer::CLASS_NAME=cluster::NAME;
+
+RetractOffer::RetractOffer(Uint64 updatee_) :
+    updatee(updatee_){
+}
+void RetractOffer::accept(Visitor& v) {  v.visit(*this); }
+void RetractOffer::accept(ConstVisitor& v) const { v.visit(*this); }
+
+std::ostream& operator << (std::ostream& o, const RetractOffer&x) {
+    o << "cluster.retract-offer[";
+    o << " updatee=" << x.updatee;
+    o << "]";
+    return o;
+}
+void RetractOffer::Handler::clusterRetractOffer(
+    Uint64 /*updatee_*/
+)
+{
+    assert(0);
+    throw NotImplementedException(QPID_MSG("cluster.retract-offer not implemented."));
 }
 
 const char* Ready::NAME="cluster.ready";
@@ -2702,6 +2729,35 @@ void MessageExpired::Handler::clusterMessageExpired(
     throw NotImplementedException(QPID_MSG("cluster.message-expired not implemented."));
 }
 
+const char* ErrorCheck::NAME="cluster.error-check";
+const char* ErrorCheck::CLASS_NAME=cluster::NAME;
+
+ErrorCheck::ErrorCheck(
+    const cluster::ErrorType& type_,
+    const SequenceNo& frameSeq_
+) :
+    type(type_),
+    frameSeq(frameSeq_){
+}
+void ErrorCheck::accept(Visitor& v) {  v.visit(*this); }
+void ErrorCheck::accept(ConstVisitor& v) const { v.visit(*this); }
+
+std::ostream& operator << (std::ostream& o, const ErrorCheck&x) {
+    o << "cluster.error-check[";
+    o << " type=" << x.type;
+    o << " frame-seq=" << x.frameSeq;
+    o << "]";
+    return o;
+}
+void ErrorCheck::Handler::clusterErrorCheck(
+    const cluster::ErrorType& /*type_*/,
+    const SequenceNo& /*frameSeq_*/
+)
+{
+    assert(0);
+    throw NotImplementedException(QPID_MSG("cluster.error-check not implemented."));
+}
+
 const char* Shutdown::NAME="cluster.shutdown";
 const char* Shutdown::CLASS_NAME=cluster::NAME;
 
@@ -2731,6 +2787,28 @@ namespace cluster_connection {
 
 const char* NAME="cluster-connection";
 
+const char* Announce::NAME="cluster-connection.announce";
+const char* Announce::CLASS_NAME=cluster_connection::NAME;
+
+Announce::Announce()
+{
+}
+void Announce::accept(Visitor& v) {  v.visit(*this); }
+void Announce::accept(ConstVisitor& v) const { v.visit(*this); }
+
+std::ostream& operator << (std::ostream& o, const Announce&) {
+    o << "cluster-connection.announce[";
+    o << "]";
+    return o;
+}
+void Announce::Handler::clusterConnectionAnnounce(
+    
+)
+{
+    assert(0);
+    throw NotImplementedException(QPID_MSG("cluster-connection.announce not implemented."));
+}
+
 const char* DeliverClose::NAME="cluster-connection.deliver-close";
 const char* DeliverClose::CLASS_NAME=cluster_connection::NAME;
 
@@ -2756,24 +2834,46 @@ void DeliverClose::Handler::clusterConnectionDeliverClose(
 const char* DeliverDoOutput::NAME="cluster-connection.deliver-do-output";
 const char* DeliverDoOutput::CLASS_NAME=cluster_connection::NAME;
 
-DeliverDoOutput::DeliverDoOutput(Uint32 bytes_) :
-    bytes(bytes_){
+DeliverDoOutput::DeliverDoOutput(Uint32 limit_) :
+    limit(limit_){
 }
 void DeliverDoOutput::accept(Visitor& v) {  v.visit(*this); }
 void DeliverDoOutput::accept(ConstVisitor& v) const { v.visit(*this); }
 
 std::ostream& operator << (std::ostream& o, const DeliverDoOutput&x) {
     o << "cluster-connection.deliver-do-output[";
-    o << " bytes=" << x.bytes;
+    o << " limit=" << x.limit;
     o << "]";
     return o;
 }
 void DeliverDoOutput::Handler::clusterConnectionDeliverDoOutput(
-    Uint32 /*bytes_*/
+    Uint32 /*limit_*/
 )
 {
     assert(0);
     throw NotImplementedException(QPID_MSG("cluster-connection.deliver-do-output not implemented."));
+}
+
+const char* Abort::NAME="cluster-connection.abort";
+const char* Abort::CLASS_NAME=cluster_connection::NAME;
+
+Abort::Abort()
+{
+}
+void Abort::accept(Visitor& v) {  v.visit(*this); }
+void Abort::accept(ConstVisitor& v) const { v.visit(*this); }
+
+std::ostream& operator << (std::ostream& o, const Abort&) {
+    o << "cluster-connection.abort[";
+    o << "]";
+    return o;
+}
+void Abort::Handler::clusterConnectionAbort(
+    
+)
+{
+    assert(0);
+    throw NotImplementedException(QPID_MSG("cluster-connection.abort not implemented."));
 }
 
 const char* ConsumerState::NAME="cluster-connection.consumer-state";
@@ -2823,6 +2923,7 @@ DeliveryRecord::DeliveryRecord(
     Bit completed_,
     Bit ended_,
     Bit windowing_,
+    Bit enqueued_,
     Uint32 credit_
 ) :
     queue(queue_),
@@ -2835,6 +2936,7 @@ DeliveryRecord::DeliveryRecord(
     completed(completed_),
     ended(ended_),
     windowing(windowing_),
+    enqueued(enqueued_),
     credit(credit_){
 }
 void DeliveryRecord::accept(Visitor& v) {  v.visit(*this); }
@@ -2852,6 +2954,7 @@ std::ostream& operator << (std::ostream& o, const DeliveryRecord&x) {
     o << " completed=" << x.completed;
     o << " ended=" << x.ended;
     o << " windowing=" << x.windowing;
+    o << " enqueued=" << x.enqueued;
     o << " credit=" << x.credit;
     o << "]";
     return o;
@@ -2867,6 +2970,7 @@ void DeliveryRecord::Handler::clusterConnectionDeliveryRecord(
     Bit /*completed_*/,
     Bit /*ended_*/,
     Bit /*windowing_*/,
+    Bit /*enqueued_*/,
     Uint32 /*credit_*/
 )
 {
@@ -3095,12 +3199,14 @@ ShadowReady::ShadowReady(
     Uint64 memberId_,
     Uint64 connectionId_,
     const Str8& userName_,
-    const Str32& fragment_
+    const Str32& fragment_,
+    Uint32 sendMax_
 ) :
     memberId(memberId_),
     connectionId(connectionId_),
     userName(userName_),
-    fragment(fragment_){
+    fragment(fragment_),
+    sendMax(sendMax_){
 }
 void ShadowReady::accept(Visitor& v) {  v.visit(*this); }
 void ShadowReady::accept(ConstVisitor& v) const { v.visit(*this); }
@@ -3111,6 +3217,7 @@ std::ostream& operator << (std::ostream& o, const ShadowReady&x) {
     o << " connection-id=" << x.connectionId;
     o << " user-name=" << x.userName;
     o << " fragment=" << x.fragment;
+    o << " send-max=" << x.sendMax;
     o << "]";
     return o;
 }
@@ -3118,7 +3225,8 @@ void ShadowReady::Handler::clusterConnectionShadowReady(
     Uint64 /*memberId_*/,
     Uint64 /*connectionId_*/,
     const Str8& /*userName_*/,
-    const Str32& /*fragment_*/
+    const Str32& /*fragment_*/,
+    Uint32 /*sendMax_*/
 )
 {
     assert(0);
@@ -3130,10 +3238,12 @@ const char* Membership::CLASS_NAME=cluster_connection::NAME;
 
 Membership::Membership(
     const Map& joiners_,
-    const Map& members_
+    const Map& members_,
+    const SequenceNo& frameSeq_
 ) :
     joiners(joiners_),
-    members(members_){
+    members(members_),
+    frameSeq(frameSeq_){
 }
 void Membership::accept(Visitor& v) {  v.visit(*this); }
 void Membership::accept(ConstVisitor& v) const { v.visit(*this); }
@@ -3142,16 +3252,40 @@ std::ostream& operator << (std::ostream& o, const Membership&x) {
     o << "cluster-connection.membership[";
     o << " joiners=" << x.joiners;
     o << " members=" << x.members;
+    o << " frame-seq=" << x.frameSeq;
     o << "]";
     return o;
 }
 void Membership::Handler::clusterConnectionMembership(
     const Map& /*joiners_*/,
-    const Map& /*members_*/
+    const Map& /*members_*/,
+    const SequenceNo& /*frameSeq_*/
 )
 {
     assert(0);
     throw NotImplementedException(QPID_MSG("cluster-connection.membership not implemented."));
+}
+
+const char* RetractOffer::NAME="cluster-connection.retract-offer";
+const char* RetractOffer::CLASS_NAME=cluster_connection::NAME;
+
+RetractOffer::RetractOffer()
+{
+}
+void RetractOffer::accept(Visitor& v) {  v.visit(*this); }
+void RetractOffer::accept(ConstVisitor& v) const { v.visit(*this); }
+
+std::ostream& operator << (std::ostream& o, const RetractOffer&) {
+    o << "cluster-connection.retract-offer[";
+    o << "]";
+    return o;
+}
+void RetractOffer::Handler::clusterConnectionRetractOffer(
+    
+)
+{
+    assert(0);
+    throw NotImplementedException(QPID_MSG("cluster-connection.retract-offer not implemented."));
 }
 
 const char* QueuePosition::NAME="cluster-connection.queue-position";
@@ -3250,6 +3384,35 @@ void ExpiryId::Handler::clusterConnectionExpiryId(
 {
     assert(0);
     throw NotImplementedException(QPID_MSG("cluster-connection.expiry-id not implemented."));
+}
+
+const char* AddQueueListener::NAME="cluster-connection.add-queue-listener";
+const char* AddQueueListener::CLASS_NAME=cluster_connection::NAME;
+
+AddQueueListener::AddQueueListener(
+    const Str8& queue_,
+    Uint32 consumer_
+) :
+    queue(queue_),
+    consumer(consumer_){
+}
+void AddQueueListener::accept(Visitor& v) {  v.visit(*this); }
+void AddQueueListener::accept(ConstVisitor& v) const { v.visit(*this); }
+
+std::ostream& operator << (std::ostream& o, const AddQueueListener&x) {
+    o << "cluster-connection.add-queue-listener[";
+    o << " queue=" << x.queue;
+    o << " consumer=" << x.consumer;
+    o << "]";
+    return o;
+}
+void AddQueueListener::Handler::clusterConnectionAddQueueListener(
+    const Str8& /*queue_*/,
+    Uint32 /*consumer_*/
+)
+{
+    assert(0);
+    throw NotImplementedException(QPID_MSG("cluster-connection.add-queue-listener not implemented."));
 }
 
 } // namespace cluster_connection

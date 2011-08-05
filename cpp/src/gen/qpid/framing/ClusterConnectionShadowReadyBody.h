@@ -43,6 +43,7 @@ class ClusterConnectionShadowReadyBody : public ModelMethod {
     uint64_t connectionId;
     string userName;
     string fragment;
+    uint32_t sendMax;
     uint16_t flags;
 public:
     static const ClassId CLASS_ID = 0x81;
@@ -51,18 +52,21 @@ public:
         ProtocolVersion, uint64_t _memberId,
         uint64_t _connectionId,
         const string& _userName,
-        const string& _fragment) : 
+        const string& _fragment,
+        uint32_t _sendMax) : 
         memberId(_memberId),
         connectionId(_connectionId),
         userName(_userName),
         fragment(_fragment),
+        sendMax(_sendMax),
         flags(0){
         flags |= (1 << 8);
         flags |= (1 << 9);
         flags |= (1 << 10);
         flags |= (1 << 11);
+        flags |= (1 << 12);
     }
-    ClusterConnectionShadowReadyBody(ProtocolVersion=ProtocolVersion())  : memberId(0), connectionId(0), flags(0) {}
+    ClusterConnectionShadowReadyBody(ProtocolVersion=ProtocolVersion())  : memberId(0), connectionId(0), sendMax(0), flags(0) {}
     
     void setMemberId(uint64_t _memberId);
     uint64_t getMemberId() const;
@@ -80,10 +84,14 @@ public:
     const string& getFragment() const;
     bool hasFragment() const;
     void clearFragmentFlag();
+    void setSendMax(uint32_t _sendMax);
+    uint32_t getSendMax() const;
+    bool hasSendMax() const;
+    void clearSendMaxFlag();
     typedef void ResultType;
 
     template <class T> ResultType invoke(T& invocable) const {
-        return invocable.shadowReady(getMemberId(), getConnectionId(), getUserName(), getFragment());
+        return invocable.shadowReady(getMemberId(), getConnectionId(), getUserName(), getFragment(), getSendMax());
     }
 
     using  AMQMethodBody::accept;

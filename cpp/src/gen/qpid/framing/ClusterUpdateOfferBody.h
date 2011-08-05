@@ -41,20 +41,24 @@ namespace framing {
 class ClusterUpdateOfferBody : public ModelMethod {
     uint64_t updatee;
     Uuid clusterId;
+    uint32_t version;
     uint16_t flags;
 public:
     static const ClassId CLASS_ID = 0x80;
     static const MethodId METHOD_ID = 0x2;
     ClusterUpdateOfferBody(
         ProtocolVersion, uint64_t _updatee,
-        const Uuid& _clusterId) : 
+        const Uuid& _clusterId,
+        uint32_t _version) : 
         updatee(_updatee),
         clusterId(_clusterId),
+        version(_version),
         flags(0){
         flags |= (1 << 8);
         flags |= (1 << 9);
+        flags |= (1 << 10);
     }
-    ClusterUpdateOfferBody(ProtocolVersion=ProtocolVersion())  : updatee(0), flags(0) {}
+    ClusterUpdateOfferBody(ProtocolVersion=ProtocolVersion())  : updatee(0), version(0), flags(0) {}
     
     void setUpdatee(uint64_t _updatee);
     uint64_t getUpdatee() const;
@@ -64,10 +68,14 @@ public:
     const Uuid& getClusterId() const;
     bool hasClusterId() const;
     void clearClusterIdFlag();
+    void setVersion(uint32_t _version);
+    uint32_t getVersion() const;
+    bool hasVersion() const;
+    void clearVersionFlag();
     typedef void ResultType;
 
     template <class T> ResultType invoke(T& invocable) const {
-        return invocable.updateOffer(getUpdatee(), getClusterId());
+        return invocable.updateOffer(getUpdatee(), getClusterId(), getVersion());
     }
 
     using  AMQMethodBody::accept;

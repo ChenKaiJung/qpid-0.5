@@ -59,6 +59,7 @@ public:
         bool _completed,
         bool _ended,
         bool _windowing,
+        bool _enqueued,
         uint32_t _credit) : 
         queue(_queue),
         position(_position),
@@ -72,11 +73,12 @@ public:
         setCompleted(_completed);
         setEnded(_ended);
         setWindowing(_windowing);
+        setEnqueued(_enqueued);
         flags |= (1 << 8);
         flags |= (1 << 9);
         flags |= (1 << 10);
         flags |= (1 << 11);
-        flags |= (1 << 2);
+        flags |= (1 << 3);
     }
     ClusterConnectionDeliveryRecordBody(ProtocolVersion=ProtocolVersion())  : credit(0), flags(0) {}
     
@@ -108,6 +110,8 @@ public:
     bool getEnded() const;
     void setWindowing(bool _windowing);
     bool getWindowing() const;
+    void setEnqueued(bool _enqueued);
+    bool getEnqueued() const;
     void setCredit(uint32_t _credit);
     uint32_t getCredit() const;
     bool hasCredit() const;
@@ -115,7 +119,7 @@ public:
     typedef void ResultType;
 
     template <class T> ResultType invoke(T& invocable) const {
-        return invocable.deliveryRecord(getQueue(), getPosition(), getTag(), getId(), getAcquired(), getAccepted(), getCancelled(), getCompleted(), getEnded(), getWindowing(), getCredit());
+        return invocable.deliveryRecord(getQueue(), getPosition(), getTag(), getId(), getAcquired(), getAccepted(), getCancelled(), getCompleted(), getEnded(), getWindowing(), getEnqueued(), getCredit());
     }
 
     using  AMQMethodBody::accept;

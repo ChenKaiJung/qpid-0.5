@@ -63,12 +63,16 @@ void ControlHolder::set(uint8_t classCode, uint8_t code) {
         case 0x20d: *this=in_place<session::Gap>(); break;
         case 0x8001: *this=in_place<cluster::UpdateRequest>(); break;
         case 0x8002: *this=in_place<cluster::UpdateOffer>(); break;
+        case 0x8003: *this=in_place<cluster::RetractOffer>(); break;
         case 0x8010: *this=in_place<cluster::Ready>(); break;
         case 0x8011: *this=in_place<cluster::ConfigChange>(); break;
         case 0x8012: *this=in_place<cluster::MessageExpired>(); break;
+        case 0x8014: *this=in_place<cluster::ErrorCheck>(); break;
         case 0x8020: *this=in_place<cluster::Shutdown>(); break;
+        case 0x8101: *this=in_place<cluster-connection::Announce>(); break;
         case 0x8102: *this=in_place<cluster-connection::DeliverClose>(); break;
         case 0x8103: *this=in_place<cluster-connection::DeliverDoOutput>(); break;
+        case 0x8104: *this=in_place<cluster-connection::Abort>(); break;
         case 0x8110: *this=in_place<cluster-connection::ConsumerState>(); break;
         case 0x8111: *this=in_place<cluster-connection::DeliveryRecord>(); break;
         case 0x8112: *this=in_place<cluster-connection::TxStart>(); break;
@@ -81,10 +85,12 @@ void ControlHolder::set(uint8_t classCode, uint8_t code) {
         case 0x811f: *this=in_place<cluster-connection::SessionState>(); break;
         case 0x8120: *this=in_place<cluster-connection::ShadowReady>(); break;
         case 0x8121: *this=in_place<cluster-connection::Membership>(); break;
+        case 0x8122: *this=in_place<cluster-connection::RetractOffer>(); break;
         case 0x8130: *this=in_place<cluster-connection::QueuePosition>(); break;
         case 0x8131: *this=in_place<cluster-connection::Exchange>(); break;
         case 0x8132: *this=in_place<cluster-connection::Queue>(); break;
         case 0x8133: *this=in_place<cluster-connection::ExpiryId>(); break;
+        case 0x8134: *this=in_place<cluster-connection::AddQueueListener>(); break;
         default: 
             throw CommandInvalidException(QPID_MSG("Invalid class-control key " << std::hex << key));
     }

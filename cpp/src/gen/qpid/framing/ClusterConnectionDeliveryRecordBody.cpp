@@ -99,13 +99,19 @@ void ClusterConnectionDeliveryRecordBody::setWindowing(bool _windowing) {
 }
 bool ClusterConnectionDeliveryRecordBody::getWindowing() const { return flags & (1 << 1); }
 
+void ClusterConnectionDeliveryRecordBody::setEnqueued(bool _enqueued) {
+    if (_enqueued) flags |= (1 << 2);
+    else flags &= ~(1 << 2);
+}
+bool ClusterConnectionDeliveryRecordBody::getEnqueued() const { return flags & (1 << 2); }
+
 void ClusterConnectionDeliveryRecordBody::setCredit(uint32_t _credit) {
     credit = _credit;
-    flags |= (1 << 2);
+    flags |= (1 << 3);
 }
 uint32_t ClusterConnectionDeliveryRecordBody::getCredit() const { return credit; }
-bool ClusterConnectionDeliveryRecordBody::hasCredit() const { return flags & (1 << 2); }
-void ClusterConnectionDeliveryRecordBody::clearCreditFlag() { flags &= ~(1 << 2); }
+bool ClusterConnectionDeliveryRecordBody::hasCredit() const { return flags & (1 << 3); }
+void ClusterConnectionDeliveryRecordBody::clearCreditFlag() { flags &= ~(1 << 3); }
 
 void ClusterConnectionDeliveryRecordBody::encodeStructBody(Buffer& buffer) const
 {
@@ -119,7 +125,7 @@ encodeHeader(buffer);
         buffer.putShortString(tag);
     if (flags & (1 << 11))
         id.encode(buffer);
-    if (flags & (1 << 2))
+    if (flags & (1 << 3))
         buffer.putLong(credit);
 }
 
@@ -140,7 +146,7 @@ decodeHeader(buffer);
         buffer.getShortString(tag);
     if (flags & (1 << 11))
         id.decode(buffer);
-    if (flags & (1 << 2))
+    if (flags & (1 << 3))
         credit = buffer.getLong();
 }
 
@@ -162,7 +168,7 @@ total += headerSize();
         total += 1 + tag.size();
     if (flags & (1 << 11))
         total += id.encodedSize();
-    if (flags & (1 << 2))
+    if (flags & (1 << 3))
         total += 4;//credit
     return total;
 }
@@ -196,6 +202,8 @@ void ClusterConnectionDeliveryRecordBody::print(std::ostream& out) const
     if (flags & (1 << 1))
         out << "windowing=" << getWindowing() << "; ";
     if (flags & (1 << 2))
+        out << "enqueued=" << getEnqueued() << "; ";
+    if (flags & (1 << 3))
         out << "credit=" << credit << "; ";
     out << "}";
 }

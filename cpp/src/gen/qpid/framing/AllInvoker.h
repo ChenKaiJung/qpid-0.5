@@ -121,12 +121,16 @@ class AMQP_AllOperations::Invoker:
     void visit(const StreamCancelBody& body);
     void visit(const ClusterUpdateRequestBody& body);
     void visit(const ClusterUpdateOfferBody& body);
+    void visit(const ClusterRetractOfferBody& body);
     void visit(const ClusterReadyBody& body);
     void visit(const ClusterConfigChangeBody& body);
     void visit(const ClusterMessageExpiredBody& body);
+    void visit(const ClusterErrorCheckBody& body);
     void visit(const ClusterShutdownBody& body);
+    void visit(const ClusterConnectionAnnounceBody& body);
     void visit(const ClusterConnectionDeliverCloseBody& body);
     void visit(const ClusterConnectionDeliverDoOutputBody& body);
+    void visit(const ClusterConnectionAbortBody& body);
     void visit(const ClusterConnectionConsumerStateBody& body);
     void visit(const ClusterConnectionDeliveryRecordBody& body);
     void visit(const ClusterConnectionTxStartBody& body);
@@ -139,10 +143,12 @@ class AMQP_AllOperations::Invoker:
     void visit(const ClusterConnectionSessionStateBody& body);
     void visit(const ClusterConnectionShadowReadyBody& body);
     void visit(const ClusterConnectionMembershipBody& body);
+    void visit(const ClusterConnectionRetractOfferBody& body);
     void visit(const ClusterConnectionQueuePositionBody& body);
     void visit(const ClusterConnectionExchangeBody& body);
     void visit(const ClusterConnectionQueueBody& body);
     void visit(const ClusterConnectionExpiryIdBody& body);
+    void visit(const ClusterConnectionAddQueueListenerBody& body);
 };
 
 class AMQP_AllOperations::ConnectionHandler::Invoker:
@@ -322,9 +328,11 @@ class AMQP_AllOperations::ClusterHandler::Invoker:
     using MethodBodyDefaultVisitor::visit;
     void visit(const ClusterUpdateRequestBody& body);
     void visit(const ClusterUpdateOfferBody& body);
+    void visit(const ClusterRetractOfferBody& body);
     void visit(const ClusterReadyBody& body);
     void visit(const ClusterConfigChangeBody& body);
     void visit(const ClusterMessageExpiredBody& body);
+    void visit(const ClusterErrorCheckBody& body);
     void visit(const ClusterShutdownBody& body);
 };
 
@@ -335,8 +343,10 @@ class AMQP_AllOperations::ClusterConnectionHandler::Invoker:
   public:
     Invoker(AMQP_AllOperations::ClusterConnectionHandler& target_) : target(target_) {}
     using MethodBodyDefaultVisitor::visit;
+    void visit(const ClusterConnectionAnnounceBody& body);
     void visit(const ClusterConnectionDeliverCloseBody& body);
     void visit(const ClusterConnectionDeliverDoOutputBody& body);
+    void visit(const ClusterConnectionAbortBody& body);
     void visit(const ClusterConnectionConsumerStateBody& body);
     void visit(const ClusterConnectionDeliveryRecordBody& body);
     void visit(const ClusterConnectionTxStartBody& body);
@@ -349,10 +359,12 @@ class AMQP_AllOperations::ClusterConnectionHandler::Invoker:
     void visit(const ClusterConnectionSessionStateBody& body);
     void visit(const ClusterConnectionShadowReadyBody& body);
     void visit(const ClusterConnectionMembershipBody& body);
+    void visit(const ClusterConnectionRetractOfferBody& body);
     void visit(const ClusterConnectionQueuePositionBody& body);
     void visit(const ClusterConnectionExchangeBody& body);
     void visit(const ClusterConnectionQueueBody& body);
     void visit(const ClusterConnectionExpiryIdBody& body);
+    void visit(const ClusterConnectionAddQueueListenerBody& body);
 };
 
 }} // namespace qpid::framing

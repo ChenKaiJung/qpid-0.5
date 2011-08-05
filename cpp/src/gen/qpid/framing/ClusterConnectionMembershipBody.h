@@ -41,18 +41,22 @@ namespace framing {
 class ClusterConnectionMembershipBody : public ModelMethod {
     FieldTable joiners;
     FieldTable members;
+    SequenceNumber frameSeq;
     uint16_t flags;
 public:
     static const ClassId CLASS_ID = 0x81;
     static const MethodId METHOD_ID = 0x21;
     ClusterConnectionMembershipBody(
         ProtocolVersion, const FieldTable& _joiners,
-        const FieldTable& _members) : 
+        const FieldTable& _members,
+        const SequenceNumber& _frameSeq) : 
         joiners(_joiners),
         members(_members),
+        frameSeq(_frameSeq),
         flags(0){
         flags |= (1 << 8);
         flags |= (1 << 9);
+        flags |= (1 << 10);
     }
     ClusterConnectionMembershipBody(ProtocolVersion=ProtocolVersion())  : flags(0) {}
     
@@ -66,10 +70,14 @@ public:
     FieldTable& getMembers();
     bool hasMembers() const;
     void clearMembersFlag();
+    void setFrameSeq(const SequenceNumber& _frameSeq);
+    SequenceNumber getFrameSeq() const;
+    bool hasFrameSeq() const;
+    void clearFrameSeqFlag();
     typedef void ResultType;
 
     template <class T> ResultType invoke(T& invocable) const {
-        return invocable.membership(getJoiners(), getMembers());
+        return invocable.membership(getJoiners(), getMembers(), getFrameSeq());
     }
 
     using  AMQMethodBody::accept;

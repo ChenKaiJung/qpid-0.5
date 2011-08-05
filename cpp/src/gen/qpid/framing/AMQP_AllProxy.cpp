@@ -114,12 +114,16 @@
 #include "qpid/framing/StreamDeliverBody.h"
 #include "qpid/framing/ClusterUpdateRequestBody.h"
 #include "qpid/framing/ClusterUpdateOfferBody.h"
+#include "qpid/framing/ClusterRetractOfferBody.h"
 #include "qpid/framing/ClusterReadyBody.h"
 #include "qpid/framing/ClusterConfigChangeBody.h"
 #include "qpid/framing/ClusterMessageExpiredBody.h"
+#include "qpid/framing/ClusterErrorCheckBody.h"
 #include "qpid/framing/ClusterShutdownBody.h"
+#include "qpid/framing/ClusterConnectionAnnounceBody.h"
 #include "qpid/framing/ClusterConnectionDeliverCloseBody.h"
 #include "qpid/framing/ClusterConnectionDeliverDoOutputBody.h"
+#include "qpid/framing/ClusterConnectionAbortBody.h"
 #include "qpid/framing/ClusterConnectionConsumerStateBody.h"
 #include "qpid/framing/ClusterConnectionDeliveryRecordBody.h"
 #include "qpid/framing/ClusterConnectionTxStartBody.h"
@@ -132,10 +136,12 @@
 #include "qpid/framing/ClusterConnectionSessionStateBody.h"
 #include "qpid/framing/ClusterConnectionShadowReadyBody.h"
 #include "qpid/framing/ClusterConnectionMembershipBody.h"
+#include "qpid/framing/ClusterConnectionRetractOfferBody.h"
 #include "qpid/framing/ClusterConnectionQueuePositionBody.h"
 #include "qpid/framing/ClusterConnectionExchangeBody.h"
 #include "qpid/framing/ClusterConnectionQueueBody.h"
 #include "qpid/framing/ClusterConnectionExpiryIdBody.h"
+#include "qpid/framing/ClusterConnectionAddQueueListenerBody.h"
 
 
 namespace qpid {
@@ -496,9 +502,13 @@ void AMQP_AllProxy::Cluster::updateRequest(const string& url)
 {
     send(ClusterUpdateRequestBody(getVersion(), url));
 }
-void AMQP_AllProxy::Cluster::updateOffer(uint64_t updatee, const Uuid& clusterId)
+void AMQP_AllProxy::Cluster::updateOffer(uint64_t updatee, const Uuid& clusterId, uint32_t version)
 {
-    send(ClusterUpdateOfferBody(getVersion(), updatee, clusterId));
+    send(ClusterUpdateOfferBody(getVersion(), updatee, clusterId, version));
+}
+void AMQP_AllProxy::Cluster::retractOffer(uint64_t updatee)
+{
+    send(ClusterRetractOfferBody(getVersion(), updatee));
 }
 void AMQP_AllProxy::Cluster::ready(const string& url)
 {
@@ -512,25 +522,37 @@ void AMQP_AllProxy::Cluster::messageExpired(uint64_t id)
 {
     send(ClusterMessageExpiredBody(getVersion(), id));
 }
+void AMQP_AllProxy::Cluster::errorCheck(uint8_t type, const SequenceNumber& frameSeq)
+{
+    send(ClusterErrorCheckBody(getVersion(), type, frameSeq));
+}
 void AMQP_AllProxy::Cluster::shutdown()
 {
     send(ClusterShutdownBody(getVersion()));
+}
+void AMQP_AllProxy::ClusterConnection::announce()
+{
+    send(ClusterConnectionAnnounceBody(getVersion()));
 }
 void AMQP_AllProxy::ClusterConnection::deliverClose()
 {
     send(ClusterConnectionDeliverCloseBody(getVersion()));
 }
-void AMQP_AllProxy::ClusterConnection::deliverDoOutput(uint32_t bytes)
+void AMQP_AllProxy::ClusterConnection::deliverDoOutput(uint32_t limit)
 {
-    send(ClusterConnectionDeliverDoOutputBody(getVersion(), bytes));
+    send(ClusterConnectionDeliverDoOutputBody(getVersion(), limit));
+}
+void AMQP_AllProxy::ClusterConnection::abort()
+{
+    send(ClusterConnectionAbortBody(getVersion()));
 }
 void AMQP_AllProxy::ClusterConnection::consumerState(const string& name, bool blocked, bool notifyEnabled)
 {
     send(ClusterConnectionConsumerStateBody(getVersion(), name, blocked, notifyEnabled));
 }
-void AMQP_AllProxy::ClusterConnection::deliveryRecord(const string& queue, const SequenceNumber& position, const string& tag, const SequenceNumber& id, bool acquired, bool accepted, bool cancelled, bool completed, bool ended, bool windowing, uint32_t credit)
+void AMQP_AllProxy::ClusterConnection::deliveryRecord(const string& queue, const SequenceNumber& position, const string& tag, const SequenceNumber& id, bool acquired, bool accepted, bool cancelled, bool completed, bool ended, bool windowing, bool enqueued, uint32_t credit)
 {
-    send(ClusterConnectionDeliveryRecordBody(getVersion(), queue, position, tag, id, acquired, accepted, cancelled, completed, ended, windowing, credit));
+    send(ClusterConnectionDeliveryRecordBody(getVersion(), queue, position, tag, id, acquired, accepted, cancelled, completed, ended, windowing, enqueued, credit));
 }
 void AMQP_AllProxy::ClusterConnection::txStart()
 {
@@ -564,13 +586,17 @@ void AMQP_AllProxy::ClusterConnection::sessionState(const SequenceNumber& replay
 {
     send(ClusterConnectionSessionStateBody(getVersion(), replayStart, commandPoint, sentIncomplete, expected, received, unknownCompleted, receivedIncomplete));
 }
-void AMQP_AllProxy::ClusterConnection::shadowReady(uint64_t memberId, uint64_t connectionId, const string& userName, const string& fragment)
+void AMQP_AllProxy::ClusterConnection::shadowReady(uint64_t memberId, uint64_t connectionId, const string& userName, const string& fragment, uint32_t sendMax)
 {
-    send(ClusterConnectionShadowReadyBody(getVersion(), memberId, connectionId, userName, fragment));
+    send(ClusterConnectionShadowReadyBody(getVersion(), memberId, connectionId, userName, fragment, sendMax));
 }
-void AMQP_AllProxy::ClusterConnection::membership(const FieldTable& joiners, const FieldTable& members)
+void AMQP_AllProxy::ClusterConnection::membership(const FieldTable& joiners, const FieldTable& members, const SequenceNumber& frameSeq)
 {
-    send(ClusterConnectionMembershipBody(getVersion(), joiners, members));
+    send(ClusterConnectionMembershipBody(getVersion(), joiners, members, frameSeq));
+}
+void AMQP_AllProxy::ClusterConnection::retractOffer()
+{
+    send(ClusterConnectionRetractOfferBody(getVersion()));
 }
 void AMQP_AllProxy::ClusterConnection::queuePosition(const string& queue, const SequenceNumber& position)
 {
@@ -587,6 +613,10 @@ void AMQP_AllProxy::ClusterConnection::queue(const string& encoded)
 void AMQP_AllProxy::ClusterConnection::expiryId(uint64_t expiryId)
 {
     send(ClusterConnectionExpiryIdBody(getVersion(), expiryId));
+}
+void AMQP_AllProxy::ClusterConnection::addQueueListener(const string& queue, uint32_t consumer)
+{
+    send(ClusterConnectionAddQueueListenerBody(getVersion(), queue, consumer));
 }
 
 }} // namespace qpid::framing

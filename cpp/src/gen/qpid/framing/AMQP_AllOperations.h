@@ -434,13 +434,19 @@ class AMQP_AllOperations {
     virtual void updateRequest(const string& url) = 0;
     
     virtual void updateOffer(uint64_t updatee,
-    const Uuid& clusterId) = 0;
+    const Uuid& clusterId,
+    uint32_t version) = 0;
+    
+    virtual void retractOffer(uint64_t updatee) = 0;
     
     virtual void ready(const string& url) = 0;
     
     virtual void configChange(const string& current) = 0;
     
     virtual void messageExpired(uint64_t id) = 0;
+    
+    virtual void errorCheck(uint8_t type,
+    const SequenceNumber& frameSeq) = 0;
     
     virtual void shutdown(    ) = 0;
     }; // class ClusterHandler
@@ -456,9 +462,13 @@ class AMQP_AllOperations {
         virtual ~ClusterConnectionHandler() {}
         // Protocol methods
     
+    virtual void announce(    ) = 0;
+    
     virtual void deliverClose(    ) = 0;
     
-    virtual void deliverDoOutput(uint32_t bytes) = 0;
+    virtual void deliverDoOutput(uint32_t limit) = 0;
+    
+    virtual void abort(    ) = 0;
     
     virtual void consumerState(const string& name,
     bool blocked,
@@ -474,6 +484,7 @@ class AMQP_AllOperations {
     bool completed,
     bool ended,
     bool windowing,
+    bool enqueued,
     uint32_t credit) = 0;
     
     virtual void txStart(    ) = 0;
@@ -502,10 +513,14 @@ class AMQP_AllOperations {
     virtual void shadowReady(uint64_t memberId,
     uint64_t connectionId,
     const string& userName,
-    const string& fragment) = 0;
+    const string& fragment,
+    uint32_t sendMax) = 0;
     
     virtual void membership(const FieldTable& joiners,
-    const FieldTable& members) = 0;
+    const FieldTable& members,
+    const SequenceNumber& frameSeq) = 0;
+    
+    virtual void retractOffer(    ) = 0;
     
     virtual void queuePosition(const string& queue,
     const SequenceNumber& position) = 0;
@@ -515,6 +530,9 @@ class AMQP_AllOperations {
     virtual void queue(const string& encoded) = 0;
     
     virtual void expiryId(uint64_t expiryId) = 0;
+    
+    virtual void addQueueListener(const string& queue,
+    uint32_t consumer) = 0;
     }; // class ClusterConnectionHandler
     
     

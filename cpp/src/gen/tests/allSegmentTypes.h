@@ -122,12 +122,16 @@ template <class Op> size_t allSegmentTypes(Op& op) {
     op(CommandHolder(stream::Deliver()));
     op(ControlHolder(cluster::UpdateRequest()));
     op(ControlHolder(cluster::UpdateOffer()));
+    op(ControlHolder(cluster::RetractOffer()));
     op(ControlHolder(cluster::Ready()));
     op(ControlHolder(cluster::ConfigChange()));
     op(ControlHolder(cluster::MessageExpired()));
+    op(ControlHolder(cluster::ErrorCheck()));
     op(ControlHolder(cluster::Shutdown()));
+    op(ControlHolder(cluster_connection::Announce()));
     op(ControlHolder(cluster_connection::DeliverClose()));
     op(ControlHolder(cluster_connection::DeliverDoOutput()));
+    op(ControlHolder(cluster_connection::Abort()));
     op(ControlHolder(cluster_connection::ConsumerState()));
     op(ControlHolder(cluster_connection::DeliveryRecord()));
     op(ControlHolder(cluster_connection::TxStart()));
@@ -140,10 +144,12 @@ template <class Op> size_t allSegmentTypes(Op& op) {
     op(ControlHolder(cluster_connection::SessionState()));
     op(ControlHolder(cluster_connection::ShadowReady()));
     op(ControlHolder(cluster_connection::Membership()));
+    op(ControlHolder(cluster_connection::RetractOffer()));
     op(ControlHolder(cluster_connection::QueuePosition()));
     op(ControlHolder(cluster_connection::Exchange()));
     op(ControlHolder(cluster_connection::Queue()));
     op(ControlHolder(cluster_connection::ExpiryId()));
+    op(ControlHolder(cluster_connection::AddQueueListener()));
     return 26;
 }
 #endif  /*!TESTS_ALLSEGMENTTYPES_H*/

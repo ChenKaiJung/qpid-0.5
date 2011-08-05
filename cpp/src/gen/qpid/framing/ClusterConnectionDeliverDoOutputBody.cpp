@@ -31,20 +31,20 @@
 
 using namespace qpid::framing;
 
-void ClusterConnectionDeliverDoOutputBody::setBytes(uint32_t _bytes) {
-    bytes = _bytes;
+void ClusterConnectionDeliverDoOutputBody::setLimit(uint32_t _limit) {
+    limit = _limit;
     flags |= (1 << 8);
 }
-uint32_t ClusterConnectionDeliverDoOutputBody::getBytes() const { return bytes; }
-bool ClusterConnectionDeliverDoOutputBody::hasBytes() const { return flags & (1 << 8); }
-void ClusterConnectionDeliverDoOutputBody::clearBytesFlag() { flags &= ~(1 << 8); }
+uint32_t ClusterConnectionDeliverDoOutputBody::getLimit() const { return limit; }
+bool ClusterConnectionDeliverDoOutputBody::hasLimit() const { return flags & (1 << 8); }
+void ClusterConnectionDeliverDoOutputBody::clearLimitFlag() { flags &= ~(1 << 8); }
 
 void ClusterConnectionDeliverDoOutputBody::encodeStructBody(Buffer& buffer) const
 {
 encodeHeader(buffer);
     buffer.putShort(flags);
     if (flags & (1 << 8))
-        buffer.putLong(bytes);
+        buffer.putLong(limit);
 }
 
 void ClusterConnectionDeliverDoOutputBody::encode(Buffer& buffer) const
@@ -57,7 +57,7 @@ void ClusterConnectionDeliverDoOutputBody::decodeStructBody(Buffer& buffer, uint
 decodeHeader(buffer);
     flags = buffer.getShort();
     if (flags & (1 << 8))
-        bytes = buffer.getLong();
+        limit = buffer.getLong();
 }
 
 void ClusterConnectionDeliverDoOutputBody::decode(Buffer& buffer, uint32_t /*size*/)
@@ -71,7 +71,7 @@ uint32_t ClusterConnectionDeliverDoOutputBody::bodySize() const
 total += headerSize();
     total += 2;
     if (flags & (1 << 8))
-        total += 4;//bytes
+        total += 4;//limit
     return total;
 }
 
@@ -84,6 +84,6 @@ void ClusterConnectionDeliverDoOutputBody::print(std::ostream& out) const
 {
     out << "{ClusterConnectionDeliverDoOutputBody: ";
     if (flags & (1 << 8))
-        out << "bytes=" << bytes << "; ";
+        out << "limit=" << limit << "; ";
     out << "}";
 }

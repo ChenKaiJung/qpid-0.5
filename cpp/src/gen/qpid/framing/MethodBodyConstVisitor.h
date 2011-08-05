@@ -117,12 +117,16 @@ class StreamReturnBody;
 class StreamDeliverBody;
 class ClusterUpdateRequestBody;
 class ClusterUpdateOfferBody;
+class ClusterRetractOfferBody;
 class ClusterReadyBody;
 class ClusterConfigChangeBody;
 class ClusterMessageExpiredBody;
+class ClusterErrorCheckBody;
 class ClusterShutdownBody;
+class ClusterConnectionAnnounceBody;
 class ClusterConnectionDeliverCloseBody;
 class ClusterConnectionDeliverDoOutputBody;
+class ClusterConnectionAbortBody;
 class ClusterConnectionConsumerStateBody;
 class ClusterConnectionDeliveryRecordBody;
 class ClusterConnectionTxStartBody;
@@ -135,10 +139,12 @@ class ClusterConnectionAccumulatedAckBody;
 class ClusterConnectionSessionStateBody;
 class ClusterConnectionShadowReadyBody;
 class ClusterConnectionMembershipBody;
+class ClusterConnectionRetractOfferBody;
 class ClusterConnectionQueuePositionBody;
 class ClusterConnectionExchangeBody;
 class ClusterConnectionQueueBody;
 class ClusterConnectionExpiryIdBody;
+class ClusterConnectionAddQueueListenerBody;
 class MethodBodyConstVisitor
 {
     public:
@@ -229,12 +235,16 @@ class MethodBodyConstVisitor
     virtual void visit(const StreamDeliverBody&) = 0;
     virtual void visit(const ClusterUpdateRequestBody&) = 0;
     virtual void visit(const ClusterUpdateOfferBody&) = 0;
+    virtual void visit(const ClusterRetractOfferBody&) = 0;
     virtual void visit(const ClusterReadyBody&) = 0;
     virtual void visit(const ClusterConfigChangeBody&) = 0;
     virtual void visit(const ClusterMessageExpiredBody&) = 0;
+    virtual void visit(const ClusterErrorCheckBody&) = 0;
     virtual void visit(const ClusterShutdownBody&) = 0;
+    virtual void visit(const ClusterConnectionAnnounceBody&) = 0;
     virtual void visit(const ClusterConnectionDeliverCloseBody&) = 0;
     virtual void visit(const ClusterConnectionDeliverDoOutputBody&) = 0;
+    virtual void visit(const ClusterConnectionAbortBody&) = 0;
     virtual void visit(const ClusterConnectionConsumerStateBody&) = 0;
     virtual void visit(const ClusterConnectionDeliveryRecordBody&) = 0;
     virtual void visit(const ClusterConnectionTxStartBody&) = 0;
@@ -247,10 +257,12 @@ class MethodBodyConstVisitor
     virtual void visit(const ClusterConnectionSessionStateBody&) = 0;
     virtual void visit(const ClusterConnectionShadowReadyBody&) = 0;
     virtual void visit(const ClusterConnectionMembershipBody&) = 0;
+    virtual void visit(const ClusterConnectionRetractOfferBody&) = 0;
     virtual void visit(const ClusterConnectionQueuePositionBody&) = 0;
     virtual void visit(const ClusterConnectionExchangeBody&) = 0;
     virtual void visit(const ClusterConnectionQueueBody&) = 0;
     virtual void visit(const ClusterConnectionExpiryIdBody&) = 0;
+    virtual void visit(const ClusterConnectionAddQueueListenerBody&) = 0;
 };
 
 }} // namespace qpid::framing

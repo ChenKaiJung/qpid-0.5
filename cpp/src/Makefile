@@ -642,18 +642,26 @@ am__libqpidcommon_la_SOURCES_DIST = gen/qpid/framing/ClientInvoker.h \
 	gen/qpid/framing/ClusterUpdateRequestBody.cpp \
 	gen/qpid/framing/ClusterUpdateOfferBody.h \
 	gen/qpid/framing/ClusterUpdateOfferBody.cpp \
+	gen/qpid/framing/ClusterRetractOfferBody.h \
+	gen/qpid/framing/ClusterRetractOfferBody.cpp \
 	gen/qpid/framing/ClusterReadyBody.h \
 	gen/qpid/framing/ClusterReadyBody.cpp \
 	gen/qpid/framing/ClusterConfigChangeBody.h \
 	gen/qpid/framing/ClusterConfigChangeBody.cpp \
 	gen/qpid/framing/ClusterMessageExpiredBody.h \
 	gen/qpid/framing/ClusterMessageExpiredBody.cpp \
+	gen/qpid/framing/ClusterErrorCheckBody.h \
+	gen/qpid/framing/ClusterErrorCheckBody.cpp \
 	gen/qpid/framing/ClusterShutdownBody.h \
 	gen/qpid/framing/ClusterShutdownBody.cpp \
+	gen/qpid/framing/ClusterConnectionAnnounceBody.h \
+	gen/qpid/framing/ClusterConnectionAnnounceBody.cpp \
 	gen/qpid/framing/ClusterConnectionDeliverCloseBody.h \
 	gen/qpid/framing/ClusterConnectionDeliverCloseBody.cpp \
 	gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.h \
 	gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.cpp \
+	gen/qpid/framing/ClusterConnectionAbortBody.h \
+	gen/qpid/framing/ClusterConnectionAbortBody.cpp \
 	gen/qpid/framing/ClusterConnectionConsumerStateBody.h \
 	gen/qpid/framing/ClusterConnectionConsumerStateBody.cpp \
 	gen/qpid/framing/ClusterConnectionDeliveryRecordBody.h \
@@ -678,6 +686,8 @@ am__libqpidcommon_la_SOURCES_DIST = gen/qpid/framing/ClientInvoker.h \
 	gen/qpid/framing/ClusterConnectionShadowReadyBody.cpp \
 	gen/qpid/framing/ClusterConnectionMembershipBody.h \
 	gen/qpid/framing/ClusterConnectionMembershipBody.cpp \
+	gen/qpid/framing/ClusterConnectionRetractOfferBody.h \
+	gen/qpid/framing/ClusterConnectionRetractOfferBody.cpp \
 	gen/qpid/framing/ClusterConnectionQueuePositionBody.h \
 	gen/qpid/framing/ClusterConnectionQueuePositionBody.cpp \
 	gen/qpid/framing/ClusterConnectionExchangeBody.h \
@@ -686,6 +696,8 @@ am__libqpidcommon_la_SOURCES_DIST = gen/qpid/framing/ClientInvoker.h \
 	gen/qpid/framing/ClusterConnectionQueueBody.cpp \
 	gen/qpid/framing/ClusterConnectionExpiryIdBody.h \
 	gen/qpid/framing/ClusterConnectionExpiryIdBody.cpp \
+	gen/qpid/framing/ClusterConnectionAddQueueListenerBody.h \
+	gen/qpid/framing/ClusterConnectionAddQueueListenerBody.cpp \
 	gen/qpid/framing/amqp_structs.h gen/qpid/framing/constants.h \
 	gen/qpid/framing/enum.h gen/qpid/framing/reply_exceptions.h \
 	gen/qpid/framing/reply_exceptions.cpp \
@@ -844,12 +856,16 @@ am__objects_5 = gen/qpid/framing/ClientInvoker.lo \
 	gen/qpid/framing/StreamDeliverBody.lo \
 	gen/qpid/framing/ClusterUpdateRequestBody.lo \
 	gen/qpid/framing/ClusterUpdateOfferBody.lo \
+	gen/qpid/framing/ClusterRetractOfferBody.lo \
 	gen/qpid/framing/ClusterReadyBody.lo \
 	gen/qpid/framing/ClusterConfigChangeBody.lo \
 	gen/qpid/framing/ClusterMessageExpiredBody.lo \
+	gen/qpid/framing/ClusterErrorCheckBody.lo \
 	gen/qpid/framing/ClusterShutdownBody.lo \
+	gen/qpid/framing/ClusterConnectionAnnounceBody.lo \
 	gen/qpid/framing/ClusterConnectionDeliverCloseBody.lo \
 	gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.lo \
+	gen/qpid/framing/ClusterConnectionAbortBody.lo \
 	gen/qpid/framing/ClusterConnectionConsumerStateBody.lo \
 	gen/qpid/framing/ClusterConnectionDeliveryRecordBody.lo \
 	gen/qpid/framing/ClusterConnectionTxStartBody.lo \
@@ -862,10 +878,12 @@ am__objects_5 = gen/qpid/framing/ClientInvoker.lo \
 	gen/qpid/framing/ClusterConnectionSessionStateBody.lo \
 	gen/qpid/framing/ClusterConnectionShadowReadyBody.lo \
 	gen/qpid/framing/ClusterConnectionMembershipBody.lo \
+	gen/qpid/framing/ClusterConnectionRetractOfferBody.lo \
 	gen/qpid/framing/ClusterConnectionQueuePositionBody.lo \
 	gen/qpid/framing/ClusterConnectionExchangeBody.lo \
 	gen/qpid/framing/ClusterConnectionQueueBody.lo \
 	gen/qpid/framing/ClusterConnectionExpiryIdBody.lo \
+	gen/qpid/framing/ClusterConnectionAddQueueListenerBody.lo \
 	gen/qpid/framing/reply_exceptions.lo \
 	gen/qpid/framing/TypeCode.lo \
 	gen/qpid/framing/MethodBodyFactory.lo
@@ -1542,18 +1560,26 @@ rgen_framing_srcs = gen/qpid/framing/ClientInvoker.h \
     gen/qpid/framing/ClusterUpdateRequestBody.cpp \
     gen/qpid/framing/ClusterUpdateOfferBody.h \
     gen/qpid/framing/ClusterUpdateOfferBody.cpp \
+    gen/qpid/framing/ClusterRetractOfferBody.h \
+    gen/qpid/framing/ClusterRetractOfferBody.cpp \
     gen/qpid/framing/ClusterReadyBody.h \
     gen/qpid/framing/ClusterReadyBody.cpp \
     gen/qpid/framing/ClusterConfigChangeBody.h \
     gen/qpid/framing/ClusterConfigChangeBody.cpp \
     gen/qpid/framing/ClusterMessageExpiredBody.h \
     gen/qpid/framing/ClusterMessageExpiredBody.cpp \
+    gen/qpid/framing/ClusterErrorCheckBody.h \
+    gen/qpid/framing/ClusterErrorCheckBody.cpp \
     gen/qpid/framing/ClusterShutdownBody.h \
     gen/qpid/framing/ClusterShutdownBody.cpp \
+    gen/qpid/framing/ClusterConnectionAnnounceBody.h \
+    gen/qpid/framing/ClusterConnectionAnnounceBody.cpp \
     gen/qpid/framing/ClusterConnectionDeliverCloseBody.h \
     gen/qpid/framing/ClusterConnectionDeliverCloseBody.cpp \
     gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.h \
     gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.cpp \
+    gen/qpid/framing/ClusterConnectionAbortBody.h \
+    gen/qpid/framing/ClusterConnectionAbortBody.cpp \
     gen/qpid/framing/ClusterConnectionConsumerStateBody.h \
     gen/qpid/framing/ClusterConnectionConsumerStateBody.cpp \
     gen/qpid/framing/ClusterConnectionDeliveryRecordBody.h \
@@ -1578,6 +1604,8 @@ rgen_framing_srcs = gen/qpid/framing/ClientInvoker.h \
     gen/qpid/framing/ClusterConnectionShadowReadyBody.cpp \
     gen/qpid/framing/ClusterConnectionMembershipBody.h \
     gen/qpid/framing/ClusterConnectionMembershipBody.cpp \
+    gen/qpid/framing/ClusterConnectionRetractOfferBody.h \
+    gen/qpid/framing/ClusterConnectionRetractOfferBody.cpp \
     gen/qpid/framing/ClusterConnectionQueuePositionBody.h \
     gen/qpid/framing/ClusterConnectionQueuePositionBody.cpp \
     gen/qpid/framing/ClusterConnectionExchangeBody.h \
@@ -1586,6 +1614,8 @@ rgen_framing_srcs = gen/qpid/framing/ClientInvoker.h \
     gen/qpid/framing/ClusterConnectionQueueBody.cpp \
     gen/qpid/framing/ClusterConnectionExpiryIdBody.h \
     gen/qpid/framing/ClusterConnectionExpiryIdBody.cpp \
+    gen/qpid/framing/ClusterConnectionAddQueueListenerBody.h \
+    gen/qpid/framing/ClusterConnectionAddQueueListenerBody.cpp \
     gen/qpid/framing/amqp_structs.h \
     gen/qpid/framing/constants.h \
     gen/qpid/framing/enum.h \
@@ -1853,18 +1883,26 @@ rgen_srcs = gen/qpid/framing/ClientInvoker.h \
     gen/qpid/framing/ClusterUpdateRequestBody.cpp \
     gen/qpid/framing/ClusterUpdateOfferBody.h \
     gen/qpid/framing/ClusterUpdateOfferBody.cpp \
+    gen/qpid/framing/ClusterRetractOfferBody.h \
+    gen/qpid/framing/ClusterRetractOfferBody.cpp \
     gen/qpid/framing/ClusterReadyBody.h \
     gen/qpid/framing/ClusterReadyBody.cpp \
     gen/qpid/framing/ClusterConfigChangeBody.h \
     gen/qpid/framing/ClusterConfigChangeBody.cpp \
     gen/qpid/framing/ClusterMessageExpiredBody.h \
     gen/qpid/framing/ClusterMessageExpiredBody.cpp \
+    gen/qpid/framing/ClusterErrorCheckBody.h \
+    gen/qpid/framing/ClusterErrorCheckBody.cpp \
     gen/qpid/framing/ClusterShutdownBody.h \
     gen/qpid/framing/ClusterShutdownBody.cpp \
+    gen/qpid/framing/ClusterConnectionAnnounceBody.h \
+    gen/qpid/framing/ClusterConnectionAnnounceBody.cpp \
     gen/qpid/framing/ClusterConnectionDeliverCloseBody.h \
     gen/qpid/framing/ClusterConnectionDeliverCloseBody.cpp \
     gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.h \
     gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.cpp \
+    gen/qpid/framing/ClusterConnectionAbortBody.h \
+    gen/qpid/framing/ClusterConnectionAbortBody.cpp \
     gen/qpid/framing/ClusterConnectionConsumerStateBody.h \
     gen/qpid/framing/ClusterConnectionConsumerStateBody.cpp \
     gen/qpid/framing/ClusterConnectionDeliveryRecordBody.h \
@@ -1889,6 +1927,8 @@ rgen_srcs = gen/qpid/framing/ClientInvoker.h \
     gen/qpid/framing/ClusterConnectionShadowReadyBody.cpp \
     gen/qpid/framing/ClusterConnectionMembershipBody.h \
     gen/qpid/framing/ClusterConnectionMembershipBody.cpp \
+    gen/qpid/framing/ClusterConnectionRetractOfferBody.h \
+    gen/qpid/framing/ClusterConnectionRetractOfferBody.cpp \
     gen/qpid/framing/ClusterConnectionQueuePositionBody.h \
     gen/qpid/framing/ClusterConnectionQueuePositionBody.cpp \
     gen/qpid/framing/ClusterConnectionExchangeBody.h \
@@ -1897,6 +1937,8 @@ rgen_srcs = gen/qpid/framing/ClientInvoker.h \
     gen/qpid/framing/ClusterConnectionQueueBody.cpp \
     gen/qpid/framing/ClusterConnectionExpiryIdBody.h \
     gen/qpid/framing/ClusterConnectionExpiryIdBody.cpp \
+    gen/qpid/framing/ClusterConnectionAddQueueListenerBody.h \
+    gen/qpid/framing/ClusterConnectionAddQueueListenerBody.cpp \
     gen/qpid/framing/amqp_structs.h \
     gen/qpid/framing/constants.h \
     gen/qpid/framing/enum.h \
@@ -2076,12 +2118,16 @@ dist_qpid_framing_HEADERS = gen/qpid/framing/ClientInvoker.h \
     gen/qpid/framing/StreamDeliverBody.h \
     gen/qpid/framing/ClusterUpdateRequestBody.h \
     gen/qpid/framing/ClusterUpdateOfferBody.h \
+    gen/qpid/framing/ClusterRetractOfferBody.h \
     gen/qpid/framing/ClusterReadyBody.h \
     gen/qpid/framing/ClusterConfigChangeBody.h \
     gen/qpid/framing/ClusterMessageExpiredBody.h \
+    gen/qpid/framing/ClusterErrorCheckBody.h \
     gen/qpid/framing/ClusterShutdownBody.h \
+    gen/qpid/framing/ClusterConnectionAnnounceBody.h \
     gen/qpid/framing/ClusterConnectionDeliverCloseBody.h \
     gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.h \
+    gen/qpid/framing/ClusterConnectionAbortBody.h \
     gen/qpid/framing/ClusterConnectionConsumerStateBody.h \
     gen/qpid/framing/ClusterConnectionDeliveryRecordBody.h \
     gen/qpid/framing/ClusterConnectionTxStartBody.h \
@@ -2094,10 +2140,12 @@ dist_qpid_framing_HEADERS = gen/qpid/framing/ClientInvoker.h \
     gen/qpid/framing/ClusterConnectionSessionStateBody.h \
     gen/qpid/framing/ClusterConnectionShadowReadyBody.h \
     gen/qpid/framing/ClusterConnectionMembershipBody.h \
+    gen/qpid/framing/ClusterConnectionRetractOfferBody.h \
     gen/qpid/framing/ClusterConnectionQueuePositionBody.h \
     gen/qpid/framing/ClusterConnectionExchangeBody.h \
     gen/qpid/framing/ClusterConnectionQueueBody.h \
     gen/qpid/framing/ClusterConnectionExpiryIdBody.h \
+    gen/qpid/framing/ClusterConnectionAddQueueListenerBody.h \
     gen/qpid/framing/amqp_structs.h \
     gen/qpid/framing/constants.h \
     gen/qpid/framing/enum.h \
@@ -3934,6 +3982,9 @@ gen/qpid/framing/ClusterUpdateRequestBody.lo:  \
 gen/qpid/framing/ClusterUpdateOfferBody.lo:  \
 	gen/qpid/framing/$(am__dirstamp) \
 	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterRetractOfferBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
 gen/qpid/framing/ClusterReadyBody.lo:  \
 	gen/qpid/framing/$(am__dirstamp) \
 	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
@@ -3943,13 +3994,22 @@ gen/qpid/framing/ClusterConfigChangeBody.lo:  \
 gen/qpid/framing/ClusterMessageExpiredBody.lo:  \
 	gen/qpid/framing/$(am__dirstamp) \
 	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterErrorCheckBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
 gen/qpid/framing/ClusterShutdownBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionAnnounceBody.lo:  \
 	gen/qpid/framing/$(am__dirstamp) \
 	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
 gen/qpid/framing/ClusterConnectionDeliverCloseBody.lo:  \
 	gen/qpid/framing/$(am__dirstamp) \
 	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
 gen/qpid/framing/ClusterConnectionDeliverDoOutputBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionAbortBody.lo:  \
 	gen/qpid/framing/$(am__dirstamp) \
 	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
 gen/qpid/framing/ClusterConnectionConsumerStateBody.lo:  \
@@ -3988,6 +4048,9 @@ gen/qpid/framing/ClusterConnectionShadowReadyBody.lo:  \
 gen/qpid/framing/ClusterConnectionMembershipBody.lo:  \
 	gen/qpid/framing/$(am__dirstamp) \
 	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionRetractOfferBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
 gen/qpid/framing/ClusterConnectionQueuePositionBody.lo:  \
 	gen/qpid/framing/$(am__dirstamp) \
 	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
@@ -3998,6 +4061,9 @@ gen/qpid/framing/ClusterConnectionQueueBody.lo:  \
 	gen/qpid/framing/$(am__dirstamp) \
 	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
 gen/qpid/framing/ClusterConnectionExpiryIdBody.lo:  \
+	gen/qpid/framing/$(am__dirstamp) \
+	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
+gen/qpid/framing/ClusterConnectionAddQueueListenerBody.lo:  \
 	gen/qpid/framing/$(am__dirstamp) \
 	gen/qpid/framing/$(DEPDIR)/$(am__dirstamp)
 gen/qpid/framing/reply_exceptions.lo:  \
@@ -4412,8 +4478,14 @@ mostlyclean-compile:
 	-rm -f gen/qpid/framing/ClientInvoker.lo
 	-rm -f gen/qpid/framing/ClusterConfigChangeBody.$(OBJEXT)
 	-rm -f gen/qpid/framing/ClusterConfigChangeBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionAbortBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionAbortBody.lo
 	-rm -f gen/qpid/framing/ClusterConnectionAccumulatedAckBody.$(OBJEXT)
 	-rm -f gen/qpid/framing/ClusterConnectionAccumulatedAckBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionAddQueueListenerBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionAddQueueListenerBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionAnnounceBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionAnnounceBody.lo
 	-rm -f gen/qpid/framing/ClusterConnectionConsumerStateBody.$(OBJEXT)
 	-rm -f gen/qpid/framing/ClusterConnectionConsumerStateBody.lo
 	-rm -f gen/qpid/framing/ClusterConnectionDeliverCloseBody.$(OBJEXT)
@@ -4432,6 +4504,8 @@ mostlyclean-compile:
 	-rm -f gen/qpid/framing/ClusterConnectionQueueBody.lo
 	-rm -f gen/qpid/framing/ClusterConnectionQueuePositionBody.$(OBJEXT)
 	-rm -f gen/qpid/framing/ClusterConnectionQueuePositionBody.lo
+	-rm -f gen/qpid/framing/ClusterConnectionRetractOfferBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterConnectionRetractOfferBody.lo
 	-rm -f gen/qpid/framing/ClusterConnectionSessionStateBody.$(OBJEXT)
 	-rm -f gen/qpid/framing/ClusterConnectionSessionStateBody.lo
 	-rm -f gen/qpid/framing/ClusterConnectionShadowReadyBody.$(OBJEXT)
@@ -4448,10 +4522,14 @@ mostlyclean-compile:
 	-rm -f gen/qpid/framing/ClusterConnectionTxPublishBody.lo
 	-rm -f gen/qpid/framing/ClusterConnectionTxStartBody.$(OBJEXT)
 	-rm -f gen/qpid/framing/ClusterConnectionTxStartBody.lo
+	-rm -f gen/qpid/framing/ClusterErrorCheckBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterErrorCheckBody.lo
 	-rm -f gen/qpid/framing/ClusterMessageExpiredBody.$(OBJEXT)
 	-rm -f gen/qpid/framing/ClusterMessageExpiredBody.lo
 	-rm -f gen/qpid/framing/ClusterReadyBody.$(OBJEXT)
 	-rm -f gen/qpid/framing/ClusterReadyBody.lo
+	-rm -f gen/qpid/framing/ClusterRetractOfferBody.$(OBJEXT)
+	-rm -f gen/qpid/framing/ClusterRetractOfferBody.lo
 	-rm -f gen/qpid/framing/ClusterShutdownBody.$(OBJEXT)
 	-rm -f gen/qpid/framing/ClusterShutdownBody.lo
 	-rm -f gen/qpid/framing/ClusterUpdateOfferBody.$(OBJEXT)
@@ -5139,7 +5217,10 @@ include gen/qpid/framing/$(DEPDIR)/AMQP_ServerProxy.Plo
 include gen/qpid/framing/$(DEPDIR)/AllInvoker.Plo
 include gen/qpid/framing/$(DEPDIR)/ClientInvoker.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterConfigChangeBody.Plo
+include gen/qpid/framing/$(DEPDIR)/ClusterConnectionAbortBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterConnectionAccumulatedAckBody.Plo
+include gen/qpid/framing/$(DEPDIR)/ClusterConnectionAddQueueListenerBody.Plo
+include gen/qpid/framing/$(DEPDIR)/ClusterConnectionAnnounceBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterConnectionConsumerStateBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterConnectionDeliverCloseBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterConnectionDeliverDoOutputBody.Plo
@@ -5149,6 +5230,7 @@ include gen/qpid/framing/$(DEPDIR)/ClusterConnectionExpiryIdBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterConnectionMembershipBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterConnectionQueueBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterConnectionQueuePositionBody.Plo
+include gen/qpid/framing/$(DEPDIR)/ClusterConnectionRetractOfferBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterConnectionSessionStateBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterConnectionShadowReadyBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterConnectionTxAcceptBody.Plo
@@ -5157,8 +5239,10 @@ include gen/qpid/framing/$(DEPDIR)/ClusterConnectionTxEndBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterConnectionTxEnqueueBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterConnectionTxPublishBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterConnectionTxStartBody.Plo
+include gen/qpid/framing/$(DEPDIR)/ClusterErrorCheckBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterMessageExpiredBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterReadyBody.Plo
+include gen/qpid/framing/$(DEPDIR)/ClusterRetractOfferBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterShutdownBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterUpdateOfferBody.Plo
 include gen/qpid/framing/$(DEPDIR)/ClusterUpdateRequestBody.Plo

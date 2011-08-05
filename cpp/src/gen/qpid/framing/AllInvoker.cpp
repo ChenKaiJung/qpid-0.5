@@ -106,12 +106,16 @@
 #include "qpid/framing/StreamCancelBody.h"
 #include "qpid/framing/ClusterUpdateRequestBody.h"
 #include "qpid/framing/ClusterUpdateOfferBody.h"
+#include "qpid/framing/ClusterRetractOfferBody.h"
 #include "qpid/framing/ClusterReadyBody.h"
 #include "qpid/framing/ClusterConfigChangeBody.h"
 #include "qpid/framing/ClusterMessageExpiredBody.h"
+#include "qpid/framing/ClusterErrorCheckBody.h"
 #include "qpid/framing/ClusterShutdownBody.h"
+#include "qpid/framing/ClusterConnectionAnnounceBody.h"
 #include "qpid/framing/ClusterConnectionDeliverCloseBody.h"
 #include "qpid/framing/ClusterConnectionDeliverDoOutputBody.h"
+#include "qpid/framing/ClusterConnectionAbortBody.h"
 #include "qpid/framing/ClusterConnectionConsumerStateBody.h"
 #include "qpid/framing/ClusterConnectionDeliveryRecordBody.h"
 #include "qpid/framing/ClusterConnectionTxStartBody.h"
@@ -124,10 +128,12 @@
 #include "qpid/framing/ClusterConnectionSessionStateBody.h"
 #include "qpid/framing/ClusterConnectionShadowReadyBody.h"
 #include "qpid/framing/ClusterConnectionMembershipBody.h"
+#include "qpid/framing/ClusterConnectionRetractOfferBody.h"
 #include "qpid/framing/ClusterConnectionQueuePositionBody.h"
 #include "qpid/framing/ClusterConnectionExchangeBody.h"
 #include "qpid/framing/ClusterConnectionQueueBody.h"
 #include "qpid/framing/ClusterConnectionExpiryIdBody.h"
+#include "qpid/framing/ClusterConnectionAddQueueListenerBody.h"
 
 namespace qpid {
 namespace framing {
@@ -532,6 +538,11 @@ void AMQP_AllOperations::Invoker::visit(const ClusterUpdateOfferBody& body) {
     body.accept(invoker);
     result=invoker.getResult();
 }
+void AMQP_AllOperations::Invoker::visit(const ClusterRetractOfferBody& body) {
+    AMQP_AllOperations::ClusterHandler::Invoker invoker(*target.getClusterHandler());
+    body.accept(invoker);
+    result=invoker.getResult();
+}
 void AMQP_AllOperations::Invoker::visit(const ClusterReadyBody& body) {
     AMQP_AllOperations::ClusterHandler::Invoker invoker(*target.getClusterHandler());
     body.accept(invoker);
@@ -547,8 +558,18 @@ void AMQP_AllOperations::Invoker::visit(const ClusterMessageExpiredBody& body) {
     body.accept(invoker);
     result=invoker.getResult();
 }
+void AMQP_AllOperations::Invoker::visit(const ClusterErrorCheckBody& body) {
+    AMQP_AllOperations::ClusterHandler::Invoker invoker(*target.getClusterHandler());
+    body.accept(invoker);
+    result=invoker.getResult();
+}
 void AMQP_AllOperations::Invoker::visit(const ClusterShutdownBody& body) {
     AMQP_AllOperations::ClusterHandler::Invoker invoker(*target.getClusterHandler());
+    body.accept(invoker);
+    result=invoker.getResult();
+}
+void AMQP_AllOperations::Invoker::visit(const ClusterConnectionAnnounceBody& body) {
+    AMQP_AllOperations::ClusterConnectionHandler::Invoker invoker(*target.getClusterConnectionHandler());
     body.accept(invoker);
     result=invoker.getResult();
 }
@@ -558,6 +579,11 @@ void AMQP_AllOperations::Invoker::visit(const ClusterConnectionDeliverCloseBody&
     result=invoker.getResult();
 }
 void AMQP_AllOperations::Invoker::visit(const ClusterConnectionDeliverDoOutputBody& body) {
+    AMQP_AllOperations::ClusterConnectionHandler::Invoker invoker(*target.getClusterConnectionHandler());
+    body.accept(invoker);
+    result=invoker.getResult();
+}
+void AMQP_AllOperations::Invoker::visit(const ClusterConnectionAbortBody& body) {
     AMQP_AllOperations::ClusterConnectionHandler::Invoker invoker(*target.getClusterConnectionHandler());
     body.accept(invoker);
     result=invoker.getResult();
@@ -622,6 +648,11 @@ void AMQP_AllOperations::Invoker::visit(const ClusterConnectionMembershipBody& b
     body.accept(invoker);
     result=invoker.getResult();
 }
+void AMQP_AllOperations::Invoker::visit(const ClusterConnectionRetractOfferBody& body) {
+    AMQP_AllOperations::ClusterConnectionHandler::Invoker invoker(*target.getClusterConnectionHandler());
+    body.accept(invoker);
+    result=invoker.getResult();
+}
 void AMQP_AllOperations::Invoker::visit(const ClusterConnectionQueuePositionBody& body) {
     AMQP_AllOperations::ClusterConnectionHandler::Invoker invoker(*target.getClusterConnectionHandler());
     body.accept(invoker);
@@ -638,6 +669,11 @@ void AMQP_AllOperations::Invoker::visit(const ClusterConnectionQueueBody& body) 
     result=invoker.getResult();
 }
 void AMQP_AllOperations::Invoker::visit(const ClusterConnectionExpiryIdBody& body) {
+    AMQP_AllOperations::ClusterConnectionHandler::Invoker invoker(*target.getClusterConnectionHandler());
+    body.accept(invoker);
+    result=invoker.getResult();
+}
+void AMQP_AllOperations::Invoker::visit(const ClusterConnectionAddQueueListenerBody& body) {
     AMQP_AllOperations::ClusterConnectionHandler::Invoker invoker(*target.getClusterConnectionHandler());
     body.accept(invoker);
     result=invoker.getResult();
@@ -962,6 +998,10 @@ void AMQP_AllOperations::ClusterHandler::Invoker::visit(const ClusterUpdateOffer
     body.invoke(target);
     result.handled=true;
 }
+void AMQP_AllOperations::ClusterHandler::Invoker::visit(const ClusterRetractOfferBody& body) {
+    body.invoke(target);
+    result.handled=true;
+}
 void AMQP_AllOperations::ClusterHandler::Invoker::visit(const ClusterReadyBody& body) {
     body.invoke(target);
     result.handled=true;
@@ -974,7 +1014,15 @@ void AMQP_AllOperations::ClusterHandler::Invoker::visit(const ClusterMessageExpi
     body.invoke(target);
     result.handled=true;
 }
+void AMQP_AllOperations::ClusterHandler::Invoker::visit(const ClusterErrorCheckBody& body) {
+    body.invoke(target);
+    result.handled=true;
+}
 void AMQP_AllOperations::ClusterHandler::Invoker::visit(const ClusterShutdownBody& body) {
+    body.invoke(target);
+    result.handled=true;
+}
+void AMQP_AllOperations::ClusterConnectionHandler::Invoker::visit(const ClusterConnectionAnnounceBody& body) {
     body.invoke(target);
     result.handled=true;
 }
@@ -983,6 +1031,10 @@ void AMQP_AllOperations::ClusterConnectionHandler::Invoker::visit(const ClusterC
     result.handled=true;
 }
 void AMQP_AllOperations::ClusterConnectionHandler::Invoker::visit(const ClusterConnectionDeliverDoOutputBody& body) {
+    body.invoke(target);
+    result.handled=true;
+}
+void AMQP_AllOperations::ClusterConnectionHandler::Invoker::visit(const ClusterConnectionAbortBody& body) {
     body.invoke(target);
     result.handled=true;
 }
@@ -1034,6 +1086,10 @@ void AMQP_AllOperations::ClusterConnectionHandler::Invoker::visit(const ClusterC
     body.invoke(target);
     result.handled=true;
 }
+void AMQP_AllOperations::ClusterConnectionHandler::Invoker::visit(const ClusterConnectionRetractOfferBody& body) {
+    body.invoke(target);
+    result.handled=true;
+}
 void AMQP_AllOperations::ClusterConnectionHandler::Invoker::visit(const ClusterConnectionQueuePositionBody& body) {
     body.invoke(target);
     result.handled=true;
@@ -1047,6 +1103,10 @@ void AMQP_AllOperations::ClusterConnectionHandler::Invoker::visit(const ClusterC
     result.handled=true;
 }
 void AMQP_AllOperations::ClusterConnectionHandler::Invoker::visit(const ClusterConnectionExpiryIdBody& body) {
+    body.invoke(target);
+    result.handled=true;
+}
+void AMQP_AllOperations::ClusterConnectionHandler::Invoker::visit(const ClusterConnectionAddQueueListenerBody& body) {
     body.invoke(target);
     result.handled=true;
 }

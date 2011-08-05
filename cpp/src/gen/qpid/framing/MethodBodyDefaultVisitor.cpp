@@ -117,12 +117,16 @@ void MethodBodyDefaultVisitor::visit(const StreamReturnBody& b) { defaultVisit(b
 void MethodBodyDefaultVisitor::visit(const StreamDeliverBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterUpdateRequestBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterUpdateOfferBody& b) { defaultVisit(b); }
+void MethodBodyDefaultVisitor::visit(const ClusterRetractOfferBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterReadyBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterConfigChangeBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterMessageExpiredBody& b) { defaultVisit(b); }
+void MethodBodyDefaultVisitor::visit(const ClusterErrorCheckBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterShutdownBody& b) { defaultVisit(b); }
+void MethodBodyDefaultVisitor::visit(const ClusterConnectionAnnounceBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterConnectionDeliverCloseBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterConnectionDeliverDoOutputBody& b) { defaultVisit(b); }
+void MethodBodyDefaultVisitor::visit(const ClusterConnectionAbortBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterConnectionConsumerStateBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterConnectionDeliveryRecordBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterConnectionTxStartBody& b) { defaultVisit(b); }
@@ -135,10 +139,12 @@ void MethodBodyDefaultVisitor::visit(const ClusterConnectionAccumulatedAckBody& 
 void MethodBodyDefaultVisitor::visit(const ClusterConnectionSessionStateBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterConnectionShadowReadyBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterConnectionMembershipBody& b) { defaultVisit(b); }
+void MethodBodyDefaultVisitor::visit(const ClusterConnectionRetractOfferBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterConnectionQueuePositionBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterConnectionExchangeBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterConnectionQueueBody& b) { defaultVisit(b); }
 void MethodBodyDefaultVisitor::visit(const ClusterConnectionExpiryIdBody& b) { defaultVisit(b); }
+void MethodBodyDefaultVisitor::visit(const ClusterConnectionAddQueueListenerBody& b) { defaultVisit(b); }
 
 }} // namespace qpid::framing
 

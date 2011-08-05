@@ -333,7 +333,7 @@ struct deleter
 AsynchIO::~AsynchIO() {
     std::for_each( bufferQueue.begin(), bufferQueue.end(), deleter());
     std::for_each( writeQueue.begin(), writeQueue.end(), deleter());
-    if(AIOInstance.get()) AIOInstance.release();
+//    if(AIOInstance.get()) AIOInstance.release();
 }
 
 void AsynchIO::queueForDeletion() {

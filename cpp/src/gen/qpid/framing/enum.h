@@ -169,6 +169,17 @@ enum ReturnCode {
 } // namespace stream
 
 
+namespace cluster {
+
+enum ErrorType {
+    ERROR_TYPE_NONE=0,
+    ERROR_TYPE_SESSION=1,
+    ERROR_TYPE_CONNECTION=2
+};
+
+} // namespace cluster
+
+
 }} // namespace qpid::framing
 
 #endif  /*!QPID_FRAMING_ENUM_H*/

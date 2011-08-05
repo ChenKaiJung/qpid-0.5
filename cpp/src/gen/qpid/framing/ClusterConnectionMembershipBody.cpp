@@ -55,6 +55,14 @@ FieldTable& ClusterConnectionMembershipBody::getMembers() {
 bool ClusterConnectionMembershipBody::hasMembers() const { return flags & (1 << 9); }
 void ClusterConnectionMembershipBody::clearMembersFlag() { flags &= ~(1 << 9); }
 
+void ClusterConnectionMembershipBody::setFrameSeq(const SequenceNumber& _frameSeq) {
+    frameSeq = _frameSeq;
+    flags |= (1 << 10);
+}
+SequenceNumber ClusterConnectionMembershipBody::getFrameSeq() const { return frameSeq; }
+bool ClusterConnectionMembershipBody::hasFrameSeq() const { return flags & (1 << 10); }
+void ClusterConnectionMembershipBody::clearFrameSeqFlag() { flags &= ~(1 << 10); }
+
 void ClusterConnectionMembershipBody::encodeStructBody(Buffer& buffer) const
 {
 encodeHeader(buffer);
@@ -63,6 +71,8 @@ encodeHeader(buffer);
         joiners.encode(buffer);
     if (flags & (1 << 9))
         members.encode(buffer);
+    if (flags & (1 << 10))
+        frameSeq.encode(buffer);
 }
 
 void ClusterConnectionMembershipBody::encode(Buffer& buffer) const
@@ -78,6 +88,8 @@ decodeHeader(buffer);
         joiners.decode(buffer);
     if (flags & (1 << 9))
         members.decode(buffer);
+    if (flags & (1 << 10))
+        frameSeq.decode(buffer);
 }
 
 void ClusterConnectionMembershipBody::decode(Buffer& buffer, uint32_t /*size*/)
@@ -94,6 +106,8 @@ total += headerSize();
         total += joiners.encodedSize();
     if (flags & (1 << 9))
         total += members.encodedSize();
+    if (flags & (1 << 10))
+        total += frameSeq.encodedSize();
     return total;
 }
 
@@ -109,5 +123,7 @@ void ClusterConnectionMembershipBody::print(std::ostream& out) const
         out << "joiners=" << joiners << "; ";
     if (flags & (1 << 9))
         out << "members=" << members << "; ";
+    if (flags & (1 << 10))
+        out << "frame-seq=" << frameSeq << "; ";
     out << "}";
 }

@@ -432,13 +432,19 @@ class AMQP_AllProxy:
         virtual void updateRequest(const string& url);
         
         virtual void updateOffer(uint64_t updatee,
-                    const Uuid& clusterId);
+                    const Uuid& clusterId,
+                    uint32_t version);
+        
+        virtual void retractOffer(uint64_t updatee);
         
         virtual void ready(const string& url);
         
         virtual void configChange(const string& current);
         
         virtual void messageExpired(uint64_t id);
+        
+        virtual void errorCheck(uint8_t type,
+                    const SequenceNumber& frameSeq);
         
         virtual void shutdown();
         
@@ -452,9 +458,13 @@ class AMQP_AllProxy:
         public:
         ClusterConnection(FrameHandler& f) : Proxy(f) {}
         static ClusterConnection& get(AMQP_AllProxy& proxy) { return proxy.getClusterConnection(); }
+        virtual void announce();
+        
         virtual void deliverClose();
         
-        virtual void deliverDoOutput(uint32_t bytes);
+        virtual void deliverDoOutput(uint32_t limit);
+        
+        virtual void abort();
         
         virtual void consumerState(const string& name,
                     bool blocked,
@@ -470,6 +480,7 @@ class AMQP_AllProxy:
                     bool completed,
                     bool ended,
                     bool windowing,
+                    bool enqueued,
                     uint32_t credit);
         
         virtual void txStart();
@@ -498,10 +509,14 @@ class AMQP_AllProxy:
         virtual void shadowReady(uint64_t memberId,
                     uint64_t connectionId,
                     const string& userName,
-                    const string& fragment);
+                    const string& fragment,
+                    uint32_t sendMax);
         
         virtual void membership(const FieldTable& joiners,
-                    const FieldTable& members);
+                    const FieldTable& members,
+                    const SequenceNumber& frameSeq);
+        
+        virtual void retractOffer();
         
         virtual void queuePosition(const string& queue,
                     const SequenceNumber& position);
@@ -511,6 +526,9 @@ class AMQP_AllProxy:
         virtual void queue(const string& encoded);
         
         virtual void expiryId(uint64_t expiryId);
+        
+        virtual void addQueueListener(const string& queue,
+                    uint32_t consumer);
         
     };
     

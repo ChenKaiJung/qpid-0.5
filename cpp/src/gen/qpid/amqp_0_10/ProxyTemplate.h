@@ -844,11 +844,19 @@ class ProxyTemplate
     
     R clusterUpdateOffer(
         Uint64 updatee_,
-        const Uuid& clusterId_
+        const Uuid& clusterId_,
+        Uint32 version_
     )
     {
-        cluster::UpdateOffer updateOffer(updatee_, clusterId_);
+        cluster::UpdateOffer updateOffer(updatee_, clusterId_, version_);
         return functor(updateOffer);
+    }
+    
+    
+    R clusterRetractOffer(Uint64 updatee_)
+    {
+        cluster::RetractOffer retractOffer(updatee_);
+        return functor(retractOffer);
     }
     
     
@@ -873,10 +881,27 @@ class ProxyTemplate
     }
     
     
+    R clusterErrorCheck(
+        const cluster::ErrorType& type_,
+        const SequenceNo& frameSeq_
+    )
+    {
+        cluster::ErrorCheck errorCheck(type_, frameSeq_);
+        return functor(errorCheck);
+    }
+    
+    
     R clusterShutdown()
     {
         cluster::Shutdown shutdown;
         return functor(shutdown);
+    }
+    
+    
+    R clusterConnectionAnnounce()
+    {
+        cluster-connection::Announce announce;
+        return functor(announce);
     }
     
     
@@ -887,10 +912,17 @@ class ProxyTemplate
     }
     
     
-    R clusterConnectionDeliverDoOutput(Uint32 bytes_)
+    R clusterConnectionDeliverDoOutput(Uint32 limit_)
     {
-        cluster-connection::DeliverDoOutput deliverDoOutput(bytes_);
+        cluster-connection::DeliverDoOutput deliverDoOutput(limit_);
         return functor(deliverDoOutput);
+    }
+    
+    
+    R clusterConnectionAbort()
+    {
+        cluster-connection::Abort abort;
+        return functor(abort);
     }
     
     
@@ -916,10 +948,11 @@ class ProxyTemplate
         Bit completed_,
         Bit ended_,
         Bit windowing_,
+        Bit enqueued_,
         Uint32 credit_
     )
     {
-        cluster-connection::DeliveryRecord deliveryRecord(queue_, position_, tag_, id_, acquired_, accepted_, cancelled_, completed_, ended_, windowing_, credit_);
+        cluster-connection::DeliveryRecord deliveryRecord(queue_, position_, tag_, id_, acquired_, accepted_, cancelled_, completed_, ended_, windowing_, enqueued_, credit_);
         return functor(deliveryRecord);
     }
     
@@ -995,21 +1028,30 @@ class ProxyTemplate
         Uint64 memberId_,
         Uint64 connectionId_,
         const Str8& userName_,
-        const Str32& fragment_
+        const Str32& fragment_,
+        Uint32 sendMax_
     )
     {
-        cluster-connection::ShadowReady shadowReady(memberId_, connectionId_, userName_, fragment_);
+        cluster-connection::ShadowReady shadowReady(memberId_, connectionId_, userName_, fragment_, sendMax_);
         return functor(shadowReady);
     }
     
     
     R clusterConnectionMembership(
         const Map& joiners_,
-        const Map& members_
+        const Map& members_,
+        const SequenceNo& frameSeq_
     )
     {
-        cluster-connection::Membership membership(joiners_, members_);
+        cluster-connection::Membership membership(joiners_, members_, frameSeq_);
         return functor(membership);
+    }
+    
+    
+    R clusterConnectionRetractOffer()
+    {
+        cluster-connection::RetractOffer retractOffer;
+        return functor(retractOffer);
     }
     
     
@@ -1041,6 +1083,16 @@ class ProxyTemplate
     {
         cluster-connection::ExpiryId expiryId(expiryId_);
         return functor(expiryId);
+    }
+    
+    
+    R clusterConnectionAddQueueListener(
+        const Str8& queue_,
+        Uint32 consumer_
+    )
+    {
+        cluster-connection::AddQueueListener addQueueListener(queue_, consumer_);
+        return functor(addQueueListener);
     }
   private:
     F functor;

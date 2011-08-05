@@ -113,12 +113,16 @@
 #include "qpid/framing/StreamDeliverBody.h"
 #include "qpid/framing/ClusterUpdateRequestBody.h"
 #include "qpid/framing/ClusterUpdateOfferBody.h"
+#include "qpid/framing/ClusterRetractOfferBody.h"
 #include "qpid/framing/ClusterReadyBody.h"
 #include "qpid/framing/ClusterConfigChangeBody.h"
 #include "qpid/framing/ClusterMessageExpiredBody.h"
+#include "qpid/framing/ClusterErrorCheckBody.h"
 #include "qpid/framing/ClusterShutdownBody.h"
+#include "qpid/framing/ClusterConnectionAnnounceBody.h"
 #include "qpid/framing/ClusterConnectionDeliverCloseBody.h"
 #include "qpid/framing/ClusterConnectionDeliverDoOutputBody.h"
+#include "qpid/framing/ClusterConnectionAbortBody.h"
 #include "qpid/framing/ClusterConnectionConsumerStateBody.h"
 #include "qpid/framing/ClusterConnectionDeliveryRecordBody.h"
 #include "qpid/framing/ClusterConnectionTxStartBody.h"
@@ -131,10 +135,12 @@
 #include "qpid/framing/ClusterConnectionSessionStateBody.h"
 #include "qpid/framing/ClusterConnectionShadowReadyBody.h"
 #include "qpid/framing/ClusterConnectionMembershipBody.h"
+#include "qpid/framing/ClusterConnectionRetractOfferBody.h"
 #include "qpid/framing/ClusterConnectionQueuePositionBody.h"
 #include "qpid/framing/ClusterConnectionExchangeBody.h"
 #include "qpid/framing/ClusterConnectionQueueBody.h"
 #include "qpid/framing/ClusterConnectionExpiryIdBody.h"
+#include "qpid/framing/ClusterConnectionAddQueueListenerBody.h"
 #include "qpid/Exception.h"
 
 
@@ -270,16 +276,20 @@ boost::intrusive_ptr<AMQMethodBody> MethodBodyFactory::create(ClassId c, MethodI
         case 0x80: switch(m) {
             case 0x1: return BodyFactory::create<ClusterUpdateRequestBody>();
             case 0x2: return BodyFactory::create<ClusterUpdateOfferBody>();
+            case 0x3: return BodyFactory::create<ClusterRetractOfferBody>();
             case 0x10: return BodyFactory::create<ClusterReadyBody>();
             case 0x11: return BodyFactory::create<ClusterConfigChangeBody>();
             case 0x12: return BodyFactory::create<ClusterMessageExpiredBody>();
+            case 0x14: return BodyFactory::create<ClusterErrorCheckBody>();
             case 0x20: return BodyFactory::create<ClusterShutdownBody>();
             default: throw Exception(QPID_MSG("Invalid method id " << int(m) << " for class cluster "));
         }
         break;
         case 0x81: switch(m) {
+            case 0x1: return BodyFactory::create<ClusterConnectionAnnounceBody>();
             case 0x2: return BodyFactory::create<ClusterConnectionDeliverCloseBody>();
             case 0x3: return BodyFactory::create<ClusterConnectionDeliverDoOutputBody>();
+            case 0x4: return BodyFactory::create<ClusterConnectionAbortBody>();
             case 0x10: return BodyFactory::create<ClusterConnectionConsumerStateBody>();
             case 0x11: return BodyFactory::create<ClusterConnectionDeliveryRecordBody>();
             case 0x12: return BodyFactory::create<ClusterConnectionTxStartBody>();
@@ -292,10 +302,12 @@ boost::intrusive_ptr<AMQMethodBody> MethodBodyFactory::create(ClassId c, MethodI
             case 0x1F: return BodyFactory::create<ClusterConnectionSessionStateBody>();
             case 0x20: return BodyFactory::create<ClusterConnectionShadowReadyBody>();
             case 0x21: return BodyFactory::create<ClusterConnectionMembershipBody>();
+            case 0x22: return BodyFactory::create<ClusterConnectionRetractOfferBody>();
             case 0x30: return BodyFactory::create<ClusterConnectionQueuePositionBody>();
             case 0x31: return BodyFactory::create<ClusterConnectionExchangeBody>();
             case 0x32: return BodyFactory::create<ClusterConnectionQueueBody>();
             case 0x33: return BodyFactory::create<ClusterConnectionExpiryIdBody>();
+            case 0x34: return BodyFactory::create<ClusterConnectionAddQueueListenerBody>();
             default: throw Exception(QPID_MSG("Invalid method id " << int(m) << " for class cluster-connection "));
         }
         break;

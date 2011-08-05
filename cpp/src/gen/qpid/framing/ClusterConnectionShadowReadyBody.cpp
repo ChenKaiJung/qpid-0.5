@@ -63,6 +63,14 @@ const string& ClusterConnectionShadowReadyBody::getFragment() const { return fra
 bool ClusterConnectionShadowReadyBody::hasFragment() const { return flags & (1 << 11); }
 void ClusterConnectionShadowReadyBody::clearFragmentFlag() { flags &= ~(1 << 11); }
 
+void ClusterConnectionShadowReadyBody::setSendMax(uint32_t _sendMax) {
+    sendMax = _sendMax;
+    flags |= (1 << 12);
+}
+uint32_t ClusterConnectionShadowReadyBody::getSendMax() const { return sendMax; }
+bool ClusterConnectionShadowReadyBody::hasSendMax() const { return flags & (1 << 12); }
+void ClusterConnectionShadowReadyBody::clearSendMaxFlag() { flags &= ~(1 << 12); }
+
 void ClusterConnectionShadowReadyBody::encodeStructBody(Buffer& buffer) const
 {
 encodeHeader(buffer);
@@ -75,6 +83,8 @@ encodeHeader(buffer);
         buffer.putShortString(userName);
     if (flags & (1 << 11))
         buffer.putLongString(fragment);
+    if (flags & (1 << 12))
+        buffer.putLong(sendMax);
 }
 
 void ClusterConnectionShadowReadyBody::encode(Buffer& buffer) const
@@ -94,6 +104,8 @@ decodeHeader(buffer);
         buffer.getShortString(userName);
     if (flags & (1 << 11))
         buffer.getLongString(fragment);
+    if (flags & (1 << 12))
+        sendMax = buffer.getLong();
 }
 
 void ClusterConnectionShadowReadyBody::decode(Buffer& buffer, uint32_t /*size*/)
@@ -114,6 +126,8 @@ total += headerSize();
         total += 1 + userName.size();
     if (flags & (1 << 11))
         total += 4 + fragment.size();
+    if (flags & (1 << 12))
+        total += 4;//sendMax
     return total;
 }
 
@@ -133,5 +147,7 @@ void ClusterConnectionShadowReadyBody::print(std::ostream& out) const
         out << "user-name=" << userName << "; ";
     if (flags & (1 << 11))
         out << "fragment=" << fragment << "; ";
+    if (flags & (1 << 12))
+        out << "send-max=" << sendMax << "; ";
     out << "}";
 }

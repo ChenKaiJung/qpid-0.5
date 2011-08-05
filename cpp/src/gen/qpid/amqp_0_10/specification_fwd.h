@@ -377,9 +377,20 @@ const uint8_t CODE=0x80;
 extern const char* NAME;
 class UpdateRequest;
 class UpdateOffer;
+class RetractOffer;
 class Ready;
 class ConfigChange;
 class MessageExpired;
+
+enum ErrorType {
+    NONE = 0,
+    SESSION = 1,
+    CONNECTION = 2
+};
+inline SerializeAs<ErrorType, uint8_t> serializable(ErrorType& e) {
+    return SerializeAs<ErrorType, uint8_t>(e);
+}
+class ErrorCheck;
 class Shutdown;
 
 } // namespace cluster
@@ -389,8 +400,10 @@ namespace cluster_connection {
 
 const uint8_t CODE=0x81;
 extern const char* NAME;
+class Announce;
 class DeliverClose;
 class DeliverDoOutput;
+class Abort;
 class ConsumerState;
 class DeliveryRecord;
 class TxStart;
@@ -403,10 +416,12 @@ class AccumulatedAck;
 class SessionState;
 class ShadowReady;
 class Membership;
+class RetractOffer;
 class QueuePosition;
 class Exchange;
 class Queue;
 class ExpiryId;
+class AddQueueListener;
 
 } // namespace cluster_connection
 

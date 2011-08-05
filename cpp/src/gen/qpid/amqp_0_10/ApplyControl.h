@@ -64,12 +64,16 @@ struct ApplyVisitor<ControlVisitor, F>:
     virtual void visit(session::Gap& x) { this->invoke(x); }
     virtual void visit(cluster::UpdateRequest& x) { this->invoke(x); }
     virtual void visit(cluster::UpdateOffer& x) { this->invoke(x); }
+    virtual void visit(cluster::RetractOffer& x) { this->invoke(x); }
     virtual void visit(cluster::Ready& x) { this->invoke(x); }
     virtual void visit(cluster::ConfigChange& x) { this->invoke(x); }
     virtual void visit(cluster::MessageExpired& x) { this->invoke(x); }
+    virtual void visit(cluster::ErrorCheck& x) { this->invoke(x); }
     virtual void visit(cluster::Shutdown& x) { this->invoke(x); }
+    virtual void visit(cluster-connection::Announce& x) { this->invoke(x); }
     virtual void visit(cluster-connection::DeliverClose& x) { this->invoke(x); }
     virtual void visit(cluster-connection::DeliverDoOutput& x) { this->invoke(x); }
+    virtual void visit(cluster-connection::Abort& x) { this->invoke(x); }
     virtual void visit(cluster-connection::ConsumerState& x) { this->invoke(x); }
     virtual void visit(cluster-connection::DeliveryRecord& x) { this->invoke(x); }
     virtual void visit(cluster-connection::TxStart& x) { this->invoke(x); }
@@ -82,10 +86,12 @@ struct ApplyVisitor<ControlVisitor, F>:
     virtual void visit(cluster-connection::SessionState& x) { this->invoke(x); }
     virtual void visit(cluster-connection::ShadowReady& x) { this->invoke(x); }
     virtual void visit(cluster-connection::Membership& x) { this->invoke(x); }
+    virtual void visit(cluster-connection::RetractOffer& x) { this->invoke(x); }
     virtual void visit(cluster-connection::QueuePosition& x) { this->invoke(x); }
     virtual void visit(cluster-connection::Exchange& x) { this->invoke(x); }
     virtual void visit(cluster-connection::Queue& x) { this->invoke(x); }
     virtual void visit(cluster-connection::ExpiryId& x) { this->invoke(x); }
+    virtual void visit(cluster-connection::AddQueueListener& x) { this->invoke(x); }
 };
 template <class F>
 struct ApplyVisitor<ConstControlVisitor, F>:
@@ -118,12 +124,16 @@ struct ApplyVisitor<ConstControlVisitor, F>:
     virtual void visit(const session::Gap& x) { this->invoke(x); }
     virtual void visit(const cluster::UpdateRequest& x) { this->invoke(x); }
     virtual void visit(const cluster::UpdateOffer& x) { this->invoke(x); }
+    virtual void visit(const cluster::RetractOffer& x) { this->invoke(x); }
     virtual void visit(const cluster::Ready& x) { this->invoke(x); }
     virtual void visit(const cluster::ConfigChange& x) { this->invoke(x); }
     virtual void visit(const cluster::MessageExpired& x) { this->invoke(x); }
+    virtual void visit(const cluster::ErrorCheck& x) { this->invoke(x); }
     virtual void visit(const cluster::Shutdown& x) { this->invoke(x); }
+    virtual void visit(const cluster-connection::Announce& x) { this->invoke(x); }
     virtual void visit(const cluster-connection::DeliverClose& x) { this->invoke(x); }
     virtual void visit(const cluster-connection::DeliverDoOutput& x) { this->invoke(x); }
+    virtual void visit(const cluster-connection::Abort& x) { this->invoke(x); }
     virtual void visit(const cluster-connection::ConsumerState& x) { this->invoke(x); }
     virtual void visit(const cluster-connection::DeliveryRecord& x) { this->invoke(x); }
     virtual void visit(const cluster-connection::TxStart& x) { this->invoke(x); }
@@ -136,10 +146,12 @@ struct ApplyVisitor<ConstControlVisitor, F>:
     virtual void visit(const cluster-connection::SessionState& x) { this->invoke(x); }
     virtual void visit(const cluster-connection::ShadowReady& x) { this->invoke(x); }
     virtual void visit(const cluster-connection::Membership& x) { this->invoke(x); }
+    virtual void visit(const cluster-connection::RetractOffer& x) { this->invoke(x); }
     virtual void visit(const cluster-connection::QueuePosition& x) { this->invoke(x); }
     virtual void visit(const cluster-connection::Exchange& x) { this->invoke(x); }
     virtual void visit(const cluster-connection::Queue& x) { this->invoke(x); }
     virtual void visit(const cluster-connection::ExpiryId& x) { this->invoke(x); }
+    virtual void visit(const cluster-connection::AddQueueListener& x) { this->invoke(x); }
 };
 
 }} // namespace qpid::amqp_0_10

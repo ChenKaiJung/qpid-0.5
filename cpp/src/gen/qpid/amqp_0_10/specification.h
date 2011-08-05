@@ -3232,6 +3232,7 @@ struct UpdateOffer:
 {
     Uint64 updatee;
     Uuid clusterId;
+    Uint32 version;
     
     static const char* NAME;
     static const uint8_t CODE=0x2;
@@ -3239,30 +3240,64 @@ struct UpdateOffer:
     static const char* CLASS_NAME;
     explicit UpdateOffer(
         Uint64 updatee_=Uint64(),
-        const Uuid& clusterId_=Uuid()
+        const Uuid& clusterId_=Uuid(),
+        Uint32 version_=Uint32()
     );
     void accept(Visitor&);
     void accept(ConstVisitor&) const;
     template <class S> void serialize(S& s) {
-        s(updatee)(clusterId);
+        s(updatee)(clusterId)(version);
     }
     
     struct Handler
     {
         void clusterUpdateOffer(
             Uint64 updatee_,
-            const Uuid& clusterId_
+            const Uuid& clusterId_,
+            Uint32 version_
         );
     };
     
     template <class T> void invoke(T& target)const
     {
-        target.clusterUpdateOffer(updatee, clusterId );
+        target.clusterUpdateOffer(updatee, clusterId, version );
     }
 };
 inline Packer<UpdateOffer> serializable(UpdateOffer& x) { return Packer<UpdateOffer>(x); }
 std::ostream& operator << (std::ostream&, const UpdateOffer&);
 bool operator==(const UpdateOffer&, const UpdateOffer&);
+
+struct RetractOffer:
+    public Control
+{
+    Uint64 updatee;
+    
+    static const char* NAME;
+    static const uint8_t CODE=0x3;
+    static const uint8_t CLASS_CODE=cluster::CODE;
+    static const char* CLASS_NAME;
+    explicit RetractOffer(Uint64 updatee_=Uint64());
+    void accept(Visitor&);
+    void accept(ConstVisitor&) const;
+    template <class S> void serialize(S& s) {
+        s(updatee);
+    }
+    
+    struct Handler
+    {
+        void clusterRetractOffer(
+            Uint64 updatee_
+        );
+    };
+    
+    template <class T> void invoke(T& target)const
+    {
+        target.clusterRetractOffer(updatee );
+    }
+};
+inline Packer<RetractOffer> serializable(RetractOffer& x) { return Packer<RetractOffer>(x); }
+std::ostream& operator << (std::ostream&, const RetractOffer&);
+bool operator==(const RetractOffer&, const RetractOffer&);
 
 struct Ready:
     public Control
@@ -3360,6 +3395,43 @@ inline Packer<MessageExpired> serializable(MessageExpired& x) { return Packer<Me
 std::ostream& operator << (std::ostream&, const MessageExpired&);
 bool operator==(const MessageExpired&, const MessageExpired&);
 
+struct ErrorCheck:
+    public Control
+{
+    ErrorType type;
+    SequenceNo frameSeq;
+    
+    static const char* NAME;
+    static const uint8_t CODE=0x14;
+    static const uint8_t CLASS_CODE=cluster::CODE;
+    static const char* CLASS_NAME;
+    explicit ErrorCheck(
+        const cluster::ErrorType& type_=cluster::ErrorType(),
+        const SequenceNo& frameSeq_=SequenceNo()
+    );
+    void accept(Visitor&);
+    void accept(ConstVisitor&) const;
+    template <class S> void serialize(S& s) {
+        s(type)(frameSeq);
+    }
+    
+    struct Handler
+    {
+        void clusterErrorCheck(
+            const cluster::ErrorType& type_,
+            const SequenceNo& frameSeq_
+        );
+    };
+    
+    template <class T> void invoke(T& target)const
+    {
+        target.clusterErrorCheck(type, frameSeq );
+    }
+};
+inline Packer<ErrorCheck> serializable(ErrorCheck& x) { return Packer<ErrorCheck>(x); }
+std::ostream& operator << (std::ostream&, const ErrorCheck&);
+bool operator==(const ErrorCheck&, const ErrorCheck&);
+
 struct Shutdown:
     public Control
 {
@@ -3395,6 +3467,35 @@ bool operator==(const Shutdown&, const Shutdown&);
 namespace cluster_connection {
 
 
+struct Announce:
+    public Control
+{
+    
+    static const char* NAME;
+    static const uint8_t CODE=0x1;
+    static const uint8_t CLASS_CODE=cluster_connection::CODE;
+    static const char* CLASS_NAME;
+    explicit Announce();
+    void accept(Visitor&);
+    void accept(ConstVisitor&) const;
+    template <class S> void serialize(S&) {}
+    
+    struct Handler
+    {
+        void clusterConnectionAnnounce(
+            
+        );
+    };
+    
+    template <class T> void invoke(T& target)const
+    {
+        target.clusterConnectionAnnounce( );
+    }
+};
+inline Packer<Announce> serializable(Announce& x) { return Packer<Announce>(x); }
+std::ostream& operator << (std::ostream&, const Announce&);
+bool operator==(const Announce&, const Announce&);
+
 struct DeliverClose:
     public Control
 {
@@ -3427,34 +3528,63 @@ bool operator==(const DeliverClose&, const DeliverClose&);
 struct DeliverDoOutput:
     public Control
 {
-    Uint32 bytes;
+    Uint32 limit;
     
     static const char* NAME;
     static const uint8_t CODE=0x3;
     static const uint8_t CLASS_CODE=cluster_connection::CODE;
     static const char* CLASS_NAME;
-    explicit DeliverDoOutput(Uint32 bytes_=Uint32());
+    explicit DeliverDoOutput(Uint32 limit_=Uint32());
     void accept(Visitor&);
     void accept(ConstVisitor&) const;
     template <class S> void serialize(S& s) {
-        s(bytes);
+        s(limit);
     }
     
     struct Handler
     {
         void clusterConnectionDeliverDoOutput(
-            Uint32 bytes_
+            Uint32 limit_
         );
     };
     
     template <class T> void invoke(T& target)const
     {
-        target.clusterConnectionDeliverDoOutput(bytes );
+        target.clusterConnectionDeliverDoOutput(limit );
     }
 };
 inline Packer<DeliverDoOutput> serializable(DeliverDoOutput& x) { return Packer<DeliverDoOutput>(x); }
 std::ostream& operator << (std::ostream&, const DeliverDoOutput&);
 bool operator==(const DeliverDoOutput&, const DeliverDoOutput&);
+
+struct Abort:
+    public Control
+{
+    
+    static const char* NAME;
+    static const uint8_t CODE=0x4;
+    static const uint8_t CLASS_CODE=cluster_connection::CODE;
+    static const char* CLASS_NAME;
+    explicit Abort();
+    void accept(Visitor&);
+    void accept(ConstVisitor&) const;
+    template <class S> void serialize(S&) {}
+    
+    struct Handler
+    {
+        void clusterConnectionAbort(
+            
+        );
+    };
+    
+    template <class T> void invoke(T& target)const
+    {
+        target.clusterConnectionAbort( );
+    }
+};
+inline Packer<Abort> serializable(Abort& x) { return Packer<Abort>(x); }
+std::ostream& operator << (std::ostream&, const Abort&);
+bool operator==(const Abort&, const Abort&);
 
 struct ConsumerState:
     public Control
@@ -3509,6 +3639,7 @@ struct DeliveryRecord:
     Bit completed;
     Bit ended;
     Bit windowing;
+    Bit enqueued;
     Uint32 credit;
     
     static const char* NAME;
@@ -3526,12 +3657,13 @@ struct DeliveryRecord:
         Bit completed_=Bit(),
         Bit ended_=Bit(),
         Bit windowing_=Bit(),
+        Bit enqueued_=Bit(),
         Uint32 credit_=Uint32()
     );
     void accept(Visitor&);
     void accept(ConstVisitor&) const;
     template <class S> void serialize(S& s) {
-        s(queue)(position)(tag)(id)(acquired)(accepted)(cancelled)(completed)(ended)(windowing)(credit);
+        s(queue)(position)(tag)(id)(acquired)(accepted)(cancelled)(completed)(ended)(windowing)(enqueued)(credit);
     }
     
     struct Handler
@@ -3547,13 +3679,14 @@ struct DeliveryRecord:
             Bit completed_,
             Bit ended_,
             Bit windowing_,
+            Bit enqueued_,
             Uint32 credit_
         );
     };
     
     template <class T> void invoke(T& target)const
     {
-        target.clusterConnectionDeliveryRecord(queue, position, tag, id, acquired, accepted, cancelled, completed, ended, windowing, credit );
+        target.clusterConnectionDeliveryRecord(queue, position, tag, id, acquired, accepted, cancelled, completed, ended, windowing, enqueued, credit );
     }
 };
 inline Packer<DeliveryRecord> serializable(DeliveryRecord& x) { return Packer<DeliveryRecord>(x); }
@@ -3842,6 +3975,7 @@ struct ShadowReady:
     Uint64 connectionId;
     Str8 userName;
     Str32 fragment;
+    Uint32 sendMax;
     
     static const char* NAME;
     static const uint8_t CODE=0x20;
@@ -3851,12 +3985,13 @@ struct ShadowReady:
         Uint64 memberId_=Uint64(),
         Uint64 connectionId_=Uint64(),
         const Str8& userName_=Str8(),
-        const Str32& fragment_=Str32()
+        const Str32& fragment_=Str32(),
+        Uint32 sendMax_=Uint32()
     );
     void accept(Visitor&);
     void accept(ConstVisitor&) const;
     template <class S> void serialize(S& s) {
-        s(memberId)(connectionId)(userName)(fragment);
+        s(memberId)(connectionId)(userName)(fragment)(sendMax);
     }
     
     struct Handler
@@ -3865,13 +4000,14 @@ struct ShadowReady:
             Uint64 memberId_,
             Uint64 connectionId_,
             const Str8& userName_,
-            const Str32& fragment_
+            const Str32& fragment_,
+            Uint32 sendMax_
         );
     };
     
     template <class T> void invoke(T& target)const
     {
-        target.clusterConnectionShadowReady(memberId, connectionId, userName, fragment );
+        target.clusterConnectionShadowReady(memberId, connectionId, userName, fragment, sendMax );
     }
 };
 inline Packer<ShadowReady> serializable(ShadowReady& x) { return Packer<ShadowReady>(x); }
@@ -3883,6 +4019,7 @@ struct Membership:
 {
     Map joiners;
     Map members;
+    SequenceNo frameSeq;
     
     static const char* NAME;
     static const uint8_t CODE=0x21;
@@ -3890,30 +4027,61 @@ struct Membership:
     static const char* CLASS_NAME;
     explicit Membership(
         const Map& joiners_=Map(),
-        const Map& members_=Map()
+        const Map& members_=Map(),
+        const SequenceNo& frameSeq_=SequenceNo()
     );
     void accept(Visitor&);
     void accept(ConstVisitor&) const;
     template <class S> void serialize(S& s) {
-        s(joiners)(members);
+        s(joiners)(members)(frameSeq);
     }
     
     struct Handler
     {
         void clusterConnectionMembership(
             const Map& joiners_,
-            const Map& members_
+            const Map& members_,
+            const SequenceNo& frameSeq_
         );
     };
     
     template <class T> void invoke(T& target)const
     {
-        target.clusterConnectionMembership(joiners, members );
+        target.clusterConnectionMembership(joiners, members, frameSeq );
     }
 };
 inline Packer<Membership> serializable(Membership& x) { return Packer<Membership>(x); }
 std::ostream& operator << (std::ostream&, const Membership&);
 bool operator==(const Membership&, const Membership&);
+
+struct RetractOffer:
+    public Control
+{
+    
+    static const char* NAME;
+    static const uint8_t CODE=0x22;
+    static const uint8_t CLASS_CODE=cluster_connection::CODE;
+    static const char* CLASS_NAME;
+    explicit RetractOffer();
+    void accept(Visitor&);
+    void accept(ConstVisitor&) const;
+    template <class S> void serialize(S&) {}
+    
+    struct Handler
+    {
+        void clusterConnectionRetractOffer(
+            
+        );
+    };
+    
+    template <class T> void invoke(T& target)const
+    {
+        target.clusterConnectionRetractOffer( );
+    }
+};
+inline Packer<RetractOffer> serializable(RetractOffer& x) { return Packer<RetractOffer>(x); }
+std::ostream& operator << (std::ostream&, const RetractOffer&);
+bool operator==(const RetractOffer&, const RetractOffer&);
 
 struct QueuePosition:
     public Control
@@ -4047,6 +4215,43 @@ struct ExpiryId:
 inline Packer<ExpiryId> serializable(ExpiryId& x) { return Packer<ExpiryId>(x); }
 std::ostream& operator << (std::ostream&, const ExpiryId&);
 bool operator==(const ExpiryId&, const ExpiryId&);
+
+struct AddQueueListener:
+    public Control
+{
+    Str8 queue;
+    Uint32 consumer;
+    
+    static const char* NAME;
+    static const uint8_t CODE=0x34;
+    static const uint8_t CLASS_CODE=cluster_connection::CODE;
+    static const char* CLASS_NAME;
+    explicit AddQueueListener(
+        const Str8& queue_=Str8(),
+        Uint32 consumer_=Uint32()
+    );
+    void accept(Visitor&);
+    void accept(ConstVisitor&) const;
+    template <class S> void serialize(S& s) {
+        s(queue)(consumer);
+    }
+    
+    struct Handler
+    {
+        void clusterConnectionAddQueueListener(
+            const Str8& queue_,
+            Uint32 consumer_
+        );
+    };
+    
+    template <class T> void invoke(T& target)const
+    {
+        target.clusterConnectionAddQueueListener(queue, consumer );
+    }
+};
+inline Packer<AddQueueListener> serializable(AddQueueListener& x) { return Packer<AddQueueListener>(x); }
+std::ostream& operator << (std::ostream&, const AddQueueListener&);
+bool operator==(const AddQueueListener&, const AddQueueListener&);
 
 } // namespace cluster_connection
 

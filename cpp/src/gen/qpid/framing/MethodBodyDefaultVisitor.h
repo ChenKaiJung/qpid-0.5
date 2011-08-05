@@ -124,12 +124,16 @@ class MethodBodyDefaultVisitor:
     virtual void visit(const StreamDeliverBody&);
     virtual void visit(const ClusterUpdateRequestBody&);
     virtual void visit(const ClusterUpdateOfferBody&);
+    virtual void visit(const ClusterRetractOfferBody&);
     virtual void visit(const ClusterReadyBody&);
     virtual void visit(const ClusterConfigChangeBody&);
     virtual void visit(const ClusterMessageExpiredBody&);
+    virtual void visit(const ClusterErrorCheckBody&);
     virtual void visit(const ClusterShutdownBody&);
+    virtual void visit(const ClusterConnectionAnnounceBody&);
     virtual void visit(const ClusterConnectionDeliverCloseBody&);
     virtual void visit(const ClusterConnectionDeliverDoOutputBody&);
+    virtual void visit(const ClusterConnectionAbortBody&);
     virtual void visit(const ClusterConnectionConsumerStateBody&);
     virtual void visit(const ClusterConnectionDeliveryRecordBody&);
     virtual void visit(const ClusterConnectionTxStartBody&);
@@ -142,10 +146,12 @@ class MethodBodyDefaultVisitor:
     virtual void visit(const ClusterConnectionSessionStateBody&);
     virtual void visit(const ClusterConnectionShadowReadyBody&);
     virtual void visit(const ClusterConnectionMembershipBody&);
+    virtual void visit(const ClusterConnectionRetractOfferBody&);
     virtual void visit(const ClusterConnectionQueuePositionBody&);
     virtual void visit(const ClusterConnectionExchangeBody&);
     virtual void visit(const ClusterConnectionQueueBody&);
     virtual void visit(const ClusterConnectionExpiryIdBody&);
+    virtual void visit(const ClusterConnectionAddQueueListenerBody&);
 };
 
 }} // namespace qpid::framing

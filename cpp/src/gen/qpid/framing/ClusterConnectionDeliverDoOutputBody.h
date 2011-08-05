@@ -39,27 +39,27 @@ namespace qpid {
 namespace framing {
 
 class ClusterConnectionDeliverDoOutputBody : public ModelMethod {
-    uint32_t bytes;
+    uint32_t limit;
     uint16_t flags;
 public:
     static const ClassId CLASS_ID = 0x81;
     static const MethodId METHOD_ID = 0x3;
     ClusterConnectionDeliverDoOutputBody(
-        ProtocolVersion, uint32_t _bytes) : 
-        bytes(_bytes),
+        ProtocolVersion, uint32_t _limit) : 
+        limit(_limit),
         flags(0){
         flags |= (1 << 8);
     }
-    ClusterConnectionDeliverDoOutputBody(ProtocolVersion=ProtocolVersion())  : bytes(0), flags(0) {}
+    ClusterConnectionDeliverDoOutputBody(ProtocolVersion=ProtocolVersion())  : limit(0), flags(0) {}
     
-    void setBytes(uint32_t _bytes);
-    uint32_t getBytes() const;
-    bool hasBytes() const;
-    void clearBytesFlag();
+    void setLimit(uint32_t _limit);
+    uint32_t getLimit() const;
+    bool hasLimit() const;
+    void clearLimitFlag();
     typedef void ResultType;
 
     template <class T> ResultType invoke(T& invocable) const {
-        return invocable.deliverDoOutput(getBytes());
+        return invocable.deliverDoOutput(getLimit());
     }
 
     using  AMQMethodBody::accept;
